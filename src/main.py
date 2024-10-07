@@ -1,17 +1,14 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+
 from .frontend import frontend_page
+from .models import ModelResponse
 
 app = FastAPI()
 
 @app.get("/")
 async def root():
     return HTMLResponse(frontend_page)
-
-# Model response
-class ModelResponse(BaseModel):
-    response: str
 
 @app.post("/run/model")
 async def run_model(file: UploadFile = File(...)) -> ModelResponse:

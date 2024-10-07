@@ -119,5 +119,4 @@ frontend_page = """
     </script>
 </body>
 </html>
-
 """
