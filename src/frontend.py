@@ -97,7 +97,7 @@ frontend_page = """
 
         async function sendAudio(audioBlob) {
             const formData = new FormData();
-            formData.append('file', audioBlob);
+            formData.append('file', audioBlob, 'audio.wav');
 
             try {
                 const response = await fetch(apiUrl, {
@@ -107,7 +107,7 @@ frontend_page = """
 
                 if (response.ok) {
                     const result = await response.json();
-                    resultDiv.innerText = `Response: ${result.message || 'Success!'}`;
+                    resultDiv.innerText = `Response: ${result.response}`;
                 } else {
                     resultDiv.innerText = 'Error uploading audio.';
                 }
@@ -119,4 +119,5 @@ frontend_page = """
     </script>
 </body>
 </html>
+
 """
