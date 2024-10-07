@@ -1,8 +1,8 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
-from .frontend import frontend_page
-from .models import ModelResponse
+from src.frontend.frontend_page import frontend_page
+from src.frontend.models import ModelResponse
 
 app = FastAPI()
 

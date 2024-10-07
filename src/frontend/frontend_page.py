@@ -1,4 +1,3 @@
-
 frontend_page = """
 <!DOCTYPE html>
 <html lang="en">
