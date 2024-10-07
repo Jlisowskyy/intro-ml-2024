@@ -20,10 +20,10 @@ The project task is to develop CNN model for intercom device detecting authorise
 
 ### Project Structure:
 
-├── examples
-├── reports
-└── src
-    └── frontend
+├── examples </br>
+├── reports </br>
+└── src </br>
+    └── frontend </br>
 
 - `examples`: Contains example code using jupyter notebooks.
 - `reports`: Contains reports and documentation created for project milestones etc.
