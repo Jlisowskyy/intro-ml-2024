@@ -16,4 +16,5 @@ httptools~=0.6.1
 watchfiles~=0.24.0
 annotated-types~=0.7.0
 python-multipart
+pylint
 fastapi[standard]

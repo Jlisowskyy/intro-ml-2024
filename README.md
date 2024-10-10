@@ -94,11 +94,11 @@ fastapi dev src/frontend/main.py
 
 ## Authors:
 
-- Jakub Lisowski
-- Michał Kwiatkowski
 - Łukasz Kryczka
-- Kuba Pietrzak
+- Michał Kwiatkowski
+- Jakub Lisowski
 - Tomasz Mycielski
+- Kuba Pietrzak
 
 ## License:
 
