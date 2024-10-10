@@ -6,11 +6,11 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
-from .models import ModelResponse
+from frontend.models import ModelResponse
 
 app = FastAPI()
 
-index_path = Path.resolve(Path(f'{__file__}/../website/index.html'))
+index_path = Path.resolve(Path(f'{__file__}/../index.html'))
 
 with open(index_path, 'r', encoding='utf-8') as f:
     FRONTEND_PAGE = f.read()
