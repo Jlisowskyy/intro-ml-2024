@@ -1,12 +1,14 @@
 """
-File for generating spectrogram
+Module generating spectrogram data
 """
+
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from PIL import Image
+
 
 
 
@@ -42,6 +44,7 @@ def gen_spectrogram(audio_data:np.array, sample_rate:int,
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
+
     if show_axis:
         img = librosa.display.specshow(s_db, sr=sample_rate, fmax=fmax,
                                        x_axis='time', y_axis='mel', ax=ax)
@@ -65,6 +68,7 @@ def gen_spectrogram(audio_data:np.array, sample_rate:int,
 
     return image_array
 
+
 def save_spectogram(spectrogram, file_path):
     """
     Saves spectrogram to file
@@ -73,3 +77,4 @@ def save_spectogram(spectrogram, file_path):
     plt.axis('off')
     plt.savefig(file_path, bbox_inches='tight', pad_inches=0)
     
+
