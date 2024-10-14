@@ -24,6 +24,7 @@ The project task is to develop CNN model for intercom device detecting authorise
 ├── examples
 ├── reports
 └── src
+    ├── audio
     └── frontend
 ```
 

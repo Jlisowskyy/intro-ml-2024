@@ -18,3 +18,7 @@ annotated-types~=0.7.0
 python-multipart
 pylint
 fastapi[standard]
+wave
+numpy
+matplotlib
+scipy
