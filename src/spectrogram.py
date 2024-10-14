@@ -1,4 +1,6 @@
-import os
+"""
+File for generating spectrogram
+"""
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,35 +11,33 @@ from PIL import Image
 
 
 
-"""
-Function generates mel-frequency spectrogram based on audio data. Audio data is a numpy array. It 
-retrurns numpy array that represents - 
-image of spectrogram.
-It uses Mel scale, which is more aligned with human hearing perception. This makes it effective for
-speech or voice-based tasks.
-Mel scale emphasizes the lower frequencies where most of the speech information resides while 
-compressing the higher frequencies.
-This makes Mel spectrogram efficient for voice recognition and voice detection and emotion 
-detection.
-It underline sounds that human ear hears.
-Mel-frequency scale, which is a linear frequency space below 1000 Hz and a logarithmic space above
-1000 Hz.
-"""
+
 def gen_spectrogram(audio_data, sample_rate, save_to_file=False,
                     save_path="./image_spectrograms/spectrogram.png",
                     show_axis=False, width=400, height=300):
+    """
+    Function generates mel-frequency spectrogram based on audio data. Audio data is a numpy array. 
+    It retrurns numpy array that represents - 
+    image of spectrogram.
+    It uses Mel scale, which is more aligned with human hearing perception. This makes it effective 
+    for speech or voice-based tasks.
+    Mel scale emphasizes the lower frequencies where most of the speech information resides while 
+    compressing the higher frequencies.
+    This makes Mel spectrogram efficient for voice recognition and voice detection and emotion 
+    detection.
+    It underline sounds that human ear hears.
+    Mel-frequency scale, which is a linear frequency space below 1000 Hz and a logarithmic space 
+    above 1000 Hz.
+    """
     dpi = 100
     fmax = 8000
-    
     # Generate Mel spectrogram
     s = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate,
                                        n_fft=4096, hop_length=512, n_mels=512, fmax=fmax)
-    s_db = librosa.power_to_db(S, ref=np.max)
+    s_db = librosa.power_to_db(s, ref=np.max)
 
     # Set figure size in inches (for the given width and height in pixels)
-    width_in_inches = width / dpi
-    height_in_inches = height / dpi
-    fig, ax = plt.subplots(figsize=(width_in_inches, height_in_inches), dpi=dpi)
+    fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
     # Display Mel spectrogram with or without axis
     if show_axis:
@@ -69,4 +69,3 @@ def gen_spectrogram(audio_data, sample_rate, save_to_file=False,
     plt.close(fig)
 
     return image_array
-
