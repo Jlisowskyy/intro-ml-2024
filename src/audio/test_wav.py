@@ -31,11 +31,11 @@ def test_display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds
         if i >= num_chunks:
             break
 
-        freqs, times, Sxx = spectrogram(chunk, fs=iterator.get_frame_rate(), nperseg=256)
+        freqs, times, sxx = spectrogram(chunk, fs=iterator.get_frame_rate(), nperseg=256)
 
         plt.figure(figsize=(10, 8))
 
-        plt.pcolormesh(times, freqs, 10 * np.log10(Sxx), shading='gouraud')
+        plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
         plt.ylabel('Frequency [Hz]')
         plt.xlabel('Time [s]')
         plt.title(f'Spectrogram for Chunk {i + 1}')
