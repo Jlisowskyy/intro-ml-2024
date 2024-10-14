@@ -7,13 +7,15 @@ import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from PIL import Image
-import soundfile as sf
+
 
 
 
 """
 Example use:
-audio_file_path="C:/Users/pietr/Documents/studia/machine learning/projekt/cutted_audios/class0/f2_script1_ipad_office1_5000.wav"
+import soundfile as sf
+audio_file_path="C:/Users/pietr/Documents/studia/machine learning/projekt/cutted_audios
+    /class0/f2_script1_ipad_office1_5000.wav"
 audio_data, sample_rate = sf.read(audio_file_path)
 spectrogram=gen_spectrogram(audio_data, sample_rate)
 save_spectogram(spectrogram,"./spectrogram.png")
@@ -37,12 +39,10 @@ def gen_spectrogram(audio_data:np.array, sample_rate:int,
     """
     dpi = 100
     fmax = 8000
-    
     s = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate,
                                        n_fft=4096, hop_length=512, n_mels=512, fmax=fmax)
     s_db = librosa.power_to_db(s, ref=np.max)
 
-    
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
     if show_axis:
