@@ -18,3 +18,4 @@ annotated-types~=0.7.0
 python-multipart
 pylint
 fastapi[standard]
+scikit-learn
