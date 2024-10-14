@@ -21,3 +21,6 @@ matplotlib==3.7.1
 librosa
 pillow
 soundfile
+pylint
+fastapi[standard]
+
