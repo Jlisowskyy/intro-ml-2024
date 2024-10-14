@@ -23,7 +23,7 @@ It underline sounds that human ear hears.
 Mel-frequency scale, which is a linear frequency space below 1000 Hz and a logarithmic space above
 1000 Hz.
 """
-def gen_spectrogram(audio_data, sample_rate, save_to_file=True, 
+def gen_spectrogram(audio_data, sample_rate, save_to_file=False, 
                     save_path="./image_spectrograms/spectrogram.png", 
                     show_axis=False, width=400, height=300):
     dpi = 100
@@ -76,3 +76,5 @@ def save_figure(file_name):
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     output_file_path = os.path.join(output_directory, file_name)
+    
+
