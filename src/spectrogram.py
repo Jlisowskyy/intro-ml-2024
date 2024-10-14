@@ -10,17 +10,6 @@ from PIL import Image
 
 
 
-
-"""
-Example use:
-import soundfile as sf
-audio_file_path="C:/Users/pietr/Documents/studia/machine learning/projekt/cutted_audios
-    /class0/f2_script1_ipad_office1_5000.wav"
-audio_data, sample_rate = sf.read(audio_file_path)
-spectrogram=gen_spectrogram(audio_data, sample_rate)
-save_spectogram(spectrogram,"./spectrogram.png")
-"""
-
 def gen_spectrogram(audio_data:np.array, sample_rate:int,
                     show_axis:bool=False, width:int=400, height:int=300) -> np.array:
     """
@@ -36,6 +25,14 @@ def gen_spectrogram(audio_data:np.array, sample_rate:int,
     It underline sounds that human ear hears.
     Mel-frequency scale, which is a linear frequency space below 1000 Hz and a logarithmic space 
     above 1000 Hz.
+    
+    Example use:
+    import soundfile as sf
+    audio_file_path="C:/Users/pietr/Documents/studia/machine learning/projekt/cutted_audios
+        /class0/f2_script1_ipad_office1_5000.wav"
+    audio_data, sample_rate = sf.read(audio_file_path)
+    spectrogram=gen_spectrogram(audio_data, sample_rate)
+    save_spectogram(spectrogram,"./spectrogram.png")
     """
     dpi = 100
     fmax = 8000
