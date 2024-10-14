@@ -1,6 +1,9 @@
-#
-# Created by: Jakub Lisowski, 2024
-#
+"""
+Author: Jakub Lisowski, 2024
+
+This module provides a simple iterator over the samples of a WAV file.
+
+"""
 
 import wave
 
@@ -8,10 +11,18 @@ import numpy as np
 
 
 class WavIterator:
+    """
+    Iterator over the samples of a WAV file
+
+    The iterator provides a window of samples of a fixed size. The window is moved by half of its
+    size at each iteration.
+    """
+
     # ------------------------------
     # class fields
     # ------------------------------
 
+    #pylint: disable=too-many-instance-attributes
     _file_path: str
     _window_size_frames: int
 
@@ -86,8 +97,7 @@ class WavIterator:
 
         if self._sample_width in types:
             return types[self._sample_width]
-        else:
-            raise ValueError(f"Unsupported sample width: {self._sample_width}")
+        raise ValueError(f"Unsupported sample width: {self._sample_width}")
 
     def get_window_size(self) -> int:
         """
@@ -215,9 +225,11 @@ def load_wav(file_path: str, channel_index: int = 0) -> WavIterator:
     return WavIterator(file_path, channel_index)
 
 
-def load_wav_with_window(file_path: str, window_seconds: float = 0.1, channel_index: int = 0) -> WavIterator:
+def load_wav_with_window(file_path: str, window_seconds: float = 0.1, channel_index: int = 0) \
+        -> WavIterator:
     """
-    Load a WAV file and return an iterator over the samples with a window size being a fraction of the frame rate
+    Load a WAV file and return an iterator over the samples with a window size being a fraction
+    of the frame rate
     :param file_path: Path to the WAV file
     :param window_seconds: Length of each window in seconds
     :param channel_index: Index of the audio channel to process
