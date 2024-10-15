@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
-from frontend.models import ModelResponse
+from src.frontend.models import ModelResponse
 
 app = FastAPI()
 

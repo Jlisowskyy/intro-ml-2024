@@ -23,8 +23,6 @@ pillow
 soundfile
 pylint
 fastapi[standard]
-<<<<<<< HEAD
 scikit-learn
-=======
-
->>>>>>> dev
+wave
+scipy

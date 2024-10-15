@@ -68,7 +68,7 @@
     
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    sendAudio(audioBlob);
+                    await sendAudio(audioBlob);
                 };
     
                 mediaRecorder.start();
@@ -89,7 +89,7 @@
         audioInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
-                sendAudio(file);
+                await sendAudio(file);
             }
         });
 
