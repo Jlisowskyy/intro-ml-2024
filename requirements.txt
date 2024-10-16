@@ -25,3 +25,4 @@ pylint
 fastapi[standard]
 wave
 scipy
+pytest
