@@ -28,15 +28,17 @@ The project task is to develop CNN model for intercom device detecting authorise
 └── src
     ├── audio
     ├── test
+    ├── validation
     └── frontend
 ```
 
 - `examples`: Contains example code using jupyter notebooks.
 - `reports`: Contains reports and documentation created for project milestones etc.
 - `src`: Contains the source code for the project.
-    - `frontend`: Contains the code for the frontend of the project.
+  - `frontend`: Contains the code for the frontend of the project.
   - `audio`: Contains the code for the audio processing part of the project.
   - `test`: Contains the code for testing the project.
+  - `validation`: Contains the code for validation of the project.
 
 ## Usage:
 
