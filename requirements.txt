@@ -23,4 +23,5 @@ pillow
 soundfile
 pylint
 fastapi[standard]
-
+wave
+scipy
