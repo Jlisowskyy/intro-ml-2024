@@ -45,6 +45,9 @@ def display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: flo
 
 
 def example_test_run():
+    """
+    Example test run for the display_spectrogram function
+    """
     display_spectrogram(str(Path.resolve(Path(f'{__file__}/../test.wav'))),
                         num_chunks=10,
                         window_seconds=0.2,
