@@ -2,7 +2,7 @@
 Author: Łukasz Kryczka, 2024
 
 This module provides functionality for normalizing audio signals.
-Currently, supports mean-variance normalization, Per-Channel Energy Normalization (PCEN),
+Currently, supports mean-variance normalization, Per-Channel Energy Normalization (PCEN) and Cepstral Mean and Variance Normalization (CMVN)
 """
 
 from enum import Enum
