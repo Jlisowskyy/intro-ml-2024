@@ -226,8 +226,9 @@ def load_wav(file_path: str, channel_index: int = 0) -> WavIterator:
     return WavIterator(file_path, channel_index)
 
 
-def load_wav_with_window(file_path: str, window_length_seconds: float = 0.1, channel_index: int = 0) \
-        -> WavIterator:
+def load_wav_with_window(file_path: str,
+                         window_length_seconds: float = 0.1,
+                         channel_index: int = 0) -> WavIterator:
     """
     Load a WAV file and return an iterator over the samples with a window size being a fraction
     of the frame rate

@@ -108,7 +108,7 @@ def test_denoise_basic_passband_freq():
     plt.title('Spectrogram after Denoising Passband Frequencies - Manual Check')
     plt.show()
 
-    # TODO: Investigate
+    # NOTE: Investigate
     # ??? The results are not as expected and surprising
 
     assert np.allclose(sine_wave, filtered_wave, atol=0.20), \

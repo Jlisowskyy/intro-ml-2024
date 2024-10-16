@@ -1,4 +1,10 @@
-import logging, sys
+"""
+Author: Łukasz Kryczka, 2024
+
+This module contains the logger utility function to get a FastAPI compatible logger object
+"""
+import logging
+import sys
 
 
 def get_fastapi_logger() -> logging.Logger:
