@@ -7,8 +7,12 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
 from src.frontend.models import ModelResponse
+from src.utils.logger import get_fastapi_logger
 
 app = FastAPI()
+
+logger = get_fastapi_logger()
+logger.info('API is starting up')
 
 index_path = Path.resolve(Path(f'{__file__}/../index.html'))
 
@@ -31,7 +35,12 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
                 response="Invalid file type. Please upload a WAV file.")
 
         contents = await file.read()
-        print(f"Received file of size: {len(contents)} bytes")
+        logger.info("Received file of size: %d bytes", len(contents))
+
+        Path("uploaded_files").mkdir(exist_ok=True)
+        with open("uploaded_files/user-uploaded.wav", "wb") as audio_file:
+            audio_file.write(contents)
+        logger.info("File saved to uploaded_files/user-uploaded.wav")
 
         return ModelResponse(response="SUCCESS")
     except Exception as e:  # pylint: disable=broad-exception-caught

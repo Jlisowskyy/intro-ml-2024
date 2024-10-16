@@ -11,6 +11,7 @@ import pytest
 
 from src.test import test_validator
 from src.test import test_wav
+from src.test import test_denoise
 
 
 def run_pytest() -> None:
@@ -24,7 +25,8 @@ def run_pytest() -> None:
 TEST_CASES: dict[str, Callable[[], None]] = {
     "wav": test_wav.example_test_run,
     "pytest": run_pytest,
-    "validator": test_validator.example_test_run
+    "validator": test_validator.example_test_run,
+    "denoise": test_denoise.example_test_run
 }
 
 
