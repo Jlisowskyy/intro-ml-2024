@@ -226,19 +226,19 @@ def load_wav(file_path: str, channel_index: int = 0) -> WavIterator:
     return WavIterator(file_path, channel_index)
 
 
-def load_wav_with_window(file_path: str, window_seconds: float = 0.1, channel_index: int = 0) \
+def load_wav_with_window(file_path: str, window_length_seconds: float = 0.1, channel_index: int = 0) \
         -> WavIterator:
     """
     Load a WAV file and return an iterator over the samples with a window size being a fraction
     of the frame rate
     :param file_path: Path to the WAV file
-    :param window_seconds: Length of each window in seconds
+    :param window_length_seconds: Length of each window in seconds
     :param channel_index: Index of the audio channel to process
 
     :return: WavIterator object
     """
 
     iterator = WavIterator(file_path, channel_index)
-    iterator.set_window_size(int(iterator.get_frame_rate() * window_seconds))
+    iterator.set_window_size(int(iterator.get_frame_rate() * window_length_seconds))
 
     return iterator
