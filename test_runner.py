@@ -9,6 +9,7 @@ from typing import Callable
 
 import pytest
 
+from src.test import test_validator
 from src.test import test_wav
 
 
@@ -23,6 +24,7 @@ def run_pytest() -> None:
 TEST_CASES: dict[str, Callable[[], None]] = {
     "wav": test_wav.example_test_run,
     "pytest": run_pytest,
+    "validator": test_validator.example_test_run
 }
 
 
