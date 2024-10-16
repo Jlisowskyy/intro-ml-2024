@@ -5,17 +5,23 @@ This module provides functionality for denoising WAV data using simple filters.
 Currently, supports basic denoising for human speech frequencies.
 """
 
+from enum import Enum
 import numpy as np
 from scipy.signal import butter, sosfilt
-from enum import Enum
 
 
 class DenoiseType(Enum):
+    """
+    Enum for different types of denoising.
+    """
     BASIC = 1
-    # NOTE: Future types of denoising can be added here and handled in the denoise function
+    # NOTE: Future types of denoising can be added here and
+    # handled in the denoise function
 
 
-def denoise(chunk: np.ndarray, fs: float, denoise_type: DenoiseType = DenoiseType.BASIC) -> np.ndarray:
+def denoise(chunk: np.ndarray,
+            fs: float,
+            denoise_type: DenoiseType = DenoiseType.BASIC) -> np.ndarray:
     """
     Denoise the given audio chunk using the specified denoise type.
 
@@ -26,8 +32,8 @@ def denoise(chunk: np.ndarray, fs: float, denoise_type: DenoiseType = DenoiseTyp
     """
     if denoise_type == DenoiseType.BASIC:
         return denoise_basic(chunk, fs)
-    else:
-        raise ValueError(f"Unsupported denoise type: {denoise_type}")
+
+    raise ValueError(f"Unsupported denoise type: {denoise_type}")
 
 
 def butter_bandpass(lowcut, highcut, fs, order=18):

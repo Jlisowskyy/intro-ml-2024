@@ -13,7 +13,10 @@ from scipy.signal import spectrogram
 from src.audio.normalize import mean_variance_normalization, pcen_normalization, cmvn_normalization
 
 
-def generate_sine_wave(frequency: int, duration: float, sample_rate: int, amplitude: float = 1.0) -> np.ndarray:
+def generate_sine_wave(frequency: int,
+                       duration: float,
+                       sample_rate: int,
+                       amplitude: float = 1.0) -> np.ndarray:
     """
     Generate a sine wave of a given frequency.
 
@@ -89,12 +92,14 @@ def test_cmvn_normalization() -> None:
     mfccs_mean = np.mean(mfccs, axis=1)
     mfccs_std = np.std(mfccs, axis=1)
 
-    # Skip the first two coefficients as the first one is the energy and the second one is the delta energy
-    # and both are expected to be non-zero
-    assert np.allclose(mfccs_mean[2:], 0, atol=0.12), f"Mean of cepstral coefficients is not close to 0: {mfccs_mean[2:]}"
+    # Skip the first two coefficients as the first one is the energy and
+    # the second one is the delta energy and both are expected to be non-zero
+    assert np.allclose(mfccs_mean[2:], 0, atol=0.12), \
+        f"Mean of cepstral coefficients is not close to 0: {mfccs_mean[2:]}"
     # Allow a larger tolerance for the standard deviation
     # (The not normalized signal has std of order 5e2, and the normalization is not perfect)
-    assert np.allclose(mfccs_std, 1, atol=0.80), f"Standard deviation of cepstral coefficients is not close to 1: {mfccs_std}"
+    assert np.allclose(mfccs_std, 1, atol=0.80), \
+        f"Standard deviation of cepstral coefficients is not close to 1: {mfccs_std}"
 
     freqs, times, sxx = spectrogram(normalized_wave, fs=sample_rate, nperseg=256)
     plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
@@ -106,6 +111,9 @@ def test_cmvn_normalization() -> None:
 
 # Running all tests
 def example_test_run() -> None:
+    """
+    Run all the tests
+    """
     test_mean_variance_normalization()
     test_pcen_normalization()
     test_cmvn_normalization()

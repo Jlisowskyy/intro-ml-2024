@@ -7,12 +7,15 @@ Currently, tests the basic denoising filter.
 
 import numpy as np
 from scipy.io.wavfile import write, read
-from src.audio.denoise import denoise, DenoiseType
 from scipy.signal import spectrogram
 import matplotlib.pyplot as plt
+from src.audio.denoise import denoise, DenoiseType
 
 
-def generate_sine_wave(frequency: int, duration: float, sample_rate: int, amplitude: float = 1.0) -> np.ndarray:
+def generate_sine_wave(frequency: int,
+                       duration: float,
+                       sample_rate: int,
+                       amplitude: float = 1.0) -> np.ndarray:
     """
     Generate a sine wave of a given frequency.
 
@@ -79,7 +82,8 @@ def test_denoise_basic_high_freq_filtering():
 
 def test_denoise_basic_passband_freq():
     """
-    Test that frequencies within the passband (100 Hz - 8000 Hz) are preserved by the denoise_basic filter.
+    Test that frequencies within the passband (100 Hz - 8000 Hz)
+    are preserved by the denoise_basic filter.
     """
     sample_rate = 44100
     duration = 1.0
@@ -107,7 +111,8 @@ def test_denoise_basic_passband_freq():
     # TODO: Investigate
     # ??? The results are not as expected and surprising
 
-    assert np.allclose(sine_wave, filtered_wave, atol=0.20), "Passband frequencies were not preserved"
+    assert np.allclose(sine_wave, filtered_wave, atol=0.20), \
+        "Passband frequencies were not preserved"
 
 
 def test_denoise_basic_mixed_freq():
@@ -139,6 +144,9 @@ def test_denoise_basic_mixed_freq():
 
 # Running all tests
 def example_test_run() -> None:
+    """
+    Run all the tests
+    """
     test_denoise_basic_low_freq_filtering()
     test_denoise_basic_high_freq_filtering()
     test_denoise_basic_passband_freq()
