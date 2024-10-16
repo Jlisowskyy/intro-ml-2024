@@ -46,28 +46,29 @@ class ValidatorObj(ABC):
 
         :param input_data: The input data to validate the classifier [data, expected_output]
         """
-        pass
+        ...
 
     @abstractmethod
     def display_graphical_result(self) -> None:
         """
         Display the validation result in a graphical form
         """
-        pass
+        ...
 
     @abstractmethod
     def get_textual_result(self) -> str:
         """
         Get the validation result in a textual form
         """
-        pass
+        ...
 
 
 class Validator:
     """
     Validator class
 
-    Class used to validate the classifier by measuring various metrics and displaying them at the end
+    Class used to validate the classifier by measuring various metrics and displaying them at the
+    end
 
     :param classifier: The classifier function to validate
     """

@@ -22,6 +22,10 @@ def test_classifier(_: np.ndarray) -> int:
 
 
 def false_acceptance_ratio_test() -> None:
+    """
+    Simply uses simulated classifier to test the False Acceptance Ratio by validating random data
+    """
+
     print("False Acceptance Ratio test: ")
     validator = Validator(test_classifier, [FalseAcceptanceRatio])
 
@@ -33,6 +37,10 @@ def false_acceptance_ratio_test() -> None:
 
 
 def false_rejection_ratio_test() -> None:
+    """
+    Simply uses simulated classifier to test the False Rejection Ratio by validating random data
+    """
+
     print("False Rejection Ratio test: ")
     validator = Validator(test_classifier, [FalseRejectionRatio])
 
@@ -44,6 +52,12 @@ def false_rejection_ratio_test() -> None:
 
 
 def validator_test() -> None:
+    """
+    Simply uses simulated classifier to test the Validator by validating random data
+
+    Uses multiple validation objects
+    """
+
     print("Validator test: ")
     validator = Validator(test_classifier, [FalseRejectionRatio, FalseAcceptanceRatio])
 
@@ -55,6 +69,10 @@ def validator_test() -> None:
 
 
 def example_test_run() -> None:
+    """
+    Run all the validation objects tests
+    """
+
     false_acceptance_ratio_test()
     print("-" * 50)
     false_rejection_ratio_test()

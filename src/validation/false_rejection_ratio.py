@@ -67,7 +67,7 @@ class FalseRejectionRatio(ValidatorObj):
         Display the validation result in a graphical form
         """
 
-        pass
+        return
 
     def get_textual_result(self) -> str:
         """
