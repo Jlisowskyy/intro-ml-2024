@@ -39,7 +39,6 @@ def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
 
 
 def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
-    #pylint: disable=line-too-long
     """
     Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
 
@@ -69,6 +68,7 @@ def pcen_normalization(signal: np.ndarray,
                        delta: float = 2,
                        r: float = 0.5,
                        eps: float = 1e-6) -> np.ndarray:
+    # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
 
