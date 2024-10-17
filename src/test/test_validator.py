@@ -13,7 +13,7 @@ from src.validation.validator import Validator
 TEST_CHUNKS = 1000
 
 
-def test_classifier(_: np.ndarray) -> int:
+def mocked_classifier(_: np.ndarray) -> int:
     """
     Simulates classifier by returning random result
     """
@@ -27,7 +27,7 @@ def false_acceptance_ratio_test() -> None:
     """
 
     print("False Acceptance Ratio test: ")
-    validator = Validator(test_classifier, [FalseAcceptanceRatio])
+    validator = Validator(mocked_classifier, [FalseAcceptanceRatio])
 
     for _ in range(TEST_CHUNKS):
         validator.validate((np.ndarray([]), 0))
@@ -42,7 +42,7 @@ def false_rejection_ratio_test() -> None:
     """
 
     print("False Rejection Ratio test: ")
-    validator = Validator(test_classifier, [FalseRejectionRatio])
+    validator = Validator(mocked_classifier, [FalseRejectionRatio])
 
     for _ in range(TEST_CHUNKS):
         validator.validate((np.ndarray([]), 1))
@@ -59,7 +59,7 @@ def validator_test() -> None:
     """
 
     print("Validator test: ")
-    validator = Validator(test_classifier, [FalseRejectionRatio, FalseAcceptanceRatio])
+    validator = Validator(mocked_classifier, [FalseRejectionRatio, FalseAcceptanceRatio])
 
     for _ in range(TEST_CHUNKS):
         validator.validate((np.ndarray([]), np.random.randint(2)))
