@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Author: Jakub Lisowski, 2024
 
@@ -407,7 +408,8 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
                                   window_length_seconds: float,
                                   iterator_type: WavIteratorType) -> None:
     """
-    Cut the WAV file into chunks and save them as separate files with index suffix: {FILE}_{INDEX}.wav
+    Cut the WAV file into chunks and save them as separate files with index suffix:
+    {FILE}_{INDEX}.wav
     """
 
     os.makedirs(destination_dir, exist_ok=True)
@@ -427,7 +429,7 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
         flat_chunk = meaned_array.flatten().astype(dtype)
 
         output_file = os.path.join(destination_dir,
-                                   f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
+            f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
 
         with wave.open(output_file, 'wb') as wav_file:
             wav_file.setnchannels(1)
