@@ -238,14 +238,14 @@ class WavIteratorBase(ABC):
 
         return self
 
-    def __next__(self) -> np.ndarray:
+    def __next__(self) -> np.array:
         """
         Return the next window of samples
 
         :return: Array of samples
         """
 
-        return self._get_next()
+        return self._get_next().flatten()
 
 
 class OverlappingWavIterator(WavIteratorBase):
@@ -413,15 +413,18 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
     os.makedirs(destination_dir, exist_ok=True)
 
     iters: list[WavIteratorBase] = [
-        load_wav_with_window(file_path, window_length_seconds, 0, iterator_type)
+        load_wav_with_window(file_path, window_length_seconds, 0, iterator_type),
     ]
 
     for i in range(1, iters[0].get_num_channels()):
         iters.append(load_wav_with_window(file_path, window_length_seconds, i, iterator_type))
 
-    for index, chunk in enumerate(zip(*iters)):
-        mean_chunk = np.mean(chunk, axis=0)
-        flat_chunk = mean_chunk.tolist()
+    for index, chunks in enumerate(zip(*iters)):
+        stacked_array = np.stack(chunks, axis=0)
+        meaned_array = np.mean(stacked_array, axis=0)
+
+        dtype = stacked_array.dtype
+        flat_chunk = meaned_array.flatten().astype(dtype)
 
         output_file = os.path.join(destination_dir,
                                    f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
