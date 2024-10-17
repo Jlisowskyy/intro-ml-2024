@@ -6,6 +6,11 @@ datasets/*
 # torch models
 *.pth
 
+uploaded_files/
+test.wav
+
+# Created by the program dynamically
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
