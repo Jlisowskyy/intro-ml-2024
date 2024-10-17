@@ -4,7 +4,6 @@ Author: Łukasz Kryczka, 2024
 This module provides functionality for normalizing audio signals.
 """
 
-# pylint: skip-file
 from enum import Enum
 
 import librosa.feature
@@ -69,6 +68,7 @@ def pcen_normalization(signal: np.ndarray,
                        delta: float = 2,
                        r: float = 0.5,
                        eps: float = 1e-6) -> np.ndarray:
+    # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
 

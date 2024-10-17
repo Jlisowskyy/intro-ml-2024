@@ -3,7 +3,6 @@ Author: Jakub Lisowski, 2024
 
 Simple test starting script
 """
-# pylint: skip-file
 
 import sys
 from typing import Callable
