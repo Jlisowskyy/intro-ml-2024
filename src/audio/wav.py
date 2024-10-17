@@ -440,6 +440,7 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
                 wav_file.setnframes(len(flat_chunk))
 
                 wav_file.writeframes(np.array(flat_chunk).tobytes())
+        # pylint: disable=broad-except
         except Exception as e:
             print(f"Error while processing {output_file}: {e}")
             os.remove(output_file)
