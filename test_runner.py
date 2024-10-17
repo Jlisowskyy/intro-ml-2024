@@ -13,6 +13,7 @@ from src.test import test_validator
 from src.test import test_wav
 from src.test import test_denoise
 from src.test import test_pipeline
+from src.test import test_detect_speech
 
 
 def run_pytest() -> None:
@@ -28,7 +29,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "pytest": run_pytest,
     "validator": test_validator.example_test_run,
     "denoise": test_denoise.example_test_run,
-    "pipeline": test_pipeline.example_test_run
+    "pipeline": test_pipeline.example_test_run,
+    "speech_detection": test_detect_speech.example_test_run
 }
 
 
