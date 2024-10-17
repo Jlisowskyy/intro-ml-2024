@@ -11,7 +11,7 @@ from typing import Callable
 import numpy as np
 from scipy.io.wavfile import write
 
-from src.audio.wav import load_wav_with_window
+from src.audio.wav import load_wav_with_window, WavIteratorType
 
 AMPLITUDE: float = 0.5
 FREQUENCY: int = 960
@@ -73,7 +73,7 @@ def artificial_wav(fps: int, duration: float, np_dtype: str):
     remove_artificial_wav()
 
 
-CASES: list[tuple[int, float, str, float, int]] = [
+OVERLAPPING_CASES: list[tuple[int, float, str, float, int]] = [
     (44100, 1.0, "uint8", 0.2, 9),
     (44100, 1.0, "int16", 0.2, 9),
     (44100, 1.0, "int32", 0.2, 9),
@@ -87,14 +87,40 @@ CASES: list[tuple[int, float, str, float, int]] = [
 ]
 
 
-def test_wav_iter_count():
+def test_wav_iter_count_overlapping() -> None:
     """
     Test the number of iterations over the artificial WAV file
     """
 
-    for fps, duration, np_dtype, window_seconds, expected_iterations in CASES:
+    for fps, duration, np_dtype, window_seconds, expected_iterations in OVERLAPPING_CASES:
         with artificial_wav(fps, duration, np_dtype):
-            iterator = load_wav_with_window(FILE, window_seconds)
+            iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.OVERLAPPING)
+            iterations = sum(1 for _ in iterator)
+
+            assert iterations == expected_iterations
+
+
+PLAIN_CASES: list[tuple[int, float, str, float, int]] = [
+    (44100, 1.0, "uint8", 0.2, 5),
+    (44100, 1.0, "int16", 0.2, 5),
+    (44100, 1.0, "int32", 0.2, 5),
+    (22050, 1.0, "uint8", 0.2, 5),
+    (22050, 1.0, "int16", 0.2, 5),
+    (22050, 1.0, "int32", 0.2, 5),
+    (44100, 2.0, "uint8", 0.2, 10),
+    (44100, 2.0, "int16", 0.2, 10),
+    (44100, 2.0, "int32", 0.2, 10),
+    (44100, 0, "uint8", 0.2, 0),
+]
+
+def test_wav_iter_count_plain() -> None:
+    """
+    Test the number of iterations over the artificial WAV file
+    """
+
+    for fps, duration, np_dtype, window_seconds, expected_iterations in PLAIN_CASES:
+        with artificial_wav(fps, duration, np_dtype):
+            iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.PLAIN)
             iterations = sum(1 for _ in iterator)
 
             assert iterations == expected_iterations

@@ -13,6 +13,8 @@ from scipy.signal import spectrogram
 # pylint: disable=import-error
 from src.audio.wav import load_wav_with_window
 
+TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/test.wav')))
+
 
 def display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: float = 0.4,
                         channel_index: int = 0):
@@ -44,11 +46,12 @@ def display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: flo
         plt.show()
 
 
-def example_test_run():
+def manual_test():
     """
     Run all the tests
     """
-    display_spectrogram(str(Path.resolve(Path(f'{__file__}/../test.wav'))),
+
+    display_spectrogram(TEST_FILE_PATH,
                         num_chunks=10,
                         window_seconds=0.2,
                         channel_index=0)

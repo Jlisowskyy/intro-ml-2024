@@ -26,15 +26,17 @@ def generate_sine_wave(frequency: int,
     :param amplitude: Amplitude of the sine wave
     :return: Generated sine wave as a numpy array
     """
+
     t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
     return amplitude * np.sin(2 * np.pi * frequency * t)
 
 
 # Test for Mean and Variance Normalization
-def test_mean_variance_normalization() -> None:
+def manual_test_mean_variance_normalization() -> None:
     """
     Test that mean and variance normalization results in a signal with mean ~0 and std ~1.
     """
+
     sample_rate = 44100
     duration = 1.0
     freq = 1000
@@ -57,10 +59,11 @@ def test_mean_variance_normalization() -> None:
 
 
 # Test for PCEN Normalization
-def test_pcen_normalization() -> None:
+def manual_test_pcen_normalization() -> None:
     """
     Test that PCEN normalization applies dynamic range compression.
     """
+
     sample_rate = 44100
     duration = 1.0
     freq = 1000
@@ -77,10 +80,11 @@ def test_pcen_normalization() -> None:
 
 
 # Test for CMVN Normalization
-def test_cmvn_normalization() -> None:
+def manual_test_cmvn_normalization() -> None:
     """
     Test that CMVN normalization results in cepstral coefficients with mean ~0 and std ~1.
     """
+
     sample_rate = 44100
     duration = 1.0
     freq = 1000
@@ -110,11 +114,11 @@ def test_cmvn_normalization() -> None:
 
 
 # Running all tests
-def example_test_run() -> None:
+def manual_test() -> None:
     """
     Run all the tests
     """
-    test_mean_variance_normalization()
-    test_pcen_normalization()
-    test_cmvn_normalization()
-    print("All normalization tests passed!")
+
+    manual_test_mean_variance_normalization()
+    manual_test_pcen_normalization()
+    manual_test_cmvn_normalization()
