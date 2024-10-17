@@ -13,6 +13,8 @@ import numpy as np
 class NormalizationType(Enum):
     """
     Enum for different types of normalization.
+    Future types of normalization can be added here and
+    handled in the normalize function
     """
 
     MEAN_VARIANCE = 1

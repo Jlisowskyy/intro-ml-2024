@@ -85,7 +85,6 @@ def test_denoise_basic_high_freq_filtering() -> None:
 
     assert np.max(np.abs(filtered_wave)) < 0.10, "High frequencies were not properly reduced"
 
-
 def manual_test_denoise_basic_passband_freq() -> None:
     """
     Test that frequencies within the passband (100 Hz - 8000 Hz)
@@ -120,7 +119,6 @@ def manual_test_denoise_basic_passband_freq() -> None:
 
     assert np.allclose(sine_wave, filtered_wave, atol=0.20), \
         "Passband frequencies were not preserved"
-
 
 def manual_test_denoise_basic_mixed_freq() -> None:
     """

@@ -14,6 +14,8 @@ from scipy.signal import butter, sosfilt
 class DenoiseType(Enum):
     """
     Enum for different types of denoising.
+    Future types of denoising can be added here and
+    handled in the denoise function
     """
 
     BASIC = 1
