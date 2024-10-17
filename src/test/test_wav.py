@@ -44,7 +44,7 @@ def display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: flo
         plt.show()
 
 
-def example_test_run():
+def manual_test():
     """
     Run all the tests
     """

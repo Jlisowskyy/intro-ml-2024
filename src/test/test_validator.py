@@ -68,7 +68,7 @@ def validator_test() -> None:
     validator.display_graphical_result()
 
 
-def example_test_run() -> None:
+def manual_test() -> None:
     """
     Run all the validation objects tests
     """
