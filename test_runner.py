@@ -9,9 +9,12 @@ from typing import Callable
 
 import pytest
 
+from src.test import test_cnn
+from src.test import test_cut_wav
+from src.test import test_denoise
+from src.test import test_normalize
 from src.test import test_validator
 from src.test import test_wav
-from src.test import test_denoise
 from src.test import test_pipeline
 from src.test import test_detect_speech
 
@@ -25,14 +28,16 @@ def run_pytest() -> None:
 
 
 TEST_CASES: dict[str, Callable[[], None]] = {
-    "wav": test_wav.example_test_run,
+    "wav": test_wav.manual_test,
     "pytest": run_pytest,
-    "validator": test_validator.example_test_run,
-    "denoise": test_denoise.example_test_run,
+    "validator": test_validator.manual_test,
+    "denoise": test_denoise.manual_test,
+    "normalize": test_normalize.manual_test,
+    "cut_wav": test_cut_wav.manual_test,
+    "cnn": test_cnn.manual_test,
     "pipeline": test_pipeline.example_test_run,
     "speech_detection": test_detect_speech.example_test_run
 }
-
 
 def display_help() -> None:
     """

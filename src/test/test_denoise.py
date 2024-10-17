@@ -5,10 +5,11 @@ Test cases for the denoise module.
 Currently, tests the basic denoising filter.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io.wavfile import write, read
 from scipy.signal import spectrogram
-import matplotlib.pyplot as plt
+
 from src.audio.denoise import denoise, DenoiseType
 
 
@@ -25,6 +26,7 @@ def generate_sine_wave(frequency: int,
     :param amplitude: Amplitude of the sine wave
     :return: Generated sine wave as a numpy array
     """
+
     t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
     return amplitude * np.sin(2 * np.pi * frequency * t)
 
@@ -37,6 +39,7 @@ def save_wave(file_name: str, data: np.ndarray, sample_rate: int) -> None:
     :param data: Audio data
     :param sample_rate: Sample rate of the data
     """
+
     write(file_name, sample_rate, data)
 
 
@@ -47,6 +50,7 @@ def load_wave(file_name: str) -> tuple[int, np.ndarray]:
     :param file_name: File name to load
     :return: Sample rate and audio data as numpy array
     """
+
     return read(file_name)
 
 
@@ -56,6 +60,7 @@ def test_denoise_basic_low_freq_filtering() -> None:
     """
     Test that frequencies below 50 Hz are reduced by the denoise_basic filter.
     """
+
     sample_rate = 44100
     duration = 1.0
     low_freq = 20
@@ -70,6 +75,7 @@ def test_denoise_basic_high_freq_filtering() -> None:
     """
     Test that frequencies above 8500 Hz are reduced by the denoise_basic filter.
     """
+
     sample_rate = 44100
     duration = 1.0
     high_freq = 16500
@@ -79,12 +85,12 @@ def test_denoise_basic_high_freq_filtering() -> None:
 
     assert np.max(np.abs(filtered_wave)) < 0.10, "High frequencies were not properly reduced"
 
-
-def test_denoise_basic_passband_freq() -> None:
+def manual_test_denoise_basic_passband_freq() -> None:
     """
     Test that frequencies within the passband (100 Hz - 8000 Hz)
     are preserved by the denoise_basic filter.
     """
+
     sample_rate = 44100
     duration = 1.0
     passband_freq = 2000
@@ -114,11 +120,11 @@ def test_denoise_basic_passband_freq() -> None:
     assert np.allclose(sine_wave, filtered_wave, atol=0.20), \
         "Passband frequencies were not preserved"
 
-
-def test_denoise_basic_mixed_freq() -> None:
+def manual_test_denoise_basic_mixed_freq() -> None:
     """
     Test that a mixture of frequencies is correctly filtered by the denoise_basic filter.
     """
+
     sample_rate = 44100
     duration = 1.0
     low_freq = 50
@@ -143,12 +149,10 @@ def test_denoise_basic_mixed_freq() -> None:
 
 
 # Running all tests
-def example_test_run() -> None:
+def manual_test() -> None:
     """
     Run all the tests
     """
-    test_denoise_basic_low_freq_filtering()
-    test_denoise_basic_high_freq_filtering()
-    test_denoise_basic_passband_freq()
-    test_denoise_basic_mixed_freq()
-    print("All denoise tests passed!")
+
+    manual_test_denoise_basic_passband_freq()
+    manual_test_denoise_basic_mixed_freq()

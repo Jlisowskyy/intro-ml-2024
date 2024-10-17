@@ -2,18 +2,13 @@
 Author: Łukasz Kryczka, 2024
 
 This module provides functionality for normalizing audio signals.
-Currently, supports mean-variance normalization, Per-Channel Energy Normalization (PCEN)
-and Cepstral Mean and Variance Normalization (CMVN)
 """
 
 from enum import Enum
-import numpy as np
-import librosa.feature
 
-# Ideas for mean-variance normalization and PCEN normalization taken from:
-# https://bioacoustics.stackexchange.com/questions/846/should-we-normalize-audio-before-training-a-ml-model
-# Ideas for CMVN normalization taken from:
-# https://en.wikipedia.org/wiki/Cepstral_mean_and_variance_normalization
+import librosa.feature
+import numpy as np
+
 
 class NormalizationType(Enum):
     """
@@ -21,6 +16,7 @@ class NormalizationType(Enum):
     Future types of normalization can be added here and
     handled in the normalize function
     """
+
     MEAN_VARIANCE = 1
     PCEN = 2
     CMVN = 3
@@ -34,6 +30,7 @@ def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
     :param signal: Input audio signal (numpy array)
     :return: Normalized audio signal
     """
+
     mean = np.mean(signal)
     std = np.std(signal)
     std = np.maximum(std, 1e-8)
@@ -41,14 +38,17 @@ def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
     return normalized_signal
 
 
-def cmvn_normalization(signal: np.ndarray, fs: int) -> np.ndarray:
+def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
     """
     Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
+
+    Source: https://en.wikipedia.org/wiki/Cepstral_mean_and_variance_normalization
 
     :param signal: Input audio signal (numpy array)
     :param fs: Sampling rate
     :return: CMVN normalized audio signal (numpy array)
     """
+
     mfccs = librosa.feature.mfcc(y=signal, sr=fs, n_mfcc=13)
 
     mfccs_mean = np.mean(mfccs, axis=1, keepdims=True)
@@ -62,14 +62,17 @@ def cmvn_normalization(signal: np.ndarray, fs: int) -> np.ndarray:
 
 
 def pcen_normalization(signal: np.ndarray,
-                       fs: int,
-                       time_constant=0.06,
-                       alpha=0.98,
-                       delta=2,
-                       r=0.5,
-                       eps=1e-6) -> np.ndarray:
+                       fs: float,
+                       time_constant: float = 0.06,
+                       alpha: float = 0.98,
+                       delta: float = 2,
+                       r: float = 0.5,
+                       eps: float = 1e-6) -> np.ndarray:
+    # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
+
+    Source: https://bioacoustics.stackexchange.com/questions/846/should-we-normalize-audio-before-training-a-ml-model
 
     :param signal: Input audio signal (numpy array)
     :param fs: Sampling rate
@@ -80,6 +83,7 @@ def pcen_normalization(signal: np.ndarray,
     :param eps: Small constant to avoid division by zero
     :return: PCEN normalized audio signal (numpy array)
     """
+
     s = np.abs(librosa.stft(signal)) ** 2
     m = librosa.pcen(s, sr=fs, hop_length=512,
                      gain=alpha, bias=delta,
@@ -90,7 +94,7 @@ def pcen_normalization(signal: np.ndarray,
 
 
 def normalize(signal: np.ndarray,
-              fs: int,
+              fs: float,
               normalization_type: NormalizationType,
               *args) -> np.ndarray:
     """
@@ -102,6 +106,7 @@ def normalize(signal: np.ndarray,
     :param args: Additional arguments to pass to the normalization functions
     :return: Normalized audio signal (numpy array)
     """
+
     if normalization_type == NormalizationType.MEAN_VARIANCE:
         return mean_variance_normalization(signal)
     if normalization_type == NormalizationType.PCEN:
