@@ -33,11 +33,10 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "denoise": test_denoise.manual_test,
     "normalize": test_normalize.manual_test,
     "cut_wav": test_cut_wav.manual_test,
-    "cnn": test_cnn.manual_test
+    "cnn": test_cnn.manual_test,
     "pipeline": test_pipeline.example_test_run,
     "speech_detection": test_detect_speech.example_test_run
 }
-
 
 def display_help() -> None:
     """
