@@ -14,7 +14,15 @@ class AudioNormalizer:
 
     normalization_type = NormalizationType.CMVN
     def __init__(self, normalization_type: NormalizationType = NormalizationType.CMVN) -> None:
-        """Initializes the AudioNormalizer."""
+        """
+        Initializes the AudioNormalizer.
+
+        Parameters:
+        normalization_type (NormalizationType): Type of normalization to perform.
+
+        Returns:
+        None
+        """
         self.normalization_type = normalization_type
         return
 

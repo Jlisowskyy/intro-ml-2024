@@ -17,6 +17,12 @@ class AudioCleaner:
     def __init__(self, denoise_type: DenoiseType = DenoiseType.BASIC) -> None:
         """
         Initializes the AudioCleaner.
+
+        Parameters:
+        denoise_type (DenoiseType): Type of denoising to perform (from DenoiseType enum).
+
+        Returns:
+        None
         """
         self.denoise_type = denoise_type
         return
