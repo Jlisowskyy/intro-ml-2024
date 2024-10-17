@@ -37,6 +37,7 @@ def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
 
 
 def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
+    #pylint: disable=line-too-long
     """
     Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
 

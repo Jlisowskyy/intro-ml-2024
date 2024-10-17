@@ -86,7 +86,7 @@ def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: 
     epochs: :class:`int`
         set amount of epochs to train the model
     """
-    
+
     for i in range(epochs):
         print(f"Epoch {i+1}")
         train_single_epoch(model, data_loader, loss_fn, optim, device)
