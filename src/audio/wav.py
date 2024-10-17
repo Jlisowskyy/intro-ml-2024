@@ -5,6 +5,7 @@ This module provides a simple iterator over the samples of a WAV file.
 
 """
 
+import os
 import wave
 from abc import ABC, abstractmethod
 from enum import IntEnum
@@ -400,3 +401,36 @@ def load_wav_with_window(file_path: str,
 
     iterator.set_window_size(int(iterator.get_frame_rate() * window_length_seconds))
     return iterator
+
+
+def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
+                                  window_length_seconds: float,
+                                  iterator_type: WavIteratorType) -> None:
+    """
+    Cut the WAV file into chunks and save them as separate files with index suffix: {FILE}_{INDEX}.wav
+    """
+
+    os.makedirs(destination_dir, exist_ok=True)
+
+    iters: list[WavIteratorBase] = [
+        load_wav_with_window(file_path, window_length_seconds, 0, iterator_type)
+    ]
+
+    for i in range(1, iters[0].get_num_channels()):
+        iters.append(load_wav_with_window(file_path, window_length_seconds, i, iterator_type))
+
+    for index, chunk in enumerate(zip(*iters)):
+        mean_chunk = np.mean(chunk, axis=0)
+        flat_chunk = mean_chunk.tolist()
+
+        output_file = os.path.join(destination_dir,
+                                   f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
+
+        with wave.open(output_file, 'w') as wav_file:
+            wav_file.setnchannels(0)
+            wav_file.setsampwidth(iters[0].get_sample_width())
+            wav_file.setframerate(iters[0].get_frame_rate())
+            wav_file.setcomptype('NONE', 'not compressed')
+            wav_file.setnframes(len(flat_chunk))
+
+            wav_file.writeframes(np.array(flat_chunk).tobytes())
