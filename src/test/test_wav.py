@@ -50,6 +50,7 @@ def manual_test():
     """
     Run all the tests
     """
+
     display_spectrogram(TEST_FILE_PATH,
                         num_chunks=10,
                         window_seconds=0.2,

@@ -19,7 +19,7 @@ def manual_cut_test() -> None:
     cut_file_to_plain_chunk_files(
         TEST_DATA_PATH,
         TEST_OUT_DIR,
-        5,
+        20,
         WavIteratorType.PLAIN)
 
 

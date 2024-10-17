@@ -426,8 +426,8 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
         output_file = os.path.join(destination_dir,
                                    f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
 
-        with wave.open(output_file, 'w') as wav_file:
-            wav_file.setnchannels(0)
+        with wave.open(output_file, 'wb') as wav_file:
+            wav_file.setnchannels(1)
             wav_file.setsampwidth(iters[0].get_sample_width())
             wav_file.setframerate(iters[0].get_frame_rate())
             wav_file.setcomptype('NONE', 'not compressed')
