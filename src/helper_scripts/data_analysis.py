@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 """
 Helper script for generating DAPS dataset annotations
 """
@@ -5,7 +6,7 @@ from os import walk
 from os.path import join
 from scipy.io import wavfile
 
-SR_ANOMALY = False
+sr_anomaly = False
 min_len = float('inf')
 max_len = 0
 
@@ -18,11 +19,11 @@ for root, dirs, files in walk('./datasets/daps'):
         duration = len(data) / sr
         print(f'{i}: {sr} Hz, {duration} s')
         if sr != 44100:
-            SR_ANOMALY = True
+            sr_anomaly = True
         min_len = min(min_len, duration)
         max_len = max(max_len, duration)
 
-if SR_ANOMALY:
+if sr_anomaly:
     print('Not every file is 44.1 kHz')
 else:
     print('Every file is 44.1 kHz')
