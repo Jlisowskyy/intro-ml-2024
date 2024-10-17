@@ -102,7 +102,7 @@ if __name__ == "__main__":
     )
 
     dataset = DAPSDataset(
-        './datasets/annotations.csv',
+        './src/cnn/annotations.csv',
         './datasets/daps',
         mel_spectrogram,
         SAMPLE_RATE,

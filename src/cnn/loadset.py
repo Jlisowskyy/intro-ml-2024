@@ -47,6 +47,7 @@ class DAPSDataset(Dataset):
         self.sample_rate = sample_rate
         self.sample_count = sample_count
         self.device = device
+        self.offset_seconds = 20
 
     def __len__(self):
         return len(self.annotations)
@@ -63,7 +64,7 @@ class DAPSDataset(Dataset):
         audio_path = join(self.root, self.annotations['folder'][index],
                           self.annotations['file_name'][index])
         class_id = self.annotations['classID'][index]
-        signal, sr = torchaudio.load(audio_path, frame_offset=44100 * 50)
+        signal, sr = torchaudio.load(audio_path, frame_offset=44100 * self.offset_seconds)
         signal = signal.to(self.device)
         resample = torchaudio.transforms.Resample(sr, self.sample_rate).to(self.device)
         signal = resample(signal)
