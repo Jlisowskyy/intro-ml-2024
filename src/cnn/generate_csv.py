@@ -10,6 +10,8 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
         print(root, dirs, files)
         folder = root.rsplit('/')[-1]
         for i in files:
+            if not i.endswith('.wav'):
+                continue
             if re.match('^(m[368])|(f[178][^0])', i):
                 CLASSID = 1
             else:
