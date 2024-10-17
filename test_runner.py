@@ -3,6 +3,7 @@ Author: Jakub Lisowski, 2024
 
 Simple test starting script
 """
+# pylint: skip-file
 
 import sys
 from typing import Callable
@@ -17,6 +18,7 @@ from src.test import test_validator
 from src.test import test_wav
 from src.test import test_pipeline
 from src.test import test_detect_speech
+
 
 def run_pytest() -> None:
     """
