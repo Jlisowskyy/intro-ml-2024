@@ -1,6 +1,15 @@
-# Created by the program dynamically
+# Project-specific
+# audio data folder
+datasets/*
+!datasets/.gitkeep
+
+# torch models
+*.pth
+
 uploaded_files/
 test.wav
+
+# Created by the program dynamically
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
