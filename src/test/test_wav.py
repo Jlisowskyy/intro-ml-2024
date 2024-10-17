@@ -11,11 +11,11 @@ import numpy as np
 from scipy.signal import spectrogram
 
 # pylint: disable=import-error
-from wav import load_wav_with_window
+from src.audio.wav import load_wav_with_window
 
 
-def test_display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: float = 0.4,
-                             channel_index: int = 0):
+def display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds: float = 0.4,
+                        channel_index: int = 0):
     """
     Load a WAV file and display spectrogram for the first few chunks.
 
@@ -44,8 +44,11 @@ def test_display_spectrogram(file_path: str, num_chunks: int = 5, window_seconds
         plt.show()
 
 
-if __name__ == '__main__':
-    test_display_spectrogram(str(Path.resolve(Path(f'{__file__}/../test.wav'))),
-                             num_chunks=10,
-                             window_seconds=0.2,
-                             channel_index=0)
+def example_test_run():
+    """
+    Run all the tests
+    """
+    display_spectrogram(str(Path.resolve(Path(f'{__file__}/../test.wav'))),
+                        num_chunks=10,
+                        window_seconds=0.2,
+                        channel_index=0)

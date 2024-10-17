@@ -75,4 +75,3 @@ def save_spectogram(spectrogram, file_path):
     plt.imshow(spectrogram)
     plt.axis('off')
     plt.savefig(file_path, bbox_inches='tight', pad_inches=0)
-    

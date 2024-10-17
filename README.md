@@ -7,6 +7,8 @@
 3. [Usage](#usage)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
+   - [Running the Project](#running-the-project)
+       - [Frontend](#frontend)
 4. [Project Description](#project-description)
 5. [Authors](#authors)
 6. [License](#license)
@@ -25,13 +27,18 @@ The project task is to develop CNN model for intercom device detecting authorise
 ├── reports
 └── src
     ├── audio
+    ├── test
+    ├── validation
     └── frontend
 ```
 
 - `examples`: Contains example code using jupyter notebooks.
 - `reports`: Contains reports and documentation created for project milestones etc.
 - `src`: Contains the source code for the project.
-    - `frontend`: Contains the code for the frontend of the project.
+  - `frontend`: Contains the code for the frontend of the project.
+  - `audio`: Contains the code for the audio processing part of the project.
+  - `test`: Contains the code for testing the project.
+  - `validation`: Contains the code for validation of the project.
 
 ## Usage:
 
@@ -82,12 +89,28 @@ On Windows:
 pip install -r requirements.txt
 ```
 
-### Frontend:
+### Running the project:
+
+#### Frontend:
 
 Simply run:
 
 ```shell
 fastapi dev src/frontend/main.py
+```
+
+#### Testing:
+
+To get list of the available tests, run:
+
+```shell
+python test_runner.py
+```
+
+To run a specific test, run:
+
+```shell
+python test_runner.py <test_name>
 ```
 
 ## Project Description:

@@ -27,7 +27,6 @@ class WavIterator:
     _window_size_frames: int
 
     _window_index: int
-    _fully_traversed: bool
     _channel_index: int
 
     _frame_rate: int
@@ -36,6 +35,8 @@ class WavIterator:
     _num_channels: int
 
     _audio_data: np.ndarray
+
+    _prev_last_sample: int
 
     # ------------------------------
     # class creation
@@ -54,7 +55,7 @@ class WavIterator:
         self._file_path = file_path
 
         self._window_index = 0
-        self._fully_traversed = False
+        self._prev_last_sample = 0
         self._channel_index = channel_index
 
         with wave.open(file_path, 'rb') as wav_file:
@@ -157,7 +158,7 @@ class WavIterator:
 
         self._window_size_frames = window_size
         self._window_index = 0
-        self._fully_traversed = False
+        self._prev_last_sample = 0
 
     def set_channel_index(self, channel_index: int) -> None:
         """
@@ -173,7 +174,7 @@ class WavIterator:
 
         self._channel_index = channel_index
         self._window_index = 0
-        self._fully_traversed = False
+        self._prev_last_sample = 0
 
     # ------------------------------
     # Iterator protocol
@@ -195,9 +196,6 @@ class WavIterator:
         :return: Array of samples
         """
 
-        if self._fully_traversed:
-            raise StopIteration
-
         start_point_offset = self._window_size_frames // 2
 
         start_point = start_point_offset * self._window_index
@@ -206,7 +204,10 @@ class WavIterator:
         if end_point > self._num_frames:
             end_point = self._num_frames
             start_point = max(0, end_point - self._window_size_frames)
-            self._fully_traversed = True
+
+        if end_point <= self._prev_last_sample:
+            raise StopIteration
+        self._prev_last_sample = end_point
 
         self._window_index += 1
 
@@ -225,19 +226,20 @@ def load_wav(file_path: str, channel_index: int = 0) -> WavIterator:
     return WavIterator(file_path, channel_index)
 
 
-def load_wav_with_window(file_path: str, window_seconds: float = 0.1, channel_index: int = 0) \
-        -> WavIterator:
+def load_wav_with_window(file_path: str,
+                         window_length_seconds: float = 0.1,
+                         channel_index: int = 0) -> WavIterator:
     """
     Load a WAV file and return an iterator over the samples with a window size being a fraction
     of the frame rate
     :param file_path: Path to the WAV file
-    :param window_seconds: Length of each window in seconds
+    :param window_length_seconds: Length of each window in seconds
     :param channel_index: Index of the audio channel to process
 
     :return: WavIterator object
     """
 
     iterator = WavIterator(file_path, channel_index)
-    iterator.set_window_size(int(iterator.get_frame_rate() * window_seconds))
+    iterator.set_window_size(int(iterator.get_frame_rate() * window_length_seconds))
 
     return iterator
