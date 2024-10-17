@@ -4,12 +4,12 @@ for generating mel-frequency spectrograms from audio data.
 """
 
 from io import BytesIO
-from src.pipelines.audio_data import AudioData
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from PIL import Image
+from src.pipelines.audio_data import AudioData
 
 class SpectrogramGenerator:
     """
