@@ -1,21 +1,21 @@
 """
-This module defines the AudioNormalizer class, which normalizes audio data 
-to a specified range. It is used in audio processing pipelines to prepare 
+This module defines the AudioNormalizer class, which normalizes audio data
+to a specified range. It is used in audio processing pipelines to prepare
 audio signals for further analysis or modeling.
 """
 
 from src.pipelines.audio_data import AudioData
+from src.audio.normalize import normalize, NormalizationType
 
 class AudioNormalizer:
     """
-    A class to normalize audio data.
-
-    This class provides methods to fit and transform audio signals 
-    for normalization purposes.
+    A class to normalize audio data as part of a machine learning pipeline.
     """
 
-    def __init__(self):
+    normalization_type = NormalizationType.CMVN
+    def __init__(self, normalization_type: NormalizationType = NormalizationType.CMVN) -> None:
         """Initializes the AudioNormalizer."""
+        self.normalization_type = normalization_type
         return
 
     # pylint: disable=unused-argument
@@ -26,7 +26,7 @@ class AudioNormalizer:
         Parameters:
         x_data (list[AudioData]): A list of AudioData instances to fit on.
         y_data (list[int], optional): Target values (ignored in this transformer).
-        
+
         Returns:
         self: Returns the instance itself.
         """
@@ -43,4 +43,9 @@ class AudioNormalizer:
         Returns:
         list[AudioData]: A list of normalized AudioData instances.
         """
+        for audio_data in x_data:
+            audio_data.audio_signal = normalize(
+                audio_data.audio_signal,
+                audio_data.sample_rate,
+                self.normalization_type)
         return x_data

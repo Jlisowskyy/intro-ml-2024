@@ -49,6 +49,9 @@ def butter_bandpass(lowcut, highcut, fs, order=18):
     nyquist = 0.5 * fs
     low = lowcut / nyquist
     high = highcut / nyquist
+    if low <= 0 or high >= 1:
+        raise ValueError(
+            f"Invalid critical frequencies: low={low}, high={high}. Ensure 0 < low < high < 1.")
     sos = butter(order, [low, high], analog=False, btype='band', output='sos')
     return sos
 
