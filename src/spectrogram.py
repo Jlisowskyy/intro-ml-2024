@@ -15,9 +15,8 @@ from PIL import Image
 def gen_spectrogram(audio_data:np.array, sample_rate:int,
                     show_axis:bool=False, width:int=400, height:int=300) -> np.array:
     """
-    Function generates mel-frequency spectrogram based on audio data. Audio data is a numpy array. 
-    It retrurns numpy array that represents - 
-    image of spectrogram.
+    Function generates mel-frequency spectrogram based on audio data.
+    It returns the spectrogram image.
     It uses Mel scale, which is more aligned with human hearing perception. This makes it effective 
     for speech or voice-based tasks.
     Mel scale emphasizes the lower frequencies where most of the speech information resides while 

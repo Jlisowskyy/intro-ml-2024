@@ -23,6 +23,10 @@ pillow
 soundfile
 pylint
 fastapi[standard]
-wave
 scipy
+wave
+torch
+torchaudio
+torchsummary
+pandas
 pytest
