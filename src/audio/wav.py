@@ -317,17 +317,6 @@ class PlainWavIterator(WavIteratorBase):
     """
 
     # ------------------------------
-    # Class creation
-    # ------------------------------
-
-    def __init__(self, file_path: str, channel_index: int = 0) -> None:
-        """
-        Create a new PlainWavIterator object
-        """
-
-        super().__init__(file_path, channel_index)
-
-    # ------------------------------
     # Class interaction
     # ------------------------------
 
