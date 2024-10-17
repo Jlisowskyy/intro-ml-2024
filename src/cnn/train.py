@@ -4,8 +4,8 @@ Module featuring training functions plus a training setup
 import torch
 import torchaudio
 from torch import nn
-from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
+from torch.utils.data import DataLoader
 
 from .cnn import CNN
 from .loadset import DAPSDataset
@@ -23,7 +23,7 @@ def train_single_epoch(
         loss_fn: nn.Module,
         optim: Optimizer,
         device: str
-    ):
+) -> None:
     """Method training `model` a single iteration with the data provided
 
     Parameters
@@ -43,6 +43,8 @@ def train_single_epoch(
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
+
+    loss = None
     for input_data, target in data_loader:
         input_data, target = input_data.to(device), target.to(device)
 
@@ -50,15 +52,18 @@ def train_single_epoch(
         prediction = model(input_data)
         loss = loss_fn(prediction, target)
 
-        # backpropagate error and update weights
+        # back propagate error and update weights
         optim.zero_grad()
         loss.backward()
         optim.step()
 
-    print(f"loss: {loss.item()}")
+    if loss is not None:
+        print(f"loss: {loss.item()}")
 
 
-def train(model, data_loader, loss_fn, optim, device, epochs):
+def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: Optimizer,
+          device: str,
+          epochs: int) -> None:
     """Method training `model` a set amount of epochs, outputting loss every iteration
 
     Parameters
@@ -81,6 +86,7 @@ def train(model, data_loader, loss_fn, optim, device, epochs):
     epochs: :class:`int`
         set amount of epochs to train the model
     """
+    
     for i in range(epochs):
         print(f"Epoch {i+1}")
         train_single_epoch(model, data_loader, loss_fn, optim, device)

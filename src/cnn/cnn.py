@@ -1,15 +1,31 @@
 """
 Implementation of the CNN
 """
-from torch import nn
-from torchsummary import summary
+from torch import nn, Tensor
 
 
 class CNN(nn.Module):
     """
     Simple CNN with 4 convolution layers
     """
-    def __init__(self):
+
+    # ------------------------------
+    # Class fields
+    # ------------------------------
+
+    conv1: nn.Sequential
+    conv2: nn.Sequential
+    conv3: nn.Sequential
+    conv4: nn.Sequential
+    flatten: nn.Flatten
+    linear: nn.Linear
+    softmax: nn.Softmax
+
+    # ------------------------------
+    # Class implementation
+    # ------------------------------
+
+    def __init__(self) -> None:
         super().__init__()
 
         self.conv1 = nn.Sequential(
@@ -61,7 +77,7 @@ class CNN(nn.Module):
         self.linear = nn.Linear(7040, 2)
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, input_data):
+    def forward(self, input_data : Tensor) -> Tensor:
         """
         Data processing method
         """
@@ -73,8 +89,3 @@ class CNN(nn.Module):
         logits = self.linear(data)
         predictions = self.softmax(logits)
         return predictions
-
-
-if __name__ == "__main__":
-    cnn = CNN()
-    summary(cnn.cuda(), (1, 64, 157))

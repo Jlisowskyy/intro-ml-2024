@@ -1,17 +1,36 @@
 """
+Tomasz Mycielski, 2024
 Data loading module
 """
 from os.path import join
-from torch.utils.data import Dataset
-from torch import nn, mean  # pylint: disable=no-name-in-module
-import torchaudio
+
 import pandas as pd
+import torchaudio
+from torch import nn, mean, Tensor  # pylint: disable=no-name-in-module
+from torch.utils.data import Dataset
 
 
 class DAPSDataset(Dataset):
     """
     Class featuring methods for retrieving audio data from the DAPS dataset
     """
+
+    # ------------------------------
+    # Class fields
+    # ------------------------------
+
+    annotations: pd.DataFrame
+    root: str
+    transformation: nn.Module
+    sample_rate: int
+    sample_count: int
+    device: str
+    offset_seconds: int
+
+    # ------------------------------
+    # Class implementation
+    # ------------------------------
+
     def __init__(
             self,
             annotations_file: str,
@@ -19,7 +38,7 @@ class DAPSDataset(Dataset):
             transformation: nn.Module,
             sample_rate: int,
             sample_count: int,
-            device: str = 'cpu'):
+            device: str = 'cpu') -> None:
         """
         Parameters
         ----------
@@ -41,6 +60,7 @@ class DAPSDataset(Dataset):
         device: :class:`str`
             can be 'cuda' or 'cpu', device to load data onto
         """
+
         self.annotations = pd.read_csv(annotations_file)
         self.root = root
         self.transformation = transformation.to(device)
@@ -49,10 +69,10 @@ class DAPSDataset(Dataset):
         self.device = device
         self.offset_seconds = 20
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.annotations)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> tuple[Tensor, int]:
         """
         Retrieve item from the dataset, random access
 
@@ -61,6 +81,7 @@ class DAPSDataset(Dataset):
         index: :class:`int`
             access location
         """
+
         audio_path = join(self.root, self.annotations['folder'][index],
                           self.annotations['file_name'][index])
         class_id = self.annotations['classID'][index]
@@ -74,8 +95,11 @@ class DAPSDataset(Dataset):
         signal = self.transformation(signal)
         return signal, class_id
 
-    def _right_pad_if_necessary(self, signal):
-        # pad signal if too short
+    def _right_pad_if_necessary(self, signal: Tensor) -> Tensor:
+        """
+        Pad signal with zeros if too short
+        """
+
         length_signal = signal.shape[1]
         if length_signal < self.sample_count:
             num_missing_samples = self.sample_count - length_signal
@@ -83,14 +107,20 @@ class DAPSDataset(Dataset):
             signal = nn.functional.pad(signal, last_dim_padding)
         return signal
 
-    def _cut_if_necessary(self, signal):
-        # trim signal if too long
+    def _cut_if_necessary(self, signal: Tensor) -> Tensor:
+        """
+        Truncate signal if too long
+        """
+
         if signal.shape[1] > self.sample_count:
             signal = signal[:, :self.sample_count]
         return signal
 
-    def _mix_down_if_necessary(self, signal):
-        # make mono if stereo
+    def _mix_down_if_necessary(self, signal: Tensor) -> Tensor:
+        """
+        Mix down stereo to mono if necessary
+        """
+
         if signal.shape[0] > 1:
             signal = mean(signal, dim=0, keepdim=True)
         return signal
