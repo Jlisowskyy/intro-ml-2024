@@ -28,3 +28,4 @@ wave
 torch
 torchaudio
 torchsummary
+pandas
