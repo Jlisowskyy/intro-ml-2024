@@ -6,16 +6,15 @@ This module provides a simple iterator over the samples of a WAV file.
 """
 
 import wave
+from abc import ABC, abstractmethod
+from enum import IntEnum
 
 import numpy as np
 
 
-class WavIterator:
+class WavIteratorBase(ABC):
     """
-    Iterator over the samples of a WAV file
-
-    The iterator provides a window of samples of a fixed size. The window is moved by half of its
-    size at each iteration.
+    Base class for the WAV file iterator
     """
 
     # ------------------------------
@@ -36,8 +35,6 @@ class WavIterator:
 
     _audio_data: np.ndarray
 
-    _prev_last_sample: int
-
     # ------------------------------
     # class creation
     # ------------------------------
@@ -55,7 +52,6 @@ class WavIterator:
         self._file_path = file_path
 
         self._window_index = 0
-        self._prev_last_sample = 0
         self._channel_index = channel_index
 
         with wave.open(file_path, 'rb') as wav_file:
@@ -78,9 +74,29 @@ class WavIterator:
     # Class interaction
     # ------------------------------
 
+    def invalidate(self) -> None:
+        """
+        Invalidate the iterator
+        """
+
+        self._window_index = 0
+        self._invalidate()
+
     # ------------------------------
     # Simple getters
     # ------------------------------
+
+    def random_access(self, index: int) -> np.ndarray:
+        """
+        Plain window access method
+
+        :param index: Index of the window
+        """
+
+        return self._audio_data[
+               index * self._window_size_frames:(index + 1) * self._window_size_frames,
+               self._channel_index]
+
 
     def get_data_type(self) -> type:
         """
@@ -145,6 +161,13 @@ class WavIterator:
 
         return self._num_channels
 
+    def get_data(self) -> np.ndarray:
+        """
+        Return the audio data
+        """
+
+        return self._audio_data
+
         # ------------------------------
         # Simple setters
         # ------------------------------
@@ -157,8 +180,7 @@ class WavIterator:
         """
 
         self._window_size_frames = window_size
-        self._window_index = 0
-        self._prev_last_sample = 0
+        self._invalidate()
 
     def set_channel_index(self, channel_index: int) -> None:
         """
@@ -173,14 +195,40 @@ class WavIterator:
             raise ValueError(f"Channel index out of range: {channel_index}")
 
         self._channel_index = channel_index
-        self._window_index = 0
-        self._prev_last_sample = 0
+        self.invalidate()
+
+    # ------------------------------
+    # Abstract methods
+    # ------------------------------
+
+    @abstractmethod
+    def _get_next(self) -> np.ndarray:
+        """
+        Return the next window of samples
+
+        Used in the __next__ method
+        To be implemented in the derived classes
+
+        :return: Array of samples
+        """
+
+        return np.array([])
+
+    @abstractmethod
+    def _invalidate(self) -> None:
+        """
+        Invalidate the iterator state
+
+        To be implemented in the derived classes
+        """
+
+        return
 
     # ------------------------------
     # Iterator protocol
     # ------------------------------
 
-    def __iter__(self) -> 'WavIterator':
+    def __iter__(self) -> 'WavIteratorBase':
         """
         Return the iterator object itself.
 
@@ -192,6 +240,45 @@ class WavIterator:
     def __next__(self) -> np.ndarray:
         """
         Return the next window of samples
+
+        :return: Array of samples
+        """
+
+        return self._get_next()
+
+
+class OverlappingWavIterator(WavIteratorBase):
+    """
+    Iterator over the samples of a WAV file
+
+    The iterator provides a window of samples of a fixed size. The window is moved by half of its
+    size at each iteration.
+    """
+
+    # ------------------------------
+    # Class fields
+    # ------------------------------
+
+    _prev_last_sample: int
+
+    # ------------------------------
+    # Class creation
+    # ------------------------------
+
+    def __init__(self, file_path: str, channel_index: int = 0) -> None:
+        """
+        Create a new OverlappingWavIterator object
+        """
+        super().__init__(file_path, channel_index)
+        self._prev_last_sample = 0
+
+    # ------------------------------
+    # Class interaction
+    # ------------------------------
+
+    def _get_next(self) -> np.ndarray:
+        """
+        Return the next window of samples or raise StopIteration if the end of the file is reached
 
         :return: Array of samples
         """
@@ -213,33 +300,114 @@ class WavIterator:
 
         return self._audio_data[start_point:end_point, self._channel_index]
 
+    def _invalidate(self) -> None:
+        """
+        Invalidate the iterator state
+        """
 
-def load_wav(file_path: str, channel_index: int = 0) -> WavIterator:
+        self._prev_last_sample = 0
+
+
+class PlainWavIterator(WavIteratorBase):
+    """
+    Iterator over the samples of a WAV file
+
+    Simplest possible iterator over the samples of a WAV file.
+    It provides a window of samples of a fixed size.
+    """
+
+    # ------------------------------
+    # Class creation
+    # ------------------------------
+
+    def __init__(self, file_path: str, channel_index: int = 0) -> None:
+        """
+        Create a new PlainWavIterator object
+        """
+
+        super().__init__(file_path, channel_index)
+
+    # ------------------------------
+    # Class interaction
+    # ------------------------------
+
+    def _get_next(self) -> np.ndarray:
+        """
+        Get the next window of samples or raise StopIteration if the end of the file is reached
+
+        :return: Array of samples
+        """
+
+        start_point = self._window_size_frames * self._window_index
+
+        if start_point >= len(self._audio_data[:, self._channel_index]):
+            raise StopIteration
+
+        end_point = min(start_point + self._window_size_frames,
+                        len(self._audio_data[:, self._channel_index]))
+        self._window_index += 1
+
+        return self._audio_data[start_point:end_point, self._channel_index]
+
+    def _invalidate(self) -> None:
+        """
+        Invalidate the iterator state
+
+        No state to invalidate in this class
+        """
+
+        return
+
+
+class WavIteratorType(IntEnum):
+    """
+    Enumeration of the available WAV file iterators
+    """
+
+    PLAIN = 0
+    OVERLAPPING = 1
+
+
+def load_wav(file_path: str, channel_index: int = 0,
+             iterator_type: WavIteratorType = WavIteratorType.PLAIN) -> WavIteratorBase:
     """
     Load a WAV file and return an iterator over the samples
     :param file_path: Path to the WAV file
     :param channel_index: Index of the audio channel to process
+    :param iterator_type: Type of the iterator to use
 
     :return: WavIterator object
     """
 
-    return WavIterator(file_path, channel_index)
+    if iterator_type == WavIteratorType.PLAIN:
+        return PlainWavIterator(file_path, channel_index)
+    elif iterator_type == WavIteratorType.OVERLAPPING:
+        return OverlappingWavIterator(file_path, channel_index)
+    else:
+        raise ValueError(f"Unsupported iterator type: {iterator_type}")
 
 
 def load_wav_with_window(file_path: str,
                          window_length_seconds: float = 0.1,
-                         channel_index: int = 0) -> WavIterator:
+                         channel_index: int = 0,
+                         iterator_type: WavIteratorType = WavIteratorType.PLAIN) -> WavIteratorBase:
     """
     Load a WAV file and return an iterator over the samples with a window size being a fraction
     of the frame rate
     :param file_path: Path to the WAV file
     :param window_length_seconds: Length of each window in seconds
     :param channel_index: Index of the audio channel to process
+    :param iterator_type: Type of the iterator to use
 
     :return: WavIterator object
     """
 
-    iterator = WavIterator(file_path, channel_index)
-    iterator.set_window_size(int(iterator.get_frame_rate() * window_length_seconds))
+    if iterator_type == WavIteratorType.PLAIN:
+        iterator = PlainWavIterator(file_path, channel_index)
+    elif iterator_type == WavIteratorType.OVERLAPPING:
+        iterator = OverlappingWavIterator(file_path, channel_index)
+    else:
+        raise ValueError(f"Unsupported iterator type: {iterator_type}")
 
+    iterator.set_window_size(int(iterator.get_frame_rate() * window_length_seconds))
     return iterator
