@@ -6,7 +6,6 @@ Tests the silence detection feature.
 """
 
 import numpy as np
-
 from src.audio.detect_speech import is_speech, SpeechDetectionType
 
 
