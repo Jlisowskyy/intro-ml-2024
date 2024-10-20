@@ -42,7 +42,7 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                 CLASSID = 0
             it = wav.load_wav_with_window(path.join(root, file), WINDOW_LENGTH, 0)
             sr = it.get_frame_rate()
-            counter = 0
+            COUNTER = 0
             for audio_data in it:
                 if not detect_speech.is_speech(audio_data, sr):
                     continue
@@ -55,9 +55,9 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                                       width=300, height=400)
                 if not path.exists(path.join(newroot, file)):
                     makedirs(path.join(newroot, file))
-                np.save(path.join(newroot, file, f'{file[:-4]}_{counter:0>3}.npy'), spectrogram)
-                f.write(f'{file[0:2] if file[1:3] != "10" else file[0:3]},{folder},{file},{counter},{CLASSID}\n')  # pylint: disable=line-too-long
-                counter += 1
+                np.save(path.join(newroot, file, f'{file[:-4]}_{COUNTER:0>3}.npy'), spectrogram)
+                f.write(f'{file[0:2] if file[1:3] != "10" else file[0:3]},{folder},{file},{COUNTER},{CLASSID}\n')  # pylint: disable=line-too-long
+                COUNTER += 1
             # COUNT = wav.cut_file_to_plain_chunk_files(
             #     path.join(root, file),
             #     path.join(newroot, file),
