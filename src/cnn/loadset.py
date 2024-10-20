@@ -13,7 +13,7 @@ from torch import nn, Tensor
 from torch.utils.data import Dataset
 
 from ..pipelines.spectrogram_generator import gen_spectrogram
-from ..audio import denoise, normalize
+from ..audio import denoise
 
 
 class DAPSDataset(Dataset):
@@ -88,7 +88,7 @@ class DAPSDataset(Dataset):
             self.annotations['file_name'][index],
             f'{self.annotations["file_name"][index][:-4]}_{self.annotations["index"][index]:0>3}.wav'  # pylint: disable=line-too-long
         )
-        audio_data, sr = librosa.load(audio_path, sr=self.target_sample_rate)=
+        audio_data, sr = librosa.load(audio_path, sr=self.target_sample_rate)
         audio_data = denoise.denoise(audio_data, sr)
         audio_data = self._right_pad_if_necessary(audio_data)
         spectrogram = gen_spectrogram(audio_data, self.target_sample_rate,
