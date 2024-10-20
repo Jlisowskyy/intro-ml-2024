@@ -33,13 +33,14 @@ def denoise(chunk: np.ndarray,
     :return: Denoised chunk of audio data
     """
 
+    assert(chunk.dtype == np.float32 or chunk.dtype == np.float64)
     if denoise_type == DenoiseType.BASIC:
         return denoise_basic(chunk, fs)
 
     raise ValueError(f"Unsupported denoise type: {denoise_type}")
 
 
-def butter_bandpass(lowcut: float, highcut: float, fs: float, order: int = 18) -> any:
+def butter_bandpass(lowcut: float, highcut: float, fs: float, order: int = 6) -> any:
     """
     Create a bandpass filter to allow frequencies within a specified range and block others.
 
@@ -73,7 +74,7 @@ def denoise_basic(chunk: np.ndarray, fs: float) -> np.ndarray:
     :return: Filtered chunk of audio data
     """
 
-    lowcut = 80.0
+    lowcut = 50.0
     highcut = 8200.0
 
     sos = butter_bandpass(lowcut, highcut, fs)

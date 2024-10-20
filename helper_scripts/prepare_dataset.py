@@ -10,7 +10,9 @@ import numpy as np
 from tqdm import tqdm
 
 from src.audio import wav, normalize, denoise, detect_speech
-from src.pipelines.spectrogram_generator import gen_spectrogram
+from src.audio.audio_data import AudioData
+from src.pipelines.spectrogram_generator import gen_mel_spectrogram
+
 
 def right_pad_if_necessary(audio: np.ndarray, sample_count: int) -> np.ndarray:
     """
@@ -24,6 +26,7 @@ def right_pad_if_necessary(audio: np.ndarray, sample_count: int) -> np.ndarray:
     if len(audio) < sample_count:
         audio = np.pad(audio, (0, sample_count - len(audio)))
     return audio
+
 
 WAV_ITERATOR_TYPE = wav.WavIteratorType.PLAIN
 WINDOW_LENGTH = 5
@@ -47,16 +50,18 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                 if not detect_speech.is_speech(audio_data, sr):
                     continue
 
+                audio_data = AudioData.to_float(audio_data)
+                audio_data = denoise.denoise(audio_data, sr)
                 audio_data = normalize.normalize(audio_data, sr,
                                                  normalize.NormalizationType.MEAN_VARIANCE)
-                audio_data = denoise.denoise(audio_data, sr)
                 audio_data = right_pad_if_necessary(audio_data, WINDOW_LENGTH * sr)
-                spectrogram = gen_spectrogram(audio_data, 16000,
-                                      width=300, height=400)
+                spectrogram = gen_mel_spectrogram(audio_data, 16000,
+                                                  width=300, height=400)
                 if not path.exists(path.join(newroot, file)):
                     makedirs(path.join(newroot, file))
                 np.save(path.join(newroot, file, f'{file[:-4]}_{COUNTER:0>3}.npy'), spectrogram)
-                f.write(f'{file[0:2] if file[1:3] != "10" else file[0:3]},{folder},{file},{COUNTER},{CLASSID}\n')  # pylint: disable=line-too-long
+                f.write(
+                    f'{file[0:2] if file[1:3] != "10" else file[0:3]},{folder},{file},{COUNTER},{CLASSID}\n')  # pylint: disable=line-too-long
                 COUNTER += 1
             # COUNT = wav.cut_file_to_plain_chunk_files(
             #     path.join(root, file),

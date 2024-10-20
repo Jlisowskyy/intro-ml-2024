@@ -13,7 +13,7 @@ from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.classifier import Classifier
-from src.pipelines.audio_data import AudioData
+from src.audio.audio_data import AudioData
 
 speaker_to_class = {
     'f1': 1,
