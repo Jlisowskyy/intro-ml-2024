@@ -406,7 +406,7 @@ def load_wav_with_window(file_path: str,
 
 def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
                                   window_length_seconds: float,
-                                  iterator_type: WavIteratorType) -> None:
+                                  iterator_type: WavIteratorType) -> int:
     """
     Cut the WAV file into chunks and save them as separate files with index suffix:
     {FILE}_{INDEX}.wav
@@ -421,6 +421,8 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
     for i in range(1, iters[0].get_num_channels()):
         iters.append(load_wav_with_window(file_path, window_length_seconds, i, iterator_type))
 
+    counter = 0
+
     for index, chunks in enumerate(zip(*iters)):
         stacked_array = np.stack(chunks, axis=0)
         meaned_array = np.mean(stacked_array, axis=0)
@@ -429,7 +431,7 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
         flat_chunk = meaned_array.flatten().astype(dtype)
 
         output_file = os.path.join(destination_dir,
-            f"{os.path.splitext(os.path.basename(file_path))[0]}_{index}.wav")
+            f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
 
         try:
             with wave.open(output_file, 'wb') as wav_file:
@@ -438,9 +440,10 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
                 wav_file.setframerate(iters[0].get_frame_rate())
                 wav_file.setcomptype('NONE', 'not compressed')
                 wav_file.setnframes(len(flat_chunk))
-
                 wav_file.writeframes(np.array(flat_chunk).tobytes())
+            counter += 1
         # pylint: disable=broad-except
         except Exception as e:
             print(f"Error while processing {output_file}: {e}")
             os.remove(output_file)
+    return counter

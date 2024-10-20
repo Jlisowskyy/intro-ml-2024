@@ -8,6 +8,7 @@ based on different criteria. Currently, only silence detection is supported.
 from enum import Enum
 import numpy as np
 
+
 class SpeechDetectionType(Enum):
     """
     Enum for different types of speech detection.
@@ -16,7 +17,9 @@ class SpeechDetectionType(Enum):
     """
     SILENCE = 1
 
-def is_speech(audio: np.ndarray, sr: int, speech_detection_type: SpeechDetectionType) -> bool:
+
+def is_speech(audio: np.ndarray, sr: int,
+              speech_detection_type: SpeechDetectionType = SpeechDetectionType.SILENCE) -> bool:
     """
     Detect if the audio contains speech. 
     @param audio: audio signal
@@ -27,6 +30,7 @@ def is_speech(audio: np.ndarray, sr: int, speech_detection_type: SpeechDetection
         return not silence_detection(audio, sr, silence_tolerance=0.5, silence_threshold=0.1)
 
     raise ValueError(f"Unsupported speech detection type: {speech_detection_type}")
+
 
 def silence_detection(
     audio: np.ndarray,

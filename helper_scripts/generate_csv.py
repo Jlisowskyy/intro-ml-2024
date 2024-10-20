@@ -1,4 +1,6 @@
 """
+Author: Tomasz Mycielski
+
 Helper script for generating DAPS dataset annotations
 """
 
