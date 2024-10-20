@@ -1,5 +1,5 @@
 """
-audio_data.py
+Author: Michał Kwiatkowski
 
 This module defines the AudioData class, which represents audio signals 
 along with their sample rates. It is used in audio processing pipelines.

@@ -1,4 +1,6 @@
 """
+Autho: Michał Kwiatkowski
+
 This module contains the SpectrogramGenerator class, which provides functionality
 for generating mel-frequency spectrograms from audio data.
 """
