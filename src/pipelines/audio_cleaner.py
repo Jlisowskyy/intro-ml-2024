@@ -1,32 +1,41 @@
 """
-This module contains the AudioCleaner class, which is used to clean audio data 
-as part of a machine learning pipeline. It implements the fit and transform 
+This module contains the AudioCleaner class, which is used to clean audio data
+as part of a machine learning pipeline. It implements the fit and transform
 methods to be compatible with scikit-learn pipelines.
 """
 
 from src.pipelines.audio_data import AudioData
+from src.audio.denoise import denoise, DenoiseType
+
 
 class AudioCleaner:
     """
-    A class used to clean audio data.
-    This is a placeholder transformer in a pipeline.
+    A class used to clean audio data as part of a machine learning pipeline.
     """
 
-    def __init__(self):
+    denoise_type = DenoiseType.BASIC
+    def __init__(self, denoise_type: DenoiseType = DenoiseType.BASIC) -> None:
         """
         Initializes the AudioCleaner.
+
+        Parameters:
+        denoise_type (DenoiseType): Type of denoising to perform (from DenoiseType enum).
+
+        Returns:
+        None
         """
+        self.denoise_type = denoise_type
         return
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None):
         """
         Fits the transformer to the data.
-        
+
         Parameters:
-        x_data (array-like): Input data, typically audio samples.
+        x_data (array-like): Input data - list of AudioData objects.
         y_data (array-like, optional): Target values (ignored in this transformer).
-        
+
         Returns:
         self: Returns the instance itself.
         """
@@ -38,10 +47,15 @@ class AudioCleaner:
         Transforms the input data by cleaning the audio.
 
         Parameters:
-        x_data (array-like): Input data, typically audio samples.
+        x_data (array-like): Input data - list of AudioData objects.
 
         Returns:
-        x_data (array-like): Cleaned audio data (currently returns input unchanged).
+        x_data (array-like): Output data - list of cleaned AudioData objects.
         """
-        # In a real implementation, you would clean the audio here
+        for audio_data in x_data:
+            audio_data.audio_signal = denoise(
+                audio_data.audio_signal,
+                audio_data.sample_rate,
+                self.denoise_type)
+
         return x_data

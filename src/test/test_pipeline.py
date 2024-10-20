@@ -7,6 +7,7 @@ import os
 from glob import glob
 import soundfile as sf
 import numpy as np
+from scipy.io.wavfile import write
 from sklearn.pipeline import Pipeline
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
@@ -23,6 +24,17 @@ speaker_to_class = {
     'm8': 1
 }
 
+AUDIO_DIRECTORY_PATH = "generated_files"
+def gen_random_audio_data():
+    """
+    Generates random wav files for testing purposes.
+    """
+    if not os.path.exists(AUDIO_DIRECTORY_PATH):
+        os.makedirs(AUDIO_DIRECTORY_PATH)
+    for i in range(10):
+        audio_data = np.random.randn(18000)
+        write(os.path.join(AUDIO_DIRECTORY_PATH, f"random_{i}.wav"), 18000, audio_data)
+
 def example_test_run():
     """
     Example function to run the audio processing pipeline on sample data.
@@ -35,10 +47,8 @@ def example_test_run():
         ('Classifier', Classifier())
     ])
 
-    audio_directory_path = "/home/michal/studia/sem5/ml/daps/clean"
-    (x_train, y_train) = get_data(audio_directory_path)
+    (x_train, y_train) = get_data(AUDIO_DIRECTORY_PATH)
 
-    # Training model
     training_pipeline.fit([x_train[0]], [y_train[0]])
     prediction = training_pipeline.predict([x_train[1]])
 
@@ -54,6 +64,7 @@ def get_data(audio_directory_path):
     Returns:
         tuple: A tuple containing a list of AudioData instances and their corresponding labels.
     """
+    gen_random_audio_data()
     wav_files = glob(os.path.join(audio_directory_path, "*.wav"))
 
     x_train = []

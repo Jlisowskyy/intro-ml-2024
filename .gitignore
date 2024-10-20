@@ -10,6 +10,7 @@ datasets/*
 *.csv
 
 uploaded_files/
+generated_files/
 test.wav
 
 # Created by the program dynamically
