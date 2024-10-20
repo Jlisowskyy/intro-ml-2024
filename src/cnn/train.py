@@ -96,7 +96,7 @@ def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: 
     print("Finished training")
 
 
-def validate(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, device: str = 'cpu'):
+def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
     """
     Validate `model`
 
@@ -114,25 +114,27 @@ def validate(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, devi
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
-    for input_data, target in tqdm(data_loader):
-        input_data, target = input_data.to(device), target.to(device)
-        prediction = model(input_data)
-        loss = loss_fn(prediction, target)
-        print(prediction, target)
-        loss.backward()
-    print(loss.item())
+    model.eval()
+    with torch.no_grad():
+        for input_data, target in tqdm(data_loader):
+            input_data = input_data.to(device)
+            predictions = model(input_data)
+            print(predictions)
+            predicted_index = predictions[0].argmax(0)
+            print(predicted_index, target)
+    model.train()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if torch.cuda.is_available():
-        DEVICE = "cuda"
+        DEVICE = 'cuda'
     else:
-        DEVICE = "cpu"
-    print(f"Using {DEVICE}")
+        DEVICE = 'cpu'
+    print(f'Using {DEVICE}')
 
     dataset = DAPSDataset(
         './annotations.csv',
-        './datasets/daps_split/',
+        './datasets/daps_split_spectro/',
         SAMPLE_RATE,
         SAMPLE_COUNT,
         DEVICE
@@ -141,7 +143,7 @@ if __name__ == "__main__":
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE)
-    test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
+    test_dataloader = DataLoader(test_dataset, batch_size=1)
 
     for index, learning_rate in enumerate(LEARNING_RATES):
         cnn = TutorialCNN().to(DEVICE)
@@ -152,5 +154,4 @@ if __name__ == "__main__":
 
         train(cnn, train_dataloader, loss_function, optimiser, DEVICE, EPOCHS)
         torch.save(cnn.state_dict(), f'cnn{index:0>2}.pth')
-
-        validate(cnn, test_dataloader, loss_function, 'cuda')
+        validate(cnn, test_dataloader, DEVICE)
