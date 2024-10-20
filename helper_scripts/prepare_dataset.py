@@ -51,9 +51,9 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                     continue
 
                 audio_data = AudioData.to_float(audio_data)
+                audio_data = denoise.denoise(audio_data, sr)
                 audio_data = normalize.normalize(audio_data, sr,
                                                  normalize.NormalizationType.MEAN_VARIANCE)
-                audio_data = denoise.denoise(audio_data, sr)
                 audio_data = right_pad_if_necessary(audio_data, WINDOW_LENGTH * sr)
                 spectrogram = gen_mel_spectrogram(audio_data, 16000,
                                                   width=300, height=400)
