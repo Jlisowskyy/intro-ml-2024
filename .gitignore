@@ -6,6 +6,9 @@ datasets/*
 # torch models
 *.pth
 
+# annotation files
+*.csv
+
 uploaded_files/
 test.wav
 

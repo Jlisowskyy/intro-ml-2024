@@ -1,91 +1,40 @@
 """
+Author: Tomasz Mycielski
 Implementation of the CNN
 """
-from torch import nn, Tensor
+import torch
+from torch import nn
+import torch.nn.functional as F
+from torchsummary import summary
 
 
-class CNN(nn.Module):
+class TutorialCNN(nn.Module):
     """
-    Simple CNN with 4 convolution layers
+    Simplified CNN with two layers
     """
-
-    # ------------------------------
-    # Class fields
-    # ------------------------------
-
-    conv1: nn.Sequential
-    conv2: nn.Sequential
-    conv3: nn.Sequential
-    conv4: nn.Sequential
-    flatten: nn.Flatten
-    linear: nn.Linear
-    softmax: nn.Softmax
-
-    # ------------------------------
-    # Class implementation
-    # ------------------------------
-
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(111744, 128)
+        self.fc2 = nn.Linear(128, 84)
+        self.fc3 = nn.Linear(84, 2)
 
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(
-                in_channels=1,
-                out_channels=16,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(
-                in_channels=16,
-                out_channels=32,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(
-                in_channels=32,
-                out_channels=64,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        self.conv4 = nn.Sequential(
-            nn.Conv2d(
-                in_channels=64,
-                out_channels=128,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2)
-        )
-        self.flatten = nn.Flatten()
-        # note the tensor size changes when data shape changes
-        self.linear = nn.Linear(7040, 2)
-        self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, input_data : Tensor) -> Tensor:
+    def forward(self, x):
         """
         Data processing method
         """
-        data = self.conv1(input_data)
-        data = self.conv2(data)
-        data = self.conv3(data)
-        data = self.conv4(data)
-        data = self.flatten(data)
-        logits = self.linear(data)
-        predictions = self.softmax(logits)
-        return predictions
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1) # flatten all dimensions except batch
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+
+if __name__ == '__main__':
+    cnn = TutorialCNN().to('cuda')
+    summary(cnn, (3, 300, 400))

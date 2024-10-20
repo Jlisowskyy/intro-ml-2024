@@ -1,6 +1,8 @@
 # pylint: disable=invalid-name
 """
-Helper script for generating DAPS dataset annotations
+Author: Tomasz Mycielski
+
+Helper script for checking wav data
 """
 from os import walk
 from os.path import join

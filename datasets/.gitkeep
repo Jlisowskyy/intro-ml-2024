@@ -1,7 +1,18 @@
 datasets
-└── daps
+├── daps
+│   ├── clean
+│   ├── cleanraw
+│   .
+│   .
+│   .
+└── daps_split
     ├── clean
-    ├── cleanraw
+    │   ├── f1_script1_clean.wav
+    │   │   ├── f1_script1_clean_000.wav
+    │   .   .
+    │   .   .
+    │   .   .
+    ├── clean
     .
     .
     .
