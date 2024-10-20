@@ -21,13 +21,16 @@ class SpeechDetectionType(Enum):
 def is_speech(audio: np.ndarray, sr: int,
               speech_detection_type: SpeechDetectionType = SpeechDetectionType.SILENCE) -> bool:
     """
-    Detect if the audio contains speech. 
+    Detect if the audio contains speech.
     @param audio: audio signal
     @param sr: sample rate
     @param speech_detection_type: Type of speech detection to perform
     """
+
+    assert (audio.dtype == np.float32 or audio.dtype == np.float64)
+
     if speech_detection_type == SpeechDetectionType.SILENCE:
-        return not silence_detection(audio, sr, silence_tolerance=0.5, silence_threshold=0.1)
+        return not silence_detection(audio, sr, silence_tolerance=0.5, silence_threshold=0.015)
 
     raise ValueError(f"Unsupported speech detection type: {speech_detection_type}")
 
