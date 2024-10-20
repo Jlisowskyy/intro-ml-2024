@@ -10,7 +10,7 @@ import numpy as np
 from tqdm import tqdm
 
 from src.audio import wav, normalize, denoise, detect_speech
-from src.pipelines.spectrogram_generator import gen_spectrogram
+from src.pipelines.spectrogram_generator import gen_mel_spectrogram
 
 def right_pad_if_necessary(audio: np.ndarray, sample_count: int) -> np.ndarray:
     """
@@ -51,8 +51,8 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                                                  normalize.NormalizationType.MEAN_VARIANCE)
                 audio_data = denoise.denoise(audio_data, sr)
                 audio_data = right_pad_if_necessary(audio_data, WINDOW_LENGTH * sr)
-                spectrogram = gen_spectrogram(audio_data, 16000,
-                                      width=300, height=400)
+                spectrogram = gen_mel_spectrogram(audio_data, 16000,
+                                                  width=300, height=400)
                 if not path.exists(path.join(newroot, file)):
                     makedirs(path.join(newroot, file))
                 np.save(path.join(newroot, file, f'{file[:-4]}_{COUNTER:0>3}.npy'), spectrogram)

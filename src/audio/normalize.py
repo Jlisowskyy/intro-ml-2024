@@ -22,7 +22,7 @@ class NormalizationType(Enum):
     CMVN = 3
 
 
-def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
+def mean_variance_normalization(signal: np.array) -> np.array:
     """
     Apply mean and variance normalization to the signal.
     Adjusts the signal to have a mean of 0 and a standard deviation of 1.
@@ -106,6 +106,8 @@ def normalize(signal: np.ndarray,
     :param args: Additional arguments to pass to the normalization functions
     :return: Normalized audio signal (numpy array)
     """
+
+    assert(signal.dtype == np.float32 or signal.dtype == np.float64)
 
     if normalization_type == NormalizationType.MEAN_VARIANCE:
         return mean_variance_normalization(signal)
