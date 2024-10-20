@@ -1,16 +1,14 @@
 """
+
 This module contains the SpectrogramGenerator class, which provides functionality
 for generating mel-frequency spectrograms from audio data.
 """
-
-from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from PIL import Image
 from src.audio.audio_data import AudioData
-
 
 class SpectrogramGenerator:
     """
@@ -56,7 +54,6 @@ class SpectrogramGenerator:
             spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
             spectrogram_data.append(spectrogram)
         return spectrogram_data
-
 
 def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
                         show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
