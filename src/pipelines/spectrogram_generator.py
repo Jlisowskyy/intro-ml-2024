@@ -1,8 +1,10 @@
 """
 
 This module contains the SpectrogramGenerator class, which provides functionality
-for generating mel-frequency spectrograms from audio data.
+for generating mel-frequency and normal spectrogram's from audio data.
 """
+from io import BytesIO
+
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
@@ -10,9 +12,10 @@ import librosa.display
 from PIL import Image
 from src.audio.audio_data import AudioData
 
+
 class SpectrogramGenerator:
     """
-    A class to generate mel-frequency spectrograms from audio data.
+    A class to generate mel-frequency spectrogram's from audio data.
 
     This class provides methods to fit the model (if applicable) and to transform
     audio data into spectrogram representations.
@@ -40,20 +43,21 @@ class SpectrogramGenerator:
 
     def transform(self, audio_data_list: list[AudioData]) -> list[np.ndarray]:
         """
-        Transform audio data into mel-frequency spectrograms.
+        Transform audio data into mel-frequency spectrogram's.
 
         Args:
             audio_data_list (list[AudioData]): A list of AudioData instances 
-            to be transformed into spectrograms.
+            to be transformed into spectrogram's.
 
         Returns:
-            list[np.ndarray]: A list of NumPy arrays representing the spectrograms.
+            list[np.ndarray]: A list of NumPy arrays representing the spectrogram's.
         """
         spectrogram_data = []
         for audio_data in audio_data_list:
             spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
             spectrogram_data.append(spectrogram)
         return spectrogram_data
+
 
 def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
                         show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
