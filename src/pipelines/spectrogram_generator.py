@@ -51,4 +51,3 @@ class SpectrogramGenerator:
             spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
             spectrogram_data.append(spectrogram)
         return spectrogram_data
-
