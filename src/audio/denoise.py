@@ -5,22 +5,10 @@ This module provides functionality for denoising WAV data using simple filters.
 Currently, supports basic denoising for human speech frequencies.
 """
 
-from enum import Enum
-
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT
-
-
-class DenoiseType(Enum):
-    """
-    Enum for different types of denoising.
-    Future types of denoising can be added here and
-    handled in the denoise function
-    """
-
-    BASIC = 1
+from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DenoiseType
 
 
 def denoise(chunk: np.ndarray,

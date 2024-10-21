@@ -1,6 +1,38 @@
-from src.audio.denoise import DenoiseType
-from src.audio.normalize import NormalizationType
-from src.audio.wav import WavIteratorType
+from enum import Enum, IntEnum
+
+# ------------------------------
+# TYPE ENUMS
+# ------------------------------
+
+class DenoiseType(Enum):
+    """
+    Enum for different types of denoising.
+    Future types of denoising can be added here and
+    handled in the denoise function
+    """
+
+    BASIC = 1
+
+
+class NormalizationType(Enum):
+    """
+    Enum for different types of normalization.
+    Future types of normalization can be added here and
+    handled in the normalize function
+    """
+
+    MEAN_VARIANCE = 1
+    PCEN = 2
+    CMVN = 3
+
+
+class WavIteratorType(IntEnum):
+    """
+    Enumeration of the available WAV file iterators
+    """
+
+    PLAIN = 0
+    OVERLAPPING = 1
 
 # ------------------------------
 # DENOISE constants
@@ -58,6 +90,8 @@ SPECTROGRAM_HEIGHT: int = 300
 # ------------------------------
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
+DATABASE_PATH: str = './datasets/daps'
+DATABASE_OUT_NAME: str = 'daps_split_spectro'
 
 # ------------------------------
 # MODEL constants

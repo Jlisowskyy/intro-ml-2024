@@ -5,7 +5,9 @@ audio signals for further analysis or modeling.
 """
 
 from src.audio.audio_data import AudioData
-from src.audio.normalize import normalize, NormalizationType
+from src.audio.normalize import normalize
+from src.constants import NormalizationType
+
 
 class AudioNormalizer:
     """

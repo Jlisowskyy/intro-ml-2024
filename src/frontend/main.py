@@ -6,8 +6,8 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
+from src.frontend.logger import get_fastapi_logger
 from src.frontend.models import ModelResponse
-from src.utils.logger import get_fastapi_logger
 
 app = FastAPI()
 
