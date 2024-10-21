@@ -6,7 +6,7 @@ specifically the TutorialCNN, and preparing it for evaluation.
 """
 
 import torch
-from ..cnn.cnn import TutorialCNN
+from src.cnn.cnn import TutorialCNN
 
 def load_model(model_file_path: str) -> TutorialCNN:
     """
@@ -23,11 +23,12 @@ def load_model(model_file_path: str) -> TutorialCNN:
         ready for inference.
     """
     if torch.cuda.is_available():
-        DEVICE = 'cuda'
+        device = 'cuda'
     else:
-        DEVICE = 'cpu'
-    
+        device = 'cpu'
+
     cnn = TutorialCNN()
-    cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(DEVICE), weights_only=True))
+    cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(device),
+                                   weights_only=True))
     cnn.eval()  # Set the model to evaluation mode
     return cnn
