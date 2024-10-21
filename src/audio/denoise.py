@@ -5,20 +5,10 @@ This module provides functionality for denoising WAV data using simple filters.
 Currently, supports basic denoising for human speech frequencies.
 """
 
-from enum import Enum
-
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-
-class DenoiseType(Enum):
-    """
-    Enum for different types of denoising.
-    Future types of denoising can be added here and
-    handled in the denoise function
-    """
-
-    BASIC = 1
+from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DenoiseType
 
 
 def denoise(chunk: np.ndarray,
@@ -66,18 +56,12 @@ def denoise_basic(chunk: np.ndarray, fs: float) -> np.ndarray:
     """
     Perform basic denoising by applying a bandpass filter to the chunk of audio data.
 
-    Lowcut is chosen to be 80 Hz : Male voice frequency range
-    Highcut is chosen to be 8200 Hz : common male and female voices frequency range
-
     :param chunk: Audio chunk (numpy array) to be denoised
     :param fs: Sampling rate (frame rate in Hz)
     :return: Filtered chunk of audio data
     """
 
-    lowcut = 50.0
-    highcut = 8200.0
-
-    sos = butter_bandpass(lowcut, highcut, fs)
+    sos = butter_bandpass(DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, fs)
     filtered_chunk = sosfilt(sos, chunk)
 
     return filtered_chunk

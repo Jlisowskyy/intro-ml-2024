@@ -7,7 +7,8 @@ methods to be compatible with scikit-learn pipelines.
 """
 
 from src.audio.audio_data import AudioData
-from src.audio.denoise import denoise, DenoiseType
+from src.audio.denoise import denoise
+from src.constants import DenoiseType
 
 
 class AudioCleaner:

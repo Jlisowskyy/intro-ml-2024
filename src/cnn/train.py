@@ -11,13 +11,10 @@ from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from .cnn import BasicCNN
-from .loadset import DAPSDataset
-
-BATCH_SIZE = 128
-EPOCHS = 10
-LEARNING_RATES = [0.001]
-
+from src.cnn.cnn import BasicCNN
+from src.cnn.loadset import DAPSDataset
+from src.constants import TRAINING_BATCH_SIZE, TRAINING_EPOCHS, TRAINING_LEARNING_RATES, \
+    TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM
 
 def train_single_epoch(
         model: nn.Module,
@@ -152,19 +149,23 @@ if __name__ == '__main__':
         DEVICE
     )
 
-    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
+    train_dataset, test_dataset = (
+        torch.utils.data.random_split(dataset, [TRAINING_TRAIN_SET_SIZE,
+                                                TRAINING_TEST_SET_SIZE]))
 
-    train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE)
+    train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_BATCH_SIZE)
     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
-    for index, learning_rate in enumerate(LEARNING_RATES):
+    for index, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+
         cnn = BasicCNN().to(DEVICE)
         print(cnn)
 
         loss_function = nn.CrossEntropyLoss()
-        optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=0.9)
+        optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, DEVICE, EPOCHS)
+        train(cnn, train_dataloader, loss_function, optimiser, DEVICE, TRAINING_EPOCHS)
+
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{now}.pth')
         validate(cnn, test_dataloader, DEVICE)

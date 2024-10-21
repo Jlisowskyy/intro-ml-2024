@@ -4,9 +4,11 @@ Author: Tomasz Mycielski, 2024
 Implementation of the CNN
 """
 import torch
+import torch.nn.functional as tnnf
 from torch import nn
-import torch.nn.functional as F
 from torchsummary import summary
+
+from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 
 
 class BasicCNN(nn.Module):
@@ -27,15 +29,17 @@ class BasicCNN(nn.Module):
         """
         Data processing method
         """
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.pool(tnnf.relu(self.conv1(x)))
+        x = self.pool(tnnf.relu(self.conv2(x)))
         x = torch.flatten(x, 1) # flatten all dimensions except batch
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = tnnf.relu(self.fc1(x))
+        x = tnnf.relu(self.fc2(x))
         x = self.fc3(x)
         return x
 
 
 if __name__ == '__main__':
+    PNG_NUM_COLORS = 3
+
     cnn = BasicCNN().to('cuda')
-    summary(cnn, (3, 300, 400))
+    summary(cnn, (PNG_NUM_COLORS, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH))
