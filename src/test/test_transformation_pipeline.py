@@ -1,15 +1,21 @@
+"""
+Author: Micał Kwiatkowski
+
+This module processes audio data through a pipeline that cleans, normalizes, and generates mel 
+spectrograms. The pipeline uses `AudioCleaner`, `AudioNormalizer`, and `SpectrogramGenerator` 
+to transform the audio and save spectrograms as images.
+"""
+
 import os
 from glob import glob
-from matplotlib import pyplot as plt
 import soundfile as sf
 import numpy as np
-from scipy.io.wavfile import write
 from sklearn.pipeline import Pipeline
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator, gen_spectrogram, save_spectrogram
-from src.pipelines.classifier import Classifier
-from src.pipelines.audio_data import AudioData
+# pylint: disable=line-too-long
+from src.pipelines.spectrogram_generator import SpectrogramGenerator, gen_mel_spectrogram, save_spectrogram
+from src.audio.audio_data import AudioData
 
 speaker_to_class = {
     'f1': 1,
@@ -22,16 +28,22 @@ speaker_to_class = {
 
 AUDIO_DIRECTORY_PATH = "/home/michal/studia/sem5/ml/daps/clean"
 SPECTROGRAM_CLEANED_PATH = "/home/michal/studia/sem5/ml/spec_clean.png"
-SPCTROGRAM_PATH = "/home/michal/studia/sem5/ml/spec.png"
+SPECTROGRAM_PATH = "/home/michal/studia/sem5/ml/spec.png"
 
 def example_test_run():
+    """
+    Run an example of the transformation pipeline on the first audio file in the dataset.
+    
+    The pipeline includes cleaning, normalizing, and generating spectrograms. It saves both
+    the cleaned and uncleaned spectrograms.
+    """
     transformation_pipeline = Pipeline(steps=[
         ('AudioCleaner', AudioCleaner()),
         ('AudioNormalizer', AudioNormalizer()),
         ('SpectrogramGenerator', SpectrogramGenerator())
     ])
 
-    (x_train, y_train) = get_data(AUDIO_DIRECTORY_PATH)
+    (x_train, _) = get_data(AUDIO_DIRECTORY_PATH)
 
     # Transformed data
     transformation_pipeline.fit([x_train[0]])
@@ -39,8 +51,8 @@ def example_test_run():
 
     save_spectrogram(model_input[0], SPECTROGRAM_CLEANED_PATH)
 
-    # spectrogram_not_cleaned = gen_spectrogram(x_train[0].audio_signal, x_train[0].sample_rate)
-    # save_spectrogram(spectrogram_not_cleaned, SPCTROGRAM_PATH)
+    spectrogram_not_cleaned = gen_mel_spectrogram(x_train[0].audio_signal, x_train[0].sample_rate)
+    save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)
 
 def get_data(audio_directory_path):
     """
