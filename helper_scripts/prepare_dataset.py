@@ -15,8 +15,8 @@ from src.audio import normalize, denoise, detect_speech
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator
-from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, DATABASE_PATH, \
-    DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR
+from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
+    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR
 
 with open('annotations.csv', 'w', encoding='UTF-8') as f:
     f.write('speaker,folder,file_name,index,classID\n')
@@ -24,6 +24,8 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
     for root, dirs, files in walk(DATABASE_PATH):
         folder = root.rsplit('/')[-1]
         new_root = root.replace('daps', DATABASE_OUT_NAME)
+        data_class_id = 0
+        sub_file_counter = 0
 
         for file in tqdm(files, colour='magenta'):
             # Omit annoying hidden mac files
@@ -41,8 +43,6 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
 
             sub_file_counter = 0
             for audio_data in it:
-                # TODO: PLACE PIPLINE HERR!!!!
-
                 audio_data = AudioData.to_float(audio_data)
 
                 # Omit not full chunks to avoid filling the dataset with silence
@@ -58,8 +58,6 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                 spectrogram = gen_mel_spectrogram(audio_data, int(sr),
                                                   width=SPECTROGRAM_HEIGHT,
                                                   height=SPECTROGRAM_WIDTH)
-
-                # TODO: END OF PIPELINE
 
                 if not path.exists(path.join(new_root, file)):
                     makedirs(path.join(new_root, file))
