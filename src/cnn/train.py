@@ -11,7 +11,7 @@ from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from .cnn import TutorialCNN
+from .cnn import BasicCNN
 from .loadset import DAPSDataset
 
 BATCH_SIZE = 128
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
     for index, learning_rate in enumerate(LEARNING_RATES):
-        cnn = TutorialCNN().to(DEVICE)
+        cnn = BasicCNN().to(DEVICE)
         print(cnn)
 
         loss_function = nn.CrossEntropyLoss()

@@ -6,7 +6,7 @@ Tests for CNN model
 
 from torchsummary import summary
 
-from src.cnn.cnn import TutorialCNN
+from src.cnn.cnn import BasicCNN
 
 
 def display_summary() -> None:
@@ -14,7 +14,7 @@ def display_summary() -> None:
     Display summary of the CNN model
     """
 
-    cnn = TutorialCNN()
+    cnn = BasicCNN()
     summary(cnn.cuda(), (3, 300, 400))
 
 
