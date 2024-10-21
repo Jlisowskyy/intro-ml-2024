@@ -26,9 +26,9 @@ speaker_to_class = {
     'm8': 1
 }
 
-AUDIO_DIRECTORY_PATH = "/home/michal/studia/sem5/ml/daps/clean"
-SPECTROGRAM_CLEANED_PATH = "/home/michal/studia/sem5/ml/spec_clean.png"
-SPECTROGRAM_PATH = "/home/michal/studia/sem5/ml/spec.png"
+AUDIO_DIRECTORY_PATH = ""
+SPECTROGRAM_CLEANED_PATH = ""
+SPECTROGRAM_PATH = ""
 
 def example_test_run():
     """
