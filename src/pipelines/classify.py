@@ -18,7 +18,8 @@ from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.tensor_transform import TensorTransform
 
-MODEL_PATH = '/home/michal/Downloads/ZAJEBISTYMODEL.pth'
+MODEL_PATH = ""
+assert MODEL_PATH == "", "First setup model path"
 
 def classify(audio_data: AudioData, model: BasicCNN) -> int:
     """
