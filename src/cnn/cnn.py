@@ -1,5 +1,6 @@
 """
-Author: Tomasz Mycielski
+Author: Tomasz Mycielski, 2024
+
 Implementation of the CNN
 """
 import torch
