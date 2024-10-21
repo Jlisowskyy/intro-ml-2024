@@ -1,7 +1,8 @@
 """
+Author: Michał Kwiatkowski
 
 This module contains the SpectrogramGenerator class, which provides functionality
-for generating mel-frequency and normal spectrogram's from audio data.
+for generating mel-frequency spectrograms from audio data.
 """
 
 import numpy as np
