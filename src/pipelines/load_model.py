@@ -22,7 +22,13 @@ def load_model(model_file_path: str) -> BasicCNN:
         BasicCNN: An instance of the BasicCNN model with loaded weights, 
         ready for inference.
     """
+    if torch.cuda.is_available():
+        device = 'cuda'
+    else:
+        device = 'cpu'
+
     cnn = BasicCNN()
-    cnn.load_state_dict(torch.load(model_file_path))
+    cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(device),
+                                   weights_only=True))
     cnn.eval()  # Set the model to evaluation mode
     return cnn
