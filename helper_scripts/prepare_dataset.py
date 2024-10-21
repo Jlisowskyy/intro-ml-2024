@@ -52,7 +52,6 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                 if not detect_speech.is_speech(audio_data, int(sr)):
                     continue
 
-
                 audio_data = denoise.denoise(audio_data, sr)
                 audio_data = normalize.normalize(audio_data, sr,
                                                  src.constants.NormalizationType.MEAN_VARIANCE)

@@ -16,7 +16,6 @@ from src.cnn.loadset import DAPSDataset
 from src.constants import TRAINING_BATCH_SIZE, TRAINING_EPOCHS, TRAINING_LEARNING_RATES, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM
 
-
 def train_single_epoch(
         model: nn.Module,
         data_loader: DataLoader,
@@ -158,6 +157,7 @@ if __name__ == '__main__':
     test_dataloader = DataLoader(test_dataset, batch_size=1)
 
     for index, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+
         cnn = BasicCNN().to(DEVICE)
         print(cnn)
 
@@ -165,6 +165,7 @@ if __name__ == '__main__':
         optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
         train(cnn, train_dataloader, loss_function, optimiser, DEVICE, TRAINING_EPOCHS)
+
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{now}.pth')
         validate(cnn, test_dataloader, DEVICE)
