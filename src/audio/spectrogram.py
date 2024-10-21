@@ -1,20 +1,17 @@
-"""
-Author: Jakub Pietrzak, 2024
-
-This module provides functionality for generating and saving mel-frequency spectrograms 
-from audio data using the librosa and matplotlib libraries.
-"""
-
 from io import BytesIO
-import numpy as np
-import matplotlib.pyplot as plt
+
 import librosa
-import librosa.display
+import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
+from librosa import feature
+
+from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT
 
 
-def gen_spectrogram(audio_data: np.array, sample_rate: int,
-                    show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
+def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
+                        show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
+                        height: int = SPECTROGRAM_HEIGHT) -> np.array:
     """
     Generates a mel-frequency spectrogram from audio data.
 
@@ -29,20 +26,20 @@ def gen_spectrogram(audio_data: np.array, sample_rate: int,
         np.array: NumPy array representing the spectrogram image.
     """
     dpi = 100
-    fmax = 8000
-    s = librosa.feature.melspectrogram(y=audio_data, sr=sample_rate,
-                                       n_fft=4096, hop_length=512, n_mels=512, fmax=fmax)
+    s = feature.melspectrogram(y=audio_data, sr=sample_rate,
+                                       n_fft=4096, hop_length=512, n_mels=512,
+                                       fmax=DENOISE_FREQ_HIGH_CUT)
     s_db = librosa.power_to_db(s, ref=np.max)
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
     if show_axis:
-        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=fmax,
+        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
                                        x_axis='time', y_axis='mel', ax=ax)
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Mel-Frequency Spectrogram')
     else:
-        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=fmax, ax=ax)
+        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT, ax=ax)
         plt.axis('off')
         plt.tight_layout(pad=0)
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
