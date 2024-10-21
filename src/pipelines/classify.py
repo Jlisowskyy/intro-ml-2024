@@ -26,7 +26,7 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
 
     Args:
         data (AudioData): The audio data to classify.
-        model (TutorialCNN): The CNN model used for classification.
+        model (BasicCnn): The CNN model used for classification.
 
     Returns:
         int: user's class.
