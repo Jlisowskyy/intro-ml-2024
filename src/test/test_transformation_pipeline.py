@@ -13,8 +13,8 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
-# pylint: disable=line-too-long
-from src.pipelines.spectrogram_generator import SpectrogramGenerator, gen_mel_spectrogram, save_spectrogram
+from src.pipelines.spectrogram_generator import SpectrogramGenerator, \
+    gen_mel_spectrogram, save_spectrogram
 from src.audio.audio_data import AudioData
 
 speaker_to_class = {
