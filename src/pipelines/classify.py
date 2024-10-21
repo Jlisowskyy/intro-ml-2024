@@ -18,8 +18,6 @@ from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.tensor_transform import TensorTransform
 
-MODEL_PATH = ""
-assert MODEL_PATH == "", "First setup model path"
 
 def classify(audio_data: AudioData, model: BasicCNN) -> int:
     """
@@ -70,5 +68,6 @@ def classify_wrapper(data: AudioData) -> int:
         int: user's class.
     """
 
-    model = load_model(MODEL_PATH)
+    model_path = input('Input path to model')
+    model = load_model(model_path)
     return classify(data, model)
