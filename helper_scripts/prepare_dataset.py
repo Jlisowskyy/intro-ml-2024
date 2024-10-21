@@ -43,7 +43,7 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
     for root, dirs, files in walk('./datasets/daps/'):
         folder = root.rsplit('/')[-1]
         newroot = root.replace('daps', 'daps_split_spectro')
-        for file in tqdm(files, colour='green'):
+        for file in tqdm(files, colour='magenta'):
             if not file.endswith('.wav'):
                 continue
             if re.match('^(m[368])|(f[178][^0])', file):

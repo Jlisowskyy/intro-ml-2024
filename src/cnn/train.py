@@ -48,7 +48,7 @@ def train_single_epoch(
     """
 
     loss = None
-    for input_data, target in tqdm(data_loader):
+    for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
 
         # calculate loss
@@ -118,19 +118,24 @@ def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
     results = [[0, 0], [0, 0]]
     model.eval()
     with torch.no_grad():
-        for input_data, target in tqdm(data_loader, colour='cyan'):
+        for input_data, target in tqdm(data_loader, colour='green'):
             input_data = input_data.to(device)
             predictions = model(input_data)
             predicted_index = predictions[0].argmax(0).item()
             target = target.item()
             results[predicted_index][target] += 1
+    f1 = 2 * results[1][1]/(2*results[1][1] + results[0][1] + results[1][0])
+    # macro F1 score which assumes that both classes are positive
+    macrof1 = (results[1][1]/(2*results[1][1] + results[0][1] + results[1][0]) + 
+               results[0][0]/(2*results[0][0] + results[0][1] + results[1][0]))
     print(f'''True Positive: {results[1][1]}
 False Positive: {results[1][0]}
 False Negative: {results[0][1]}
 True Negative: {results[0][0]}
 
 Accuracy: {(results[1][1] + results[0][0]) / (sum(results[0]) + sum(results[1]))}
-F1 score: {2*results[1][1]/(2*results[1][1] + results[0][1] + results[1][0])}''')
+F1 score: {f1}
+Macro F1: {macrof1}''')
     model.train()
 
 
