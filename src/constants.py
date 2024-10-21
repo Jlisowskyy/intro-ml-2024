@@ -1,3 +1,9 @@
+"""
+Author: Jakub Lisowski, 2024
+
+File collects various constants used in the project as well as enums used for configuration.
+"""
+
 from enum import Enum, IntEnum
 
 # ------------------------------

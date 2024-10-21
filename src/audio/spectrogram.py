@@ -1,10 +1,16 @@
+"""
+Author: Jakub Pietrzak, 2024
+
+File collects various logic correlated to spectrogram processing.
+"""
+
 from io import BytesIO
 
 import librosa
 import numpy as np
 from PIL import Image
-from matplotlib import pyplot as plt
 from librosa import feature
+from matplotlib import pyplot as plt
 
 from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT
 

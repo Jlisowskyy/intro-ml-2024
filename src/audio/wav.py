@@ -384,7 +384,7 @@ class FlattenWavIterator:
         self._iters = iters
 
         if len(self._iters) < 1:
-            raise Exception("No channels found in the file!")
+            raise ValueError("No channels found in the file!")
 
     # ------------------------------
     # Class interaction
