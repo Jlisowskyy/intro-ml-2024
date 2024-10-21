@@ -1,67 +1,20 @@
 """
-Author: Michał Kwiatkowski
+Author: Jakub Pietrzak, 2024
 
-This module contains the SpectrogramGenerator class, which provides functionality
-for generating mel-frequency spectrograms from audio data.
+This module provides functionality for generating and saving mel-frequency spectrograms 
+from audio data using the librosa and matplotlib libraries.
 """
-from io import BytesIO
 
+from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
 from PIL import Image
-from src.audio.audio_data import AudioData
 
 
-class SpectrogramGenerator:
-    """
-    A class to generate mel-frequency spectrogram's from audio data.
-
-    This class provides methods to fit the model (if applicable) and to transform
-    audio data into spectrogram representations.
-    """
-
-    def __init__(self):
-        """
-        Initializes the SpectrogramGenerator instance.
-        """
-        return
-
-    # pylint: disable=unused-argument
-    def fit(self, x_data: list[AudioData], y_data: list[int] = None):
-        """
-        Fit the generator to the audio data (if necessary).
-
-        Args:
-            x_data (list[AudioData]): A list of AudioData instances.
-            y_data (list[int], optional): A list of labels (if applicable).
-
-        Returns:
-            self: Returns an instance of the fitted generator.
-        """
-        return self
-
-    def transform(self, audio_data_list: list[AudioData]) -> list[np.ndarray]:
-        """
-        Transform audio data into mel-frequency spectrogram's.
-
-        Args:
-            audio_data_list (list[AudioData]): A list of AudioData instances 
-            to be transformed into spectrogram's.
-
-        Returns:
-            list[np.ndarray]: A list of NumPy arrays representing the spectrogram's.
-        """
-        spectrogram_data = []
-        for audio_data in audio_data_list:
-            spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
-            spectrogram_data.append(spectrogram)
-        return spectrogram_data
-
-
-def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
-                        show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
+def gen_spectrogram(audio_data: np.array, sample_rate: int,
+                    show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
     """
     Generates a mel-frequency spectrogram from audio data.
 
@@ -105,6 +58,7 @@ def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
     plt.close(fig)
 
     return image_array
+
 
 def save_spectrogram(spectrogram: np.ndarray, file_path: str):
     """

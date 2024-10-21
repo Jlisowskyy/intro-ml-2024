@@ -1,5 +1,6 @@
 """
-Author: Tomasz Mycielski
+Author: Tomasz Mycielski, 2024
+
 Implementation of the CNN
 """
 import torch
@@ -8,7 +9,7 @@ import torch.nn.functional as F
 from torchsummary import summary
 
 
-class TutorialCNN(nn.Module):
+class BasicCNN(nn.Module):
     """
     Simplified CNN with two layers
     """
@@ -36,5 +37,5 @@ class TutorialCNN(nn.Module):
 
 
 if __name__ == '__main__':
-    cnn = TutorialCNN().to('cuda')
+    cnn = BasicCNN().to('cuda')
     summary(cnn, (3, 300, 400))

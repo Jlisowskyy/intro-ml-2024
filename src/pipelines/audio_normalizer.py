@@ -6,7 +6,7 @@ to a specified range. It is used in audio processing pipelines to prepare
 audio signals for further analysis or modeling.
 """
 
-from src.pipelines.audio_data import AudioData
+from src.audio.audio_data import AudioData
 from src.audio.normalize import normalize, NormalizationType
 
 class AudioNormalizer:
