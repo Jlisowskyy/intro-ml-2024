@@ -24,10 +24,7 @@ class DAPSDataset(Dataset):
     annotations: pd.DataFrame
     root: str
     transformation: nn.Module
-    sample_rate: int
-    sample_count: int
     device: str
-    offset_seconds: int
 
     # ------------------------------
     # Class implementation
@@ -37,8 +34,6 @@ class DAPSDataset(Dataset):
             self,
             annotations_file: str,
             root: str,
-            target_sample_rate: int,
-            sample_count: int,
             device: str = 'cpu') -> None:
         """
         Parameters
@@ -48,20 +43,12 @@ class DAPSDataset(Dataset):
 
         root: :class:`str` or a pathlike
             location of the dataset
-
-        target_sample_rate: :class:`int`
-            target audio sample rate
-        
-        sample_count: :class:`int`
-            sample rate * seconds to load
         
         device: :class:`str`
             can be 'cuda' or 'cpu', device to load data onto
         """
         self.annotations = pd.read_csv(annotations_file)
         self.root = root
-        self.target_sample_rate = target_sample_rate
-        self.sample_count = sample_count
         self.device = device
 
     def __len__(self) -> int:
@@ -88,8 +75,6 @@ class DAPSDataset(Dataset):
         class_id = self.annotations['classID'][index]
         return (tens, class_id)
 
-
-
 if __name__ == '__main__':
-    d = DAPSDataset('annotations.csv', './datasets/daps_split_spectro/', 16000, 'cuda')
+    d = DAPSDataset('annotations.csv', './datasets/daps_split_spectro/', 'cuda')
     print(d[0])
