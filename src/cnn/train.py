@@ -126,7 +126,7 @@ def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
             results[predicted_index][target] += 1
     f1 = 2 * results[1][1]/(2*results[1][1] + results[0][1] + results[1][0])
     # macro F1 score which assumes that both classes are positive
-    macrof1 = (results[1][1]/(2*results[1][1] + results[0][1] + results[1][0]) + 
+    macrof1 = (results[1][1]/(2*results[1][1] + results[0][1] + results[1][0]) +
                results[0][0]/(2*results[0][0] + results[0][1] + results[1][0]))
     print(f'''True Positive: {results[1][1]}
 False Positive: {results[1][0]}
