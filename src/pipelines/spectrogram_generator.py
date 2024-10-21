@@ -1,7 +1,8 @@
 """
+Author: Michał Kwiatkowski
 
 This module contains the SpectrogramGenerator class, which provides functionality
-for generating mel-frequency and normal spectrogram's from audio data.
+for generating mel-frequency spectrograms from audio data.
 """
 from io import BytesIO
 
@@ -104,51 +105,6 @@ def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
     plt.close(fig)
 
     return image_array
-
-
-def gen_spectrogram(audio_data: np.array, sample_rate: int,
-                    show_axis: bool = False, width: int = 400, height: int = 300) -> np.array:
-    """
-    Generates a normal spectrogram from audio data.
-
-    Args:
-        audio_data (np.array): Input audio signal as a NumPy array.
-        sample_rate (int): Sample rate of the audio signal.
-        show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
-        width (int, optional): Width of the output image in pixels. Defaults to 400.
-        height (int, optional): Height of the output image in pixels.
-
-    Returns:
-        np.array: NumPy array representing the spectrogram image.
-    """
-    dpi = 100
-    s = librosa.stft(audio_data, n_fft=4096, hop_length=512)
-    s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
-
-    fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
-
-    if show_axis:
-        img = librosa.display.specshow(s_db, sr=sample_rate, x_axis='time', y_axis='log', ax=ax)
-        plt.colorbar(img, format='%+2.0f dB')
-        plt.title('Spectrogram')
-    else:
-        img = librosa.display.specshow(s_db, sr=sample_rate, ax=ax)
-        plt.axis('off')
-        plt.tight_layout(pad=0)
-        plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-
-    buf = BytesIO()
-    fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
-    buf.seek(0)
-
-    image = Image.open(buf).convert('RGB')
-    image_array = np.array(image)
-
-    buf.close()
-    plt.close(fig)
-
-    return image_array
-
 
 def save_spectrogram(spectrogram: np.ndarray, file_path: str):
     """
