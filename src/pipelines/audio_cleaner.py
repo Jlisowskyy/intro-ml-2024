@@ -1,4 +1,6 @@
 """
+Author: Michał Kwiatkowski
+
 This module contains the AudioCleaner class, which is used to clean audio data
 as part of a machine learning pipeline. It implements the fit and transform
 methods to be compatible with scikit-learn pipelines.

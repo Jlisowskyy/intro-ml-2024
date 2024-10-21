@@ -1,4 +1,6 @@
 """
+Author: Michał Kwiatkowski
+
 This module contains the Classifier class, which provides functionality
 for fitting a model and making predictions based on audio data.
 """
