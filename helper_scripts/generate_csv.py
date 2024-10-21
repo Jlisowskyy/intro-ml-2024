@@ -10,6 +10,8 @@ from os import walk
 if __name__ == "__main__":
     with open('annotations.csv', 'w', encoding='UTF-8') as f:
         f.write('file_name,speaker,folder,classID\n')
+
+        # pylint: disable=invalid-name
         class_id: int = 0
 
         for root, dirs, files in walk('./datasets/daps'):
