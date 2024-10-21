@@ -17,7 +17,7 @@ if __name__ == "__main__":
                 if not i.endswith('.wav'):
                     continue
                 if re.match('^(m[368])|(f[178][^0])', i):
-                    CLASSID = 1
+                    class_id = 1
                 else:
-                    CLASSID = 0
-                f.write(f'{i},{i[0:2] if i[1:3] != "10" else i[0:3]},{folder},{CLASSID}\n')
+                    class_id = 0
+                f.write(f'{i},{i[0:2] if i[1:3] != "10" else i[0:3]},{folder},{class_id}\n')
