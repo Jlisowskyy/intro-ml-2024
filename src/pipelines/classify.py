@@ -8,14 +8,13 @@ through a series of transformations and passes it to a CNN model for prediction.
 """
 
 import torch
-from sklearn.pipeline import Pipeline
 
 from src.audio.audio_data import AudioData
+from src.audio.denoise import denoise
+from src.audio.normalize import normalize
+from src.audio.spectrogram import gen_mel_spectrogram
 from src.cnn.cnn import BasicCNN
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
-from src.pipelines.tensor_transform import TensorTransform
+from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH
 
 
 def classify(audio_data: AudioData, model: BasicCNN) -> int:
@@ -30,19 +29,16 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
         int: user's class.
     """
 
-    transformation_pipeline = Pipeline(steps=[
-        ('AudioCleaner', AudioCleaner()),
-        ('AudioNormalizer', AudioNormalizer()),
-        ('SpectrogramGenerator', SpectrogramGenerator()),
-        ('TensorTransform', TensorTransform())
-    ])
+    sr = audio_data.sample_rate
+    chunk = audio_data.audio_signal
+    chunk = denoise(chunk, sr)
+    chunk = normalize(chunk, sr, NORMALIZATION_TYPE)
+    spectrogram = gen_mel_spectrogram(chunk, int(sr),
+                                      width=SPECTROGRAM_WIDTH,
+                                      height=SPECTROGRAM_WIDTH)
 
-    # Transformed data
-    transformation_pipeline.fit([audio_data])
-    model_input = transformation_pipeline.transform([audio_data])
-
-    # getting the tensor
-    tens = model_input[0]
+    tens = torch.from_numpy(spectrogram).type(torch.float32)
+    tens = torch.rot90(tens, dims=(0, 2))
 
     # checking device
     if torch.cuda.is_available():

@@ -206,6 +206,7 @@
             formData.append('file', wavBlob, 'audio.wav');
 
             try {
+                resultDiv.textContent = 'Uploading audio...';
                 const response = await fetch(wavUrl, {
                     method: 'POST',
                     body: formData

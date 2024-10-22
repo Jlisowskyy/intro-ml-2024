@@ -57,8 +57,8 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                 audio_data = normalize.normalize(audio_data, sr,
                                                  src.constants.NormalizationType.MEAN_VARIANCE)
                 spectrogram = gen_mel_spectrogram(audio_data, int(sr),
-                                                  width=SPECTROGRAM_HEIGHT,
-                                                  height=SPECTROGRAM_WIDTH)
+                                                  width=SPECTROGRAM_WIDTH,
+                                                  height=SPECTROGRAM_HEIGHT)
 
                 if not path.exists(path.join(new_root, file)):
                     makedirs(path.join(new_root, file))
