@@ -8,7 +8,7 @@ import argparse
 import soundfile as sf
 import matplotlib.pyplot as plt
 from sklearn.pipeline import Pipeline
-from src.audio.spectrogram import gen_spectrogram, save_spectrogram
+from src.audio.spectrogram import gen_mel_spectrogram, save_spectrogram
 from src.audio.audio_data import AudioData
 from src.pipelines.audio_cleaner import AudioCleaner
 
@@ -36,7 +36,7 @@ def main(sound_path: str, output_path: str = None, show: bool = False, clean_dat
         audio_data = transformation_pipeline.transform([audio_data])[0]
 
 
-    spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+    spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
 
 
     if output_path:
