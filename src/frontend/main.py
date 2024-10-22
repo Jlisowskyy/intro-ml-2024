@@ -51,35 +51,3 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
         return ModelResponse(response="SUCCESS")
     except Exception as e:  # pylint: disable=broad-exception-caught
         return ModelResponse(response=f"Error processing file: {str(e)}")
-
-
-@app.post("/run/model/blob")
-async def run_model(file: UploadFile = File(...)) -> ModelResponse:
-    """POST audio file response"""
-    try:
-        if file.content_type != "audio/webm":
-            return ModelResponse(
-                response="Invalid file type. Please upload a WebM file.")
-
-        contents = await file.read()
-        logger.info("Received file of size: %d bytes", len(contents))
-
-        # Create directories if they don't exist
-        Path("uploaded_files").mkdir(exist_ok=True)
-
-        # Save the original WebM file
-        webm_path = "uploaded_files/user-uploaded.webm"
-        wav_path = "uploaded_files/user-uploaded.wav"
-
-        with open(webm_path, "wb") as audio_file:
-            audio_file.write(contents)
-        logger.info("WebM file saved to %s", webm_path)
-
-        clip = moviepy.VideoFileClip(webm_path)
-        clip.audio.write_audiofile(wav_path)
-
-        # Process the WAV file with your classifier
-        classify_file(wav_path, classifier)
-    except Exception as e:
-        logger.error("Error processing file: %s", str(e))
-        return ModelResponse(response=f"Error processing file: {str(e)}")
