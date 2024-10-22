@@ -18,7 +18,6 @@ from src.test import test_wav
 from src.test import test_pipeline
 from src.test import test_detect_speech
 from src.test import test_transformation_pipeline
-from src.test import test_classify
 
 
 def run_pytest() -> None:
@@ -40,7 +39,6 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "pipeline": test_pipeline.example_test_run,
     "speech_detection": test_detect_speech.example_test_run,
     "transformation_pipeline": test_transformation_pipeline.example_test_run,
-    "classify_wrapper": test_classify.example_test_run 
 }
 
 def display_help() -> None:

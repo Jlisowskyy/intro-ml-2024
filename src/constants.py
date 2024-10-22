@@ -73,7 +73,8 @@ NORMALIZATION_TYPE: NormalizationType = NormalizationType.MEAN_VARIANCE
 # TRAINING constants
 # ------------------------------
 
-TRAINING_BATCH_SIZE: int = 128
+TRAINING_TEST_BATCH_SIZE: int = 128
+TRAINING_VALIDATION_BATCH_SIZE: int = 128
 TRAINING_EPOCHS: int = 10
 TRAINING_LEARNING_RATES: list[float] = [0.001]
 TRAINING_TRAIN_SET_SIZE: float = 0.8
@@ -98,6 +99,9 @@ SPECTROGRAM_HEIGHT: int = 300
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_PATH: str = './datasets/daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
+DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
+DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
+  
 SPEAKER_TO_CLASS = {
     'f1': 1,
     'f7': 1,
@@ -112,3 +116,4 @@ SPEAKER_TO_CLASS = {
 # ------------------------------
 
 MODEL_WINDOW_LENGTH: int = 5
+MODEL_BASE_PATH: str = './models/model.pth'

@@ -61,7 +61,7 @@ def denoise_basic(chunk: np.ndarray, fs: float) -> np.ndarray:
     :return: Filtered chunk of audio data
     """
 
-    sos = butter_bandpass(DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, fs)
+    sos = butter_bandpass(DENOISE_FREQ_LOW_CUT, DENOISE_FREQ_HIGH_CUT, fs)
     filtered_chunk = sosfilt(sos, chunk)
 
     return filtered_chunk
