@@ -73,7 +73,8 @@ NORMALIZATION_TYPE: NormalizationType = NormalizationType.MEAN_VARIANCE
 # TRAINING constants
 # ------------------------------
 
-TRAINING_BATCH_SIZE: int = 128
+TRAINING_TEST_BATCH_SIZE: int = 128
+TRAINING_VALIDATION_BATCH_SIZE: int = 128
 TRAINING_EPOCHS: int = 10
 TRAINING_LEARNING_RATES: list[float] = [0.001]
 TRAINING_TRAIN_SET_SIZE: float = 0.8
