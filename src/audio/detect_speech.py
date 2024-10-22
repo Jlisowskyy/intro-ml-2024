@@ -6,7 +6,10 @@ The is_speech function can be used to detect speech in an audio signal
 based on different criteria. Currently, only silence detection is supported.
 """
 from enum import Enum
+
 import numpy as np
+
+from src.constants import DETECT_SILENCE_THRESHOLD, DETECT_SILENCE_TOLERANCE
 
 
 class SpeechDetectionType(Enum):
@@ -30,7 +33,8 @@ def is_speech(audio: np.ndarray, sr: int,
     assert (audio.dtype == np.float32 or audio.dtype == np.float64)
 
     if speech_detection_type == SpeechDetectionType.SILENCE:
-        return not silence_detection(audio, sr, silence_tolerance=0.5, silence_threshold=0.015)
+        return not silence_detection(audio, sr, silence_tolerance=DETECT_SILENCE_TOLERANCE,
+                                     silence_threshold=DETECT_SILENCE_THRESHOLD)
 
     raise ValueError(f"Unsupported speech detection type: {speech_detection_type}")
 

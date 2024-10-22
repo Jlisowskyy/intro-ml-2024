@@ -17,6 +17,7 @@ from src.test import test_validator
 from src.test import test_wav
 from src.test import test_pipeline
 from src.test import test_detect_speech
+from src.test import test_transformation_pipeline
 
 
 def run_pytest() -> None:
@@ -36,7 +37,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test,
     "pipeline": test_pipeline.example_test_run,
-    "speech_detection": test_detect_speech.example_test_run
+    "speech_detection": test_detect_speech.example_test_run,
+    "transformation_pipeline": test_transformation_pipeline.example_test_run,
 }
 
 def display_help() -> None:

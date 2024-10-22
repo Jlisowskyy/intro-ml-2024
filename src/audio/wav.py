@@ -9,9 +9,10 @@ This module provides a simple iterator over the samples of a WAV file.
 import os
 import wave
 from abc import ABC, abstractmethod
-from enum import IntEnum
 
 import numpy as np
+
+from src.constants import WavIteratorType
 
 
 class WavIteratorBase(ABC):
@@ -350,13 +351,81 @@ class PlainWavIterator(WavIteratorBase):
         return
 
 
-class WavIteratorType(IntEnum):
+class FlattenWavIterator:
     """
-    Enumeration of the available WAV file iterators
+    Iterator wrapper over multiple WAV file iterators
+
+    This iterator wraps multiple WAV file iterators and returns the mean of the samples
     """
 
-    PLAIN = 0
-    OVERLAPPING = 1
+    # ------------------------------
+    # Class fields
+    # ------------------------------
+
+    _file_path: str
+    _iters: list[WavIteratorBase]
+
+    # ------------------------------
+    # Class creation
+    # ------------------------------
+
+    def __init__(self, file_path: str, window_length_seconds: float,
+                 iterator_type: WavIteratorType) -> None:
+        iters = [load_wav(file_path, 0, iterator_type)]
+        num_channels = iters[0].get_num_channels()
+
+        for i in range(1, num_channels):
+            iters.append(load_wav(file_path, i, iterator_type))
+
+        for it in iters:
+            it.set_window_size(int(it.get_frame_rate() * window_length_seconds))
+
+        self._file_path = file_path
+        self._iters = iters
+
+        if len(self._iters) < 1:
+            raise ValueError("No channels found in the file!")
+
+    # ------------------------------
+    # Class interaction
+    # ------------------------------
+
+    def get_first_iter(self) -> WavIteratorBase:
+        """
+        Get the first iterator
+
+        :return: First iterator
+        """
+
+        return self._iters[0]
+
+    # ------------------------------
+    # Iterator Protocol
+    # ------------------------------
+
+    def __iter__(self) -> any:
+        """
+        Return the iterator object itself.
+
+        :return: self
+        """
+
+        return self.iterate()
+
+    def iterate(self) -> np.ndarray:
+        """
+        Return the next window of samples
+
+        :return: Array of samples
+        """
+
+        for chunks in zip(*self._iters):
+            stacked_array = np.stack(chunks, axis=0)
+            meaned_array = np.mean(stacked_array, axis=0)
+
+            dtype = stacked_array.dtype
+            flat_chunk = meaned_array.flatten().astype(dtype)
+            yield flat_chunk
 
 
 def load_wav(file_path: str, channel_index: int = 0,
@@ -413,34 +482,22 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
     """
 
     os.makedirs(destination_dir, exist_ok=True)
-
-    iters: list[WavIteratorBase] = [
-        load_wav_with_window(file_path, window_length_seconds, 0, iterator_type),
-    ]
-
-    for i in range(1, iters[0].get_num_channels()):
-        iters.append(load_wav_with_window(file_path, window_length_seconds, i, iterator_type))
-
+    it = FlattenWavIterator(file_path, window_length_seconds, iterator_type)
+    first_iter = it.get_first_iter()
     counter = 0
 
-    for index, chunks in enumerate(zip(*iters)):
-        stacked_array = np.stack(chunks, axis=0)
-        meaned_array = np.mean(stacked_array, axis=0)
-
-        dtype = stacked_array.dtype
-        flat_chunk = meaned_array.flatten().astype(dtype)
-
+    for index, chunk in enumerate(it):
         output_file = os.path.join(destination_dir,
             f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
 
         try:
             with wave.open(output_file, 'wb') as wav_file:
                 wav_file.setnchannels(1)
-                wav_file.setsampwidth(iters[0].get_sample_width())
-                wav_file.setframerate(iters[0].get_frame_rate())
+                wav_file.setsampwidth(first_iter.get_sample_width())
+                wav_file.setframerate(first_iter.get_frame_rate())
                 wav_file.setcomptype('NONE', 'not compressed')
-                wav_file.setnframes(len(flat_chunk))
-                wav_file.writeframes(np.array(flat_chunk).tobytes())
+                wav_file.setnframes(len(chunk))
+                wav_file.writeframes(np.array(chunk).tobytes())
             counter += 1
         # pylint: disable=broad-except
         except Exception as e:

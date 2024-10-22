@@ -10,7 +10,8 @@ import numpy as np
 from scipy.io.wavfile import write, read
 from scipy.signal import spectrogram
 
-from src.audio.denoise import denoise, DenoiseType
+from src.audio.denoise import denoise
+from src.constants import DenoiseType
 
 
 def generate_sine_wave(frequency: int,

@@ -4,22 +4,10 @@ Author: Łukasz Kryczka, 2024
 This module provides functionality for normalizing audio signals.
 """
 
-from enum import Enum
-
 import librosa.feature
 import numpy as np
 
-
-class NormalizationType(Enum):
-    """
-    Enum for different types of normalization.
-    Future types of normalization can be added here and
-    handled in the normalize function
-    """
-
-    MEAN_VARIANCE = 1
-    PCEN = 2
-    CMVN = 3
+from src.constants import NormalizationType
 
 
 def mean_variance_normalization(signal: np.array) -> np.array:

@@ -1,11 +1,15 @@
 """
+Author: Michał Kwiatkowski
+
 This module defines the AudioNormalizer class, which normalizes audio data
 to a specified range. It is used in audio processing pipelines to prepare
 audio signals for further analysis or modeling.
 """
 
 from src.audio.audio_data import AudioData
-from src.audio.normalize import normalize, NormalizationType
+from src.audio.normalize import normalize
+from src.constants import NormalizationType
+
 
 class AudioNormalizer:
     """

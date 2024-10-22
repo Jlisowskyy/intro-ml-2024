@@ -11,7 +11,8 @@ from typing import Callable
 import numpy as np
 from scipy.io.wavfile import write
 
-from src.audio.wav import load_wav_with_window, WavIteratorType
+from src.audio.wav import load_wav_with_window
+from src.constants import WavIteratorType
 
 AMPLITUDE: float = 0.5
 FREQUENCY: int = 960
