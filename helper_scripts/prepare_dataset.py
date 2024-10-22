@@ -27,7 +27,6 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
 
         # pylint: disable=invalid-name
         data_class_id: int = 0
-        sub_file_counter: int = 0
 
         for file in tqdm(files, colour='magenta'):
             # Omit annoying hidden mac files
@@ -43,6 +42,7 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                                     DATABASE_CUT_ITERATOR)
             sr = it.get_first_iter().get_frame_rate()
 
+            sub_file_counter: int = 0
             for audio_data in it:
                 audio_data = AudioData.to_float(audio_data)
 
