@@ -8,6 +8,9 @@ from fastapi.responses import HTMLResponse
 
 from src.frontend.logger import get_fastapi_logger
 from src.frontend.models import ModelResponse
+from src.pipelines.classify_file import classify_file
+from src.pipelines.load_model import get_classifier
+from src.constants import MODEL_BASE_PATH
 
 app = FastAPI()
 
@@ -19,7 +22,7 @@ index_path = Path.resolve(Path(f'{__file__}/../index.html'))
 with open(index_path, 'r', encoding='utf-8') as f:
     FRONTEND_PAGE = f.read()
 
-
+classifier = get_classifier(MODEL_BASE_PATH)
 @app.get("/")
 async def root():
     """GET / response"""
@@ -41,6 +44,8 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
         with open("uploaded_files/user-uploaded.wav", "wb") as audio_file:
             audio_file.write(contents)
         logger.info("File saved to uploaded_files/user-uploaded.wav")
+
+        classify_file("uploaded_files/user-uploaded.wav", classifier)
 
         return ModelResponse(response="SUCCESS")
     except Exception as e:  # pylint: disable=broad-exception-caught

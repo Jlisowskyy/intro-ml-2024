@@ -7,13 +7,12 @@ This module contains the classify function which processes audio data
 through a series of transformations and passes it to a CNN model for prediction.
 """
 
-from sklearn.pipeline import Pipeline
 import torch
+from sklearn.pipeline import Pipeline
 
-from src.cnn.cnn import BasicCNN
-from src.pipelines.load_model import load_model
-from src.pipelines.audio_cleaner import AudioCleaner
 from src.audio.audio_data import AudioData
+from src.cnn.cnn import BasicCNN
+from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.tensor_transform import TensorTransform
@@ -56,18 +55,3 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
     with torch.no_grad():
         prediction = model(tens)
     return prediction[0].argmax(0).item()
-
-def classify_wrapper(data: AudioData) -> int:
-    """
-    Ready to use classify wrapper.
-
-    Args:
-        data (AudioData): The audio data to classify.
-
-    Returns:
-        int: user's class.
-    """
-
-    model_path = input('Input path to model')
-    model = load_model(model_path)
-    return classify(data, model)
