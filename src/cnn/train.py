@@ -15,7 +15,10 @@ from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import DAPSDataset
 from src.constants import TRAINING_TEST_BATCH_SIZE, TRAINING_VALIDATION_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, \
-    TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM
+    TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
+    DATABASE_OUT_PATH
+from src.validation.simple_validation import SimpleValidation
+
 
 def train_single_epoch(
         model: nn.Module,
@@ -46,7 +49,7 @@ def train_single_epoch(
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    results = [[0, 0], [0, 0]]
+    validator = SimpleValidation()
     loss = None
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
@@ -55,8 +58,7 @@ def train_single_epoch(
         predictions = model(input_data)
         loss = loss_fn(predictions, target)
         if calculate_accuracy:
-            for response, answer in zip(predictions, target):
-                results[response.argmax(0).item()][answer.item()] += 1
+            validator.validate(predictions, target)
         # back propagate error and update weights
         optim.zero_grad()
         loss.backward()
@@ -65,18 +67,8 @@ def train_single_epoch(
     if loss is not None:
         print(f"loss: {loss.item()}")
     if calculate_accuracy:
-        f1 = 2 * results[1][1]/(2*results[1][1] + results[0][1] + results[1][0])
-        # macro F1 score which assumes that both classes are positive
-        macrof1 = (results[1][1]/(2*results[1][1] + results[0][1] + results[1][0]) +
-                results[0][0]/(2*results[0][0] + results[0][1] + results[1][0]))
-        print(f'''True Positive: {results[1][1]}
-False Positive: {results[1][0]}
-False Negative: {results[0][1]}
-True Negative: {results[0][0]}
+        validator.display_results()
 
-Accuracy: {(results[1][1] + results[0][0]) / (sum(results[0]) + sum(results[1]))}
-F1 score: {f1}
-Macro F1: {macrof1}''')
 
 
 def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: Optimizer,
@@ -130,26 +122,16 @@ def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
-    results = [[0, 0], [0, 0]]
+
+    validator = SimpleValidation()
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):
             input_data = input_data.to(device)
             predictions = model(input_data)
-            for response, answer in zip(predictions, target):
-                results[response.argmax(0).item()][answer.item()] += 1
-    f1 = 2 * results[1][1]/(2*results[1][1] + results[0][1] + results[1][0])
-    # macro F1 score which assumes that both classes are positive
-    macrof1 = (results[1][1]/(2*results[1][1] + results[0][1] + results[1][0]) +
-               results[0][0]/(2*results[0][0] + results[0][1] + results[1][0]))
-    print(f'''True Positive: {results[1][1]}
-False Positive: {results[1][0]}
-False Negative: {results[0][1]}
-True Negative: {results[0][0]}
+            validator.validate(predictions, target)
 
-Accuracy: {(results[1][1] + results[0][0]) / (sum(results[0]) + sum(results[1]))}
-F1 score: {f1}
-Macro F1: {macrof1}''')
+    validator.display_results()
     model.train()
 
 
@@ -161,8 +143,8 @@ if __name__ == '__main__':
     print(f'Using {DEVICE}')
 
     dataset = DAPSDataset(
-        './annotations.csv',
-        './datasets/daps_split_spectro/',
+        DATABASE_ANNOTATIONS_PATH,
+        DATABASE_OUT_PATH,
         DEVICE
     )
 

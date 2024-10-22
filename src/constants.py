@@ -99,6 +99,9 @@ SPECTROGRAM_HEIGHT: int = 300
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_PATH: str = './datasets/daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
+DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
+DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
+
 
 # ------------------------------
 # MODEL constants
