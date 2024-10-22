@@ -16,8 +16,8 @@ class AudioNormalizer:
     A class to normalize audio data as part of a machine learning pipeline.
     """
 
-    normalization_type = NormalizationType.CMVN
-    def __init__(self, normalization_type: NormalizationType = NormalizationType.CMVN) -> None:
+    def __init__(self,
+                 normalization_type: NormalizationType = NormalizationType.MEAN_VARIANCE) -> None:
         """
         Initializes the AudioNormalizer.
 
