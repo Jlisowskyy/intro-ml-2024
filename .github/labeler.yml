@@ -2,3 +2,8 @@ invalid:
 - all:
   - base-branch: 'main'
   - head-branch: '^(?!dev$)'
+
+config:
+- any:
+  - changed-files:
+    - any-glob-to-any-file: ['.github/*', '.*']
