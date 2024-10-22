@@ -9,7 +9,6 @@ import numpy as np
 
 
 class AudioData:
-    # pylint: disable=too-few-public-methods
     """
     A class to represent audio data.
 

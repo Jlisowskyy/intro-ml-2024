@@ -9,6 +9,7 @@ This module provides a simple iterator over the samples of a WAV file.
 import os
 import wave
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 
 import numpy as np
 
@@ -412,7 +413,7 @@ class FlattenWavIterator:
 
         return self.iterate()
 
-    def iterate(self) -> np.ndarray:
+    def iterate(self) -> Generator[np.ndarray, None, None]:
         """
         Return the next window of samples
 
