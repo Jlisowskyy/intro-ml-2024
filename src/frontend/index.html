@@ -72,7 +72,7 @@
                 mediaRecorder.onstop = async () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     stream.getTracks().forEach(track => track.stop());
-                    await sendAudioBlob(audioBlob);
+                    await sendAudio(audioBlob, 'audio.webm', blobUrl);
                 };
 
                 mediaRecorder.start();
@@ -97,16 +97,16 @@
         audioInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
-                await sendAudioFile(file);
+                await sendAudio(file, 'audio.wav', wavUrl);
             }
         });
 
-        async function sendAudioFile(audioBlob) {
+        async function sendAudio(audioBlob, audioType, api) {
             const formData = new FormData();
-            formData.append('file', audioBlob, 'audio.wav');
+            formData.append('file', audioBlob, audioType);
 
             try {
-                const response = await fetch(wavUrl, {
+                const response = await fetch(api, {
                     method: 'POST',
                     body: formData
                 });
@@ -123,27 +123,6 @@
             }
         }
 
-        async function sendAudioBlob(audioBlob) {
-            const formData = new FormData();
-            formData.append('file', audioBlob, 'audio.webm');
-
-            try {
-                const response = await fetch(blobUrl, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    resultDiv.innerText = `Response: ${result.response}`;
-                } else {
-                    resultDiv.innerText = 'Error uploading audio.';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                resultDiv.innerText = 'Error uploading audio.';
-            }
-        }
     </script>
 </body>
 </html>
