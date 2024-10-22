@@ -14,7 +14,7 @@ from src.audio.denoise import denoise
 from src.audio.normalize import normalize
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.cnn.cnn import BasicCNN
-from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH
+from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 
 
 def classify(audio_data: AudioData, model: BasicCNN) -> int:
@@ -30,15 +30,17 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
     """
 
     sr = audio_data.sample_rate
+    print(sr)
     chunk = audio_data.audio_signal
     chunk = denoise(chunk, sr)
     chunk = normalize(chunk, sr, NORMALIZATION_TYPE)
     spectrogram = gen_mel_spectrogram(chunk, int(sr),
                                       width=SPECTROGRAM_WIDTH,
-                                      height=SPECTROGRAM_WIDTH)
-
+                                      height=SPECTROGRAM_HEIGHT)
     tens = torch.from_numpy(spectrogram).type(torch.float32)
     tens = torch.rot90(tens, dims=(0, 2))
+    tens = tens[None, :, :, :]
+    print(tens.shape)
 
     # checking device
     if torch.cuda.is_available():

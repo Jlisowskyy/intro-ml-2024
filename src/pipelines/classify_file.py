@@ -28,7 +28,10 @@ def classify_file(file_path: str, classifier: Callable[[AudioData], int]) -> boo
     for chunk in it:
         audio_data = AudioData(chunk, int(sr))
 
+        print(len(chunk))
+        print(5.0 * sr)
         allowed = classifier(audio_data)
+        print(allowed)
 
         is_allowed = is_allowed or allowed
 
