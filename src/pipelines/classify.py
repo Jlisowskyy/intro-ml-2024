@@ -30,7 +30,6 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
     """
 
     sr = audio_data.sample_rate
-    print(sr)
     chunk = audio_data.audio_signal
     chunk = denoise(chunk, sr)
     chunk = normalize(chunk, sr, NORMALIZATION_TYPE)
@@ -40,7 +39,6 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
     tens = torch.from_numpy(spectrogram).type(torch.float32)
     tens = torch.rot90(tens, dims=(0, 2))
     tens = tens[None, :, :, :]
-    print(tens.shape)
 
     # checking device
     if torch.cuda.is_available():
