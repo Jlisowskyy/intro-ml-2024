@@ -441,10 +441,9 @@ def load_wav(file_path: str, channel_index: int = 0,
 
     if iterator_type == WavIteratorType.PLAIN:
         return PlainWavIterator(file_path, channel_index)
-    elif iterator_type == WavIteratorType.OVERLAPPING:
+    if iterator_type == WavIteratorType.OVERLAPPING:
         return OverlappingWavIterator(file_path, channel_index)
-    else:
-        raise ValueError(f"Unsupported iterator type: {iterator_type}")
+    raise ValueError(f"Unsupported iterator type: {iterator_type}")
 
 
 def load_wav_with_window(file_path: str,

@@ -28,7 +28,6 @@ class AudioNormalizer:
         None
         """
         self.normalization_type = normalization_type
-        return
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None):

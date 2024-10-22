@@ -28,7 +28,6 @@ class AudioCleaner:
         None
         """
         self.denoise_type = denoise_type
-        return
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None):
