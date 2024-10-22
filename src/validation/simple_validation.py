@@ -3,6 +3,7 @@ Author: Jakub Lisowski, Tomasz Mycielski, 2024
 
 Simple class providing a simple validation method
 """
+from torch import Tensor
 
 
 class SimpleValidation:
@@ -30,7 +31,7 @@ class SimpleValidation:
 
         self._results = [[0, 0], [0, 0]]
 
-    def validate(self, predictions, target) -> None:
+    def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
         Method saving the results of the validation
         """
