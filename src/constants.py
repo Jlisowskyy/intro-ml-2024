@@ -89,8 +89,8 @@ TRAINING_MOMENTUM: float = 0.9
 # SPECTROGRAM constants
 # ------------------------------
 
-SPECTROGRAM_WIDTH: int = 400
-SPECTROGRAM_HEIGHT: int = 300
+SPECTROGRAM_WIDTH: int = 300
+SPECTROGRAM_HEIGHT: int = 400
 
 # ------------------------------
 # DATABASE constants

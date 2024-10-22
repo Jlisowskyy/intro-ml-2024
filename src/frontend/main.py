@@ -6,11 +6,11 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
+from src.constants import MODEL_BASE_PATH
 from src.frontend.logger import get_fastapi_logger
 from src.frontend.models import ModelResponse
 from src.pipelines.classify_file import classify_file
 from src.pipelines.load_model import get_classifier
-from src.constants import MODEL_BASE_PATH
 
 app = FastAPI()
 
@@ -29,7 +29,7 @@ async def root():
     return HTMLResponse(FRONTEND_PAGE)
 
 
-@app.post("/run/model")
+@app.post("/run/model/wav")
 async def run_model(file: UploadFile = File(...)) -> ModelResponse:
     """POST wave file response"""
     try:
@@ -45,8 +45,8 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
             audio_file.write(contents)
         logger.info("File saved to uploaded_files/user-uploaded.wav")
 
-        classify_file("uploaded_files/user-uploaded.wav", classifier)
+        result = classify_file("uploaded_files/user-uploaded.wav", classifier)
 
-        return ModelResponse(response="SUCCESS")
+        return ModelResponse(response=str(result))
     except Exception as e:  # pylint: disable=broad-exception-caught
         return ModelResponse(response=f"Error processing file: {str(e)}")

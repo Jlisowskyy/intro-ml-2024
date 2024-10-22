@@ -24,12 +24,13 @@ def classify_file(file_path: str, classifier: Callable[[AudioData], int]) -> boo
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
     sr = it.get_first_iter().get_frame_rate()
 
-    is_allowed = False
+    results = [0, 0]
     for chunk in it:
         audio_data = AudioData(chunk, int(sr))
 
-        allowed = classifier(audio_data)
+        result = classifier(audio_data)
+        print(f"Classified as: {result}")
+        results[result] += 1
 
-        is_allowed = is_allowed or allowed
-
-    return is_allowed
+    total = results[0] + results[1]
+    return results[1] / total > 0.7
