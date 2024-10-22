@@ -37,16 +37,8 @@ def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
     :return: CMVN normalized audio signal (numpy array)
     """
 
-    mfccs = librosa.feature.mfcc(y=signal, sr=fs, n_mfcc=13)
+    raise NotImplementedError("CMVN normalization is not implemented yet")
 
-    mfccs_mean = np.mean(mfccs, axis=1, keepdims=True)
-    mfccs_std = np.std(mfccs, axis=1, keepdims=True)
-
-    mfccs_normalized = (mfccs - mfccs_mean) / (mfccs_std + 1e-8)
-
-    normalized_signal = librosa.feature.inverse.mfcc_to_audio(mfccs_normalized, sr=fs)
-
-    return normalized_signal
 
 
 def pcen_normalization(signal: np.ndarray,
