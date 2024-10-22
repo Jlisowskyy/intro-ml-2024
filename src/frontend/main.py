@@ -3,7 +3,6 @@ FastAPI webserver providing a web interface for the model
 """
 from pathlib import Path
 
-import moviepy.editor as moviepy
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
@@ -46,8 +45,8 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
             audio_file.write(contents)
         logger.info("File saved to uploaded_files/user-uploaded.wav")
 
-        classify_file("uploaded_files/user-uploaded.wav", classifier)
+        result = classify_file("uploaded_files/user-uploaded.wav", classifier)
 
-        return ModelResponse(response="SUCCESS")
+        return ModelResponse(response=str(result))
     except Exception as e:  # pylint: disable=broad-exception-caught
         return ModelResponse(response=f"Error processing file: {str(e)}")
