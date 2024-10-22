@@ -104,3 +104,4 @@ DATABASE_OUT_NAME: str = 'daps_split_spectro'
 # ------------------------------
 
 MODEL_WINDOW_LENGTH: int = 5
+MODEL_BASE_PATH: str = './models/model.pth'

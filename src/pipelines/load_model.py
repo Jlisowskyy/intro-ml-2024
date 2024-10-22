@@ -4,9 +4,14 @@ Author: Jakub Pietrzak, 2024
 This module contains the function for loading a pre-trained CNN model, 
 specifically the BasicCNN, and preparing it for evaluation.
 """
+from collections.abc import Callable
 
 import torch
-from ..cnn.cnn import BasicCNN
+
+from src.audio.audio_data import AudioData
+from src.cnn.cnn import BasicCNN
+from src.pipelines.classify import classify
+
 
 def load_model(model_file_path: str) -> BasicCNN:
     """
@@ -19,16 +24,24 @@ def load_model(model_file_path: str) -> BasicCNN:
         model_file_path (str): The file path to the saved model weights (state_dict).
 
     Returns:
-        BasicCNN: An instance of the BasicCNN model with loaded weights, 
+        BasicCNN: An instance of the BasicCNN model with loaded weights,
         ready for inference.
     """
-    if torch.cuda.is_available():
-        device = 'cuda'
-    else:
-        device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     cnn = BasicCNN()
     cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(device),
                                    weights_only=True))
     cnn.eval()  # Set the model to evaluation mode
     return cnn
+
+
+def get_classifier(model_path: str) -> Callable[[AudioData], int]:
+    """
+    Function loads the classifiers and return simple classification function
+
+    :param model_path: The path to the model to validate
+    """
+
+    model = load_model(model_path)
+    return lambda x: classify(x, model)
