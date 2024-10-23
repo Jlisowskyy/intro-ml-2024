@@ -67,7 +67,7 @@ class DAPSDataset(Dataset):
             self.root,
             self.annotations['folder'][index],
             self.annotations['file_name'][index],
-            f'{self.annotations["file_name"][index][:-4]}_{self.annotations["index"][index]:0>3}.npy'  # pylint: disable=line-too-long
+            f'{self.annotations["file_name"][index][:-4]}_{self.annotations["index"][index]:0>3}.npy'
         )
         spectrogram = np.load(spectrogram_path)
         tens = torch.from_numpy(spectrogram).type(torch.float32)
