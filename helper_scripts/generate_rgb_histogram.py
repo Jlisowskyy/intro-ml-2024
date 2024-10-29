@@ -42,7 +42,7 @@ def main(spectrogram_path: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generates a histogram from spectrogram.")
     parser.add_argument("spectrogram_path", type=str, help="Path to the spectrogram file.")
-    
+
     args = parser.parse_args()
 
     main(args.spectrogram_path)
