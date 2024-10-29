@@ -38,7 +38,7 @@ def main(sound_path: str, output_path: str = None, show: bool = False,
         audio_data = transformation_pipeline.transform([audio_data])[0]
 
     if mel:
-        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
+        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis, 2000,200)
     else:
         spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
 

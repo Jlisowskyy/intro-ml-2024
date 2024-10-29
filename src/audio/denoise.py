@@ -1,4 +1,4 @@
-gigig"""
+"""
 Author: Řukasz Kryczka, 2024
 
 This module provides functionality for denoising WAV data using simple filters.

@@ -22,30 +22,20 @@ def main(spectrogram_path: str):
     """
     image=Image.open(spectrogram_path)
     image_array=np.array(image)
-    # Separate the color channels
+
     r_channel = image_array[:, :, 0].flatten()
     g_channel = image_array[:, :, 1].flatten()
     b_channel = image_array[:, :, 2].flatten()
-    
-    # counts_r = np.bincount(r_channel, minlength=256)
-    # counts_g = np.bincount(g_channel, minlength=256)
-    # counts_b = np.bincount(b_channel, minlength=256)
 
-    # for index in range(0, 256):
-    #     print(f"{index}: {counts_r[index]}, {counts_g[index]}, {counts_b[index]}")
 
-    
-    # Plot the histograms
     plt.figure(figsize=(10, 5))
     plt.hist(r_channel, bins=256, color='red', alpha=0.5, label='Red Channel')
     plt.hist(g_channel, bins=256, color='green', alpha=0.5, label='Green Channel')
     plt.hist(b_channel, bins=256, color='blue', alpha=0.5, label='Blue Channel')
 
-    # Add titles and labels
     plt.title('RGB Histogram')
     plt.xlabel('Pixel Intensity')
     plt.ylabel('Frequency')
-    #plt.ylim(0, 2000)
     plt.legend()
     plt.show()
 
