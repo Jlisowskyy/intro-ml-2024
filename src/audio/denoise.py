@@ -1,5 +1,5 @@
 """
-Author: Řukasz Kryczka, 2024
+Author: Łukasz Kryczka, 2024
 
 This module provides functionality for denoising WAV data using simple filters.
 Currently, supports basic denoising for human speech frequencies.
