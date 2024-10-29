@@ -34,12 +34,11 @@ def gen_spectrogram(audio_data: np.array, sample_rate: int,
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
+    img = librosa.display.specshow(s_db, sr=sample_rate, x_axis='time', y_axis='log', ax=ax)
     if show_axis:
-        img = librosa.display.specshow(s_db, sr=sample_rate, x_axis='time', y_axis='log', ax=ax)
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Spectrogram')
     else:
-        img = librosa.display.specshow(s_db, sr=sample_rate, ax=ax)
         plt.axis('off')
         plt.tight_layout(pad=0)
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
@@ -80,13 +79,12 @@ def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-    if show_axis:
-        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
+    img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
                                        x_axis='time', y_axis='mel', ax=ax)
+    if show_axis:
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Mel-Frequency Spectrogram')
     else:
-        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT, ax=ax)
         plt.axis('off')
         plt.tight_layout(pad=0)
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)

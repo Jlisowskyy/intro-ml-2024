@@ -13,7 +13,7 @@ from src.audio.audio_data import AudioData
 from src.pipelines.audio_cleaner import AudioCleaner
 
 def main(sound_path: str, output_path: str = None, show: bool = False,
-         mel: bool = False, clean_data: bool = False):
+         mel: bool = False, clean_data: bool = False, show_axis: bool = False):
     """
     Main function that processes the audio file, generates a spectrogram, and optionally 
     cleans the data.
@@ -38,9 +38,10 @@ def main(sound_path: str, output_path: str = None, show: bool = False,
         audio_data = transformation_pipeline.transform([audio_data])[0]
 
     if mel:
-        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate
+                                          , show_axis)
     else:
-        spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+        spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
 
 
     if output_path:
@@ -64,7 +65,9 @@ if __name__ == "__main__":
                         help='Clean and normalize the audio data.')
     parser.add_argument('--mel', '-m', action='store_true',
                         help='Generate a mel-frequency spectrogram.')
+    parser.add_argument('--show_axis', '-a', action='store_true',
+                        help='Show axis on the spectrogram plot.')
 
     args = parser.parse_args()
 
-    main(args.sound_path, args.output, args.show, args.clean)
+    main(args.sound_path, args.output, args.show, args.mel, args.clean, args.show_axis)
