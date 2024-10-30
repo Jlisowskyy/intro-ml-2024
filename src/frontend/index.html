@@ -81,7 +81,7 @@
 <body>
     <div class="container">
         <h1>Intro ML 2024 Project!</h1>
-        <button id="recordButton">Record Audio (5 seconds)</button>
+        <button id="recordButton">Record Audio (3 seconds)</button>
         <button id="loadButton">Load Audio File</button>
         <input type="file" id="audioInput" accept="audio/*" style="display:none;">
         <div id="result"></div>
@@ -181,9 +181,9 @@
                 setTimeout(() => {
                     mediaRecorder.stop();
                     recordButton.disabled = false;
-                    recordButton.textContent = 'Record Audio (5 seconds)';
+                    recordButton.textContent = 'Record Audio (3 seconds)';
                     recordButton.classList.remove('recording');
-                }, 5000);
+                }, 3000);
             } catch (error) {
                 console.error('Error:', error);
                 showResult(`Error: ${error.message}`, false);

@@ -15,7 +15,7 @@ class SimpleValidation:
     - calculating the accuracy, F1 score, macro F1 score
     """
 
-    _results: list[[list[int]]]
+    _results: list[list[int]]
 
     def __init__(self) -> None:
         """
@@ -56,15 +56,18 @@ class SimpleValidation:
                 sum(self._results[0]) + sum(self._results[1]))
 
         return f'''
-            True Positive: {self._results[1][1]}
-            False Positive: {self._results[1][0]}
-            False Negative: {self._results[0][1]}
-            True Negative: {self._results[0][0]}
-    
-            Accuracy: {accuracy}
-            F1 score: {f1}
-            Macro F1: {macro_f1}
-        '''
+┏━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃      ┃ Pred. Pos. ┃ Pred. Neg. ┃
+┣━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ Pos. ┃ {self._results[1][1]:>10} ┃ {self._results[0][1]:>10} ┃
+┣━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ Neg. ┃ {self._results[1][0]:>10} ┃ {self._results[0][0]:>10} ┃
+┗━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Accuracy: {accuracy}
+F1 score: {f1}
+Macro F1: {macro_f1}
+'''
 
     def display_results(self) -> None:
         """
@@ -72,3 +75,11 @@ class SimpleValidation:
         """
 
         print(self.get_results_str())
+
+    def __add__(self, b):
+        out = SimpleValidation()
+        out._results[0][0] = self._results[0][0] + b._results[0][0]
+        out._results[0][1] = self._results[0][1] + b._results[0][1]
+        out._results[1][0] = self._results[1][0] + b._results[1][0]
+        out._results[1][1] = self._results[1][1] + b._results[1][1]
+        return out
