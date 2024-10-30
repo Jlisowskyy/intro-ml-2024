@@ -14,15 +14,7 @@ from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.classifier import Classifier
 from src.audio.audio_data import AudioData
-
-speaker_to_class = {
-    'f1': 1,
-    'f7': 1,
-    'f8': 1,
-    'm3': 1,
-    'm6': 1,
-    'm8': 1
-}
+from src.constants import SPEAKER_TO_CLASS
 
 AUDIO_DIRECTORY_PATH = "generated_files"
 def gen_random_audio_data():
@@ -79,7 +71,7 @@ def get_data(audio_directory_path):
             audio_data = AudioData(np.array(audio_data_wav), sample_rate)
 
             speaker = wav_file_path.split('_')[0]
-            speaker_class = speaker_to_class.get(speaker.lower(), 0)
+            speaker_class = SPEAKER_TO_CLASS.get(speaker.lower(), 0)
 
             x_train.append(audio_data)
             y_train.append(speaker_class)

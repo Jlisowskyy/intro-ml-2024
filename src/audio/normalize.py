@@ -87,7 +87,7 @@ def normalize(signal: np.ndarray,
     :return: Normalized audio signal (numpy array)
     """
 
-    assert(signal.dtype == np.float32 or signal.dtype == np.float64)
+    assert signal.dtype in (np.float32, np.float64)
 
     if normalization_type == NormalizationType.MEAN_VARIANCE:
         return mean_variance_normalization(signal)

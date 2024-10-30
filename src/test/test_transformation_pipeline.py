@@ -19,14 +19,6 @@ from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
-speaker_to_class = {
-    'f1': 1,
-    'f7': 1,
-    'f8': 1,
-    'm3': 1,
-    'm6': 1,
-    'm8': 1
-}
 
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
 SPECTROGRAM_CLEANED_PATH = str(Path.resolve(Path(f'{__file__}/../test_tmp/cleaned_spectrogram.png')))

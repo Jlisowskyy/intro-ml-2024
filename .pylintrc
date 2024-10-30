@@ -1,0 +1,6 @@
+[MESSAGES CONTROL]
+
+disable=too-few-public-methods,
+        too-many-arguments,
+        too-many-positional-arguments,
+        unknown-option-value

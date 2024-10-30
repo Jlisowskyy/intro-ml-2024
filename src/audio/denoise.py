@@ -23,7 +23,7 @@ def denoise(chunk: np.ndarray,
     :return: Denoised chunk of audio data
     """
 
-    assert(chunk.dtype == np.float32 or chunk.dtype == np.float64)
+    assert chunk.dtype in (np.float32, np.float64)
     if denoise_type == DenoiseType.BASIC:
         return denoise_basic(chunk, fs)
 

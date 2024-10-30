@@ -9,7 +9,6 @@ import numpy as np
 
 
 class AudioData:
-    # pylint: disable=too-few-public-methods
     """
     A class to represent audio data.
 
@@ -43,7 +42,7 @@ class AudioData:
         Returns:
         np.array: The audio data as a float32 array.
         """
-        if audio_data.dtype != np.float32 and audio_data.dtype != np.float64:
+        if audio_data.dtype not in (np.float32, np.float64):
             dtype_max = np.iinfo(audio_data.dtype).max
             audio_data = audio_data.astype(np.float32)
             audio_data /= dtype_max

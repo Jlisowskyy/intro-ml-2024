@@ -30,7 +30,7 @@ def is_speech(audio: np.ndarray, sr: int,
     @param speech_detection_type: Type of speech detection to perform
     """
 
-    assert (audio.dtype == np.float32 or audio.dtype == np.float64)
+    assert audio.dtype in (np.float32, np.float64)
 
     if speech_detection_type == SpeechDetectionType.SILENCE:
         return not silence_detection(audio, sr, silence_tolerance=DETECT_SILENCE_TOLERANCE,

@@ -9,6 +9,7 @@ This module provides a simple iterator over the samples of a WAV file.
 import os
 import wave
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 
 import numpy as np
 
@@ -412,7 +413,7 @@ class FlattenWavIterator:
 
         return self.iterate()
 
-    def iterate(self) -> np.ndarray:
+    def iterate(self) -> Generator[np.ndarray, None, None]:
         """
         Return the next window of samples
 
@@ -441,10 +442,9 @@ def load_wav(file_path: str, channel_index: int = 0,
 
     if iterator_type == WavIteratorType.PLAIN:
         return PlainWavIterator(file_path, channel_index)
-    elif iterator_type == WavIteratorType.OVERLAPPING:
+    if iterator_type == WavIteratorType.OVERLAPPING:
         return OverlappingWavIterator(file_path, channel_index)
-    else:
-        raise ValueError(f"Unsupported iterator type: {iterator_type}")
+    raise ValueError(f"Unsupported iterator type: {iterator_type}")
 
 
 def load_wav_with_window(file_path: str,
