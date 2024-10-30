@@ -42,4 +42,4 @@ if __name__ == '__main__':
     PNG_NUM_COLORS = 3
 
     cnn = BasicCNN().to('cuda')
-    summary(cnn, (PNG_NUM_COLORS, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH))
+    summary(cnn, (PNG_NUM_COLORS, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT))

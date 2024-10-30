@@ -4,6 +4,7 @@ Author: Tomasz Mycielski
 Module featuring training functions plus a training setup
 """
 from datetime import datetime
+from random import randint
 
 import torch
 from torch import nn
@@ -13,10 +14,10 @@ from tqdm import tqdm  # for the progress bar
 
 from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import DAPSDataset
-from src.constants import TRAINING_TEST_BATCH_SIZE, TRAINING_VALIDATION_BATCH_SIZE, \
-    TRAINING_EPOCHS, TRAINING_LEARNING_RATES, \
+from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
+    TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
 from src.validation.simple_validation import SimpleValidation
 
 
@@ -27,7 +28,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False
-) -> None:
+        ) -> None:
     """
     Method training `model` a single iteration with the data provided
 
@@ -50,10 +51,9 @@ def train_single_epoch(
     """
 
     validator = SimpleValidation()
-    loss = None
+    train_loss = 0.0
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
-
         # calculate loss
         predictions = model(input_data)
         loss = loss_fn(predictions, target)
@@ -63,17 +63,49 @@ def train_single_epoch(
         optim.zero_grad()
         loss.backward()
         optim.step()
+        train_loss += loss.item()
 
-    if loss is not None:
-        print(f"loss: {loss.item()}")
+    print(f"Training loss: {train_loss / len(data_loader)}")
     if calculate_accuracy:
         validator.display_results()
 
+def validate(
+        model: nn.Module,
+        data_loader: DataLoader,
+        loss_fn: nn.Module,
+        device: str = 'cpu'
+        ) -> float:
+    """
+    Function for evaluating `model` against an independent dataset during training
 
+    Parameters
+    ----------
+    model: :class:`torch.nn.Module`
+        Model to train
+    
+    data_loader: :class:`torch.utils.data.DataLoader`
+        Dataloader to feed the model
 
-def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: Optimizer,
-          device: str,
-          epochs: int) -> None:
+    loss_fn: :class:`torch.nn.Module`
+        Loss criterion
+
+    device: :class:`str`
+        Can be either 'cuda' or 'cpu', set device for pytorch
+
+    
+    """
+    valid_loss = 0.0
+    model.eval()
+    for input_data, target in tqdm(data_loader, colour='yellow'):
+        input_data, target = input_data.to(device), target.to(device)
+        predictions = model(input_data)
+        loss = loss_fn(predictions, target)
+        valid_loss += loss.item()
+    model.train()
+    return valid_loss
+
+def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
+          device: str, epochs: int, val_data: DataLoader | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -97,16 +129,24 @@ def train(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, optim: 
     epochs: :class:`int`
         set amount of epochs to train the model
     """
-
+    min_valid_loss = float('inf')
     for i in range(epochs):
         print(f"Epoch {i+1}")
-        train_single_epoch(model, data_loader, loss_fn, optim, device, i == epochs - 1)
-        # # backup for longer training sessions
-        # torch.save(model.state_dict(), f'model_epoch_{i+1}_backup.pth')
+        train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1)
+
+        if val_data is None:
+            continue
+
+        valid_loss = validate(model, val_data, loss_fn, device)
+        print(f'Validation loss: {valid_loss / len(val_data)}')
+        if valid_loss < min_valid_loss:
+            min_valid_loss = valid_loss
+            # backup for longer training sessions
+            torch.save(model.state_dict(), f'cnn_e{i+1}_backup.pth')
     print("Finished training")
 
 
-def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
+def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> SimpleValidation:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -133,6 +173,7 @@ def validate(model: nn.Module, data_loader: DataLoader, device: str = 'cpu'):
 
     validator.display_results()
     model.train()
+    return validator
 
 
 if __name__ == '__main__':
@@ -142,19 +183,27 @@ if __name__ == '__main__':
         DEVICE = 'cpu'
     print(f'Using {DEVICE}')
 
+    # preparing datasets
     dataset = DAPSDataset(
         DATABASE_ANNOTATIONS_PATH,
         DATABASE_OUT_PATH,
         DEVICE
     )
 
-    train_dataset, test_dataset = (
+    seed = randint(0, 1 << 64)
+    print(f'split seed: {seed}')
+    GENERATOR = torch.Generator().manual_seed(seed)
+    train_dataset, validation_dataset, test_dataset = (
         torch.utils.data.random_split(dataset, [TRAINING_TRAIN_SET_SIZE,
-                                                TRAINING_TEST_SET_SIZE]))
+                                                TRAINING_VALIDATION_SET_SIZE,
+                                                TRAINING_TEST_SET_SIZE],
+                                      generator=GENERATOR))
 
-    train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
-    test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
+    train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_TRAIN_BATCH_SIZE)
+    validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
+    test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
+    # training
     for index, learning_rate in enumerate(TRAINING_LEARNING_RATES):
 
         cnn = BasicCNN().to(DEVICE)
@@ -163,8 +212,9 @@ if __name__ == '__main__':
         loss_function = nn.CrossEntropyLoss()
         optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, DEVICE, TRAINING_EPOCHS)
+        train(cnn, train_dataloader, loss_function, optimiser, DEVICE, TRAINING_EPOCHS,
+              validate_dataloader)
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        torch.save(cnn.state_dict(), f'cnn_{now}.pth')
-        validate(cnn, test_dataloader, DEVICE)
+        torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
+        test(cnn, test_dataloader, DEVICE)

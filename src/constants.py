@@ -73,15 +73,22 @@ NORMALIZATION_TYPE: NormalizationType = NormalizationType.MEAN_VARIANCE
 # TRAINING constants
 # ------------------------------
 
-TRAINING_TEST_BATCH_SIZE: int = 128
+TRAINING_TRAIN_BATCH_SIZE: int = 128
 TRAINING_VALIDATION_BATCH_SIZE: int = 128
+TRAINING_TEST_BATCH_SIZE: int = 128
 TRAINING_EPOCHS: int = 10
-TRAINING_LEARNING_RATES: list[float] = [0.001]
-TRAINING_TRAIN_SET_SIZE: float = 0.8
+# 0.1 seems to be too high (exploding loss)
+# this porridge is pretty decent (maybe should be smaller? TODO: check)
+TRAINING_LEARNING_RATES: list[float] = [0.0001]
+TRAINING_TRAIN_SET_SIZE: float = 0.64
+TRAINING_VALIDATION_SET_SIZE: float = 0.16
 TRAINING_TEST_SET_SIZE: float = 0.2
 
-assert abs(TRAINING_TRAIN_SET_SIZE + TRAINING_TEST_SET_SIZE - 1) < 1e-6, \
-    "Train and test set sizes should sum to 1"
+# torch split does *not* like epsilon, requires the sum to be exactly 1.0
+assert (TRAINING_TRAIN_SET_SIZE +
+           TRAINING_VALIDATION_SET_SIZE +
+           TRAINING_TEST_SET_SIZE == 1.0), \
+    "All set sizes should sum to 1"
 
 TRAINING_MOMENTUM: float = 0.9
 
@@ -96,6 +103,29 @@ SPECTROGRAM_HEIGHT: int = 400
 # DATABASE constants
 # ------------------------------
 
+CLASSES = {
+    'm1': 0,
+    'm2': 0,
+    'm3': 1,
+    'm4': 0,
+    'm5': 0,
+    'm6': 1,
+    'm7': 0,
+    'm8': 1,
+    'm9': 0,
+    'm10':0,
+    'f1': 1,
+    'f2': 0,
+    'f3': 0,
+    'f4': 0,
+    'f5': 0,
+    'f6': 0,
+    'f7': 1,
+    'f8': 1,
+    'f9': 0,
+    'f10':0
+}
+
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_PATH: str = './datasets/daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
@@ -107,5 +137,5 @@ DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 5
+MODEL_WINDOW_LENGTH: int = 3
 MODEL_BASE_PATH: str = './models/model.pth'

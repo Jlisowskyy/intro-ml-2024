@@ -16,7 +16,7 @@ from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
-    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR
+    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES
 
 with open('annotations.csv', 'w', encoding='UTF-8') as f:
     f.write('speaker,folder,file_name,index,classID\n')
@@ -25,19 +25,14 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
         folder = root.rsplit('/')[-1]
         new_root = root.replace('daps', DATABASE_OUT_NAME)
 
-        # pylint: disable=invalid-name
-        data_class_id: int = 0
-
         for file in tqdm(files, colour='magenta'):
             # Omit annoying hidden mac files
             if not file.endswith('.wav') or file.startswith('.'):
                 continue
 
-            if re.match('^(m[368])|(f[178][^0])', file):
-                data_class_id = 1
-            else:
-                data_class_id = 0
-
+            # RIP /^(m[368])|(f[178][^0])/
+            speaker = re.search(r'[fm]\d\d?', file)[0]
+            data_class_id = CLASSES[speaker]
             it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                     DATABASE_CUT_ITERATOR)
             sr = it.get_first_iter().get_frame_rate()
@@ -60,10 +55,10 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
                                                   width=SPECTROGRAM_WIDTH,
                                                   height=SPECTROGRAM_HEIGHT)
 
-                if not path.exists(path.join(new_root, file)):
+                if not path.exists(path.join(new_root, file)): # TODO: add [:-4]
                     makedirs(path.join(new_root, file))
                 np.save(path.join(new_root, file, f'{file[:-4]}_{sub_file_counter:0>3}.npy'),
                         spectrogram)
                 f.write(
-                    f'{file[0:2] if file[1:3] != "10" else file[0:3]},{folder},{file},{sub_file_counter},{data_class_id}\n')  # pylint: disable=line-too-long
+                    f'{speaker},{folder},{file},{sub_file_counter},{data_class_id}\n')  # pylint: disable=line-too-long
                 sub_file_counter += 1
