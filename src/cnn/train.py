@@ -194,10 +194,9 @@ if __name__ == '__main__':
     print(f'split seed: {seed}')
     GENERATOR = torch.Generator().manual_seed(seed)
     train_dataset, validation_dataset, test_dataset = (
-        torch.utils.data.random_split(dataset, [TRAINING_TRAIN_SET_SIZE,
-                                                TRAINING_VALIDATION_SET_SIZE,
-                                                TRAINING_TEST_SET_SIZE],
-                                      generator=GENERATOR))
+        torch.utils.data.random_split(dataset,
+            [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
+            TRAINING_TEST_SET_SIZE], generator=GENERATOR))
 
     train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_TRAIN_BATCH_SIZE)
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)

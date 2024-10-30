@@ -27,10 +27,9 @@ dataset = DAPSDataset(
 
 GENERATOR = torch.Generator().manual_seed(4460117552633912135)
 train_dataset, validation_dataset, test_dataset = (
-    torch.utils.data.random_split(dataset, [TRAINING_TRAIN_SET_SIZE,
-                                            TRAINING_VALIDATION_SET_SIZE,
-                                            TRAINING_TEST_SET_SIZE],
-                                  generator=GENERATOR))
+    torch.utils.data.random_split(dataset,
+        [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
+        TRAINING_TEST_SET_SIZE], generator=GENERATOR))
 
 train_dataloader = DataLoader(train_dataset, batch_size=1)
 validate_dataloader = DataLoader(validation_dataset, batch_size=1)
