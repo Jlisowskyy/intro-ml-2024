@@ -103,7 +103,7 @@ SPECTROGRAM_HEIGHT: int = 400
 # DATABASE constants
 # ------------------------------
 
-CLASSES = {
+SPEAKER_CLASSES = {
     'm1': 0,
     'm2': 0,
     'm3': 1,
@@ -131,15 +131,6 @@ DATABASE_PATH: str = './datasets/daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
 DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
 DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
-
-SPEAKER_TO_CLASS = {
-    'f1': 1,
-    'f7': 1,
-    'f8': 1,
-    'm3': 1,
-    'm6': 1,
-    'm8': 1
-}
 
 # ------------------------------
 # MODEL constants

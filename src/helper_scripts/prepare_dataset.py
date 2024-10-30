@@ -16,7 +16,7 @@ from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
-    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES
+    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES
 
 with open('annotations.csv', 'w', encoding='UTF-8') as f:
     f.write('speaker,folder,file_name,index,classID\n')
@@ -32,7 +32,7 @@ with open('annotations.csv', 'w', encoding='UTF-8') as f:
 
             # RIP /^(m[368])|(f[178][^0])/
             speaker = re.search(r'[fm]\d\d?', file)[0]
-            data_class_id = CLASSES[speaker]
+            data_class_id = SPEAKER_CLASSES[speaker]
             it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                     DATABASE_CUT_ITERATOR)
             sr = it.get_first_iter().get_frame_rate()
