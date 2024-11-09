@@ -5,17 +5,21 @@ Modul for generating spectrograms and showing/saving it
 """
 
 import argparse
-import soundfile as sf
+from typing import List
+
 import matplotlib.pyplot as plt
+import soundfile as sf
 from sklearn.pipeline import Pipeline
-from src.audio.spectrogram import gen_mel_spectrogram, gen_spectrogram, save_spectrogram
+
 from src.audio.audio_data import AudioData
+from src.audio.spectrogram import gen_mel_spectrogram, gen_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
 
-def main(sound_path: str, output_path: str = None, show: bool = False,
-         mel: bool = False, clean_data: bool = False, show_axis: bool = False):
+
+def process(sound_path: str, output_path: str = None, show: bool = False,
+            mel: bool = False, clean_data: bool = False, show_axis: bool = False):
     """
-    Main function that processes the audio file, generates a spectrogram, and optionally 
+    Process function that processes the audio file, generates a spectrogram, and optionally
     cleans the data.
 
     Args:
@@ -25,10 +29,8 @@ def main(sound_path: str, output_path: str = None, show: bool = False,
         mel (bool): Flag to generate a mel-frequency spectrogram.
         clean_data (bool): Flag to clean and normalize the audio data.
     """
-
     data, samplerate = sf.read(sound_path)
     audio_data = AudioData(data, samplerate)
-
 
     if clean_data:
         transformation_pipeline = Pipeline(steps=[
@@ -38,15 +40,12 @@ def main(sound_path: str, output_path: str = None, show: bool = False,
         audio_data = transformation_pipeline.transform([audio_data])[0]
 
     if mel:
-        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate
-                                          , show_axis)
+        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
     else:
         spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
 
-
     if output_path:
         save_spectrogram(spectrogram, output_path)
-
 
     if show:
         plt.imshow(spectrogram)
@@ -54,7 +53,14 @@ def main(sound_path: str, output_path: str = None, show: bool = False,
         plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
         plt.show()
 
-if __name__ == "__main__":
+
+def main(argv: list[str]) -> None:
+    """
+    Main function that parses command line arguments and runs the processing.
+
+    Args:
+        argv (List[str]): List of command line arguments.
+    """
     parser = argparse.ArgumentParser(description="Generates a spectrogram from an audio file.")
     parser.add_argument("sound_path", type=str, help="Path to the audio file.")
     parser.add_argument('--output', '-o', type=str,
@@ -68,6 +74,11 @@ if __name__ == "__main__":
     parser.add_argument('--show_axis', '-a', action='store_true',
                         help='Show axis on the spectrogram plot.')
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
+    process(args.sound_path, args.output, args.show, args.mel, args.clean, args.show_axis)
 
-    main(args.sound_path, args.output, args.show, args.mel, args.clean, args.show_axis)
+
+if __name__ == "__main__":
+    import sys
+
+    main(sys.argv[1:])

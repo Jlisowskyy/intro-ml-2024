@@ -49,7 +49,7 @@ def display_help() -> None:
     print("Usage: python test_runner.py <test_name>")
     print("Available tests:")
     for test_name in TEST_CASES:
-        print(f"  {test_name}")
+        print(f"\t{test_name}")
 
 
 def run_test(test_name: str) -> None:
