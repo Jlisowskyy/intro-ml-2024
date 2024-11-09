@@ -28,6 +28,7 @@ def process(sound_path: str, output_path: str = None, show: bool = False,
         show (bool): Flag to show the spectrogram using matplotlib.
         mel (bool): Flag to generate a mel-frequency spectrogram.
         clean_data (bool): Flag to clean and normalize the audio data.
+        show_axis (bool): Flag to show axis on the spectrogram plot.
     """
     data, samplerate = sf.read(sound_path)
     audio_data = AudioData(data, samplerate)
