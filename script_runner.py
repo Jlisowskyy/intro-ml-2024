@@ -40,7 +40,8 @@ def validate_scripts() -> None:
 
         if not (len(params) == 0 or
                 (len(params) == 1 and params[0].annotation == list[str])):
-            raise TypeError(f"Function '{name}' must take no arguments or a single argument of type list[str].")
+            raise TypeError(f"Function '{name}' must take no arguments"
+                            f" or a single argument of type list[str].")
 
 
 def display_help() -> None:

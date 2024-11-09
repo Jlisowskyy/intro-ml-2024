@@ -11,11 +11,15 @@ from scipy.io import wavfile
 
 
 def main() -> None:
+    """
+    Script entry point
+    """
+
     sr_anomaly = False
     min_len = float('inf')
     max_len = 0
 
-    for root, dirs, files in walk('./datasets/daps'):
+    for root, _, files in walk('./datasets/daps'):
         for i in files:
             if not i.endswith('.wav'):
                 continue

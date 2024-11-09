@@ -24,9 +24,9 @@ def main() -> None:
                 continue
             location = dirs[-2]
             speaker = re.search(r'[fm]\d\d?', file)[0]
-            classID = SPEAKER_CLASSES[speaker]
+            class_id = SPEAKER_CLASSES[speaker]
             for i in range(len(samples)):
-                f.write(f'{speaker},{location},{file},{i},{classID}\n')
+                f.write(f'{speaker},{location},{file},{i},{class_id}\n')
 
 
 if __name__ == "__main__":

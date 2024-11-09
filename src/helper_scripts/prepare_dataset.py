@@ -16,7 +16,8 @@ from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
-    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, DATABASE_ANNOTATIONS_PATH
+    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
+    DATABASE_ANNOTATIONS_PATH
 
 
 def main() -> None:
@@ -27,7 +28,7 @@ def main() -> None:
     with open(DATABASE_ANNOTATIONS_PATH, 'w', encoding='UTF-8') as f:
         f.write('speaker,folder,file_name,index,classID\n')
 
-        for root, dirs, files in walk(DATABASE_PATH):
+        for root, _, files in walk(DATABASE_PATH):
             folder = root.rsplit('/')[-1]
             new_root = root.replace('daps', DATABASE_OUT_NAME)
 

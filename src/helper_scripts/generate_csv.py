@@ -11,6 +11,10 @@ from src.constants import DATABASE_PATH, DATABASE_ANNOTATIONS_PATH
 
 
 def main() -> None:
+    """
+    Script entry point
+    """
+
     with open(DATABASE_ANNOTATIONS_PATH, 'w', encoding='UTF-8') as f:
         f.write('file_name,speaker,folder,classID\n')
 

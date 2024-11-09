@@ -5,7 +5,6 @@ Modul for generating spectrograms and showing/saving it
 """
 
 import argparse
-from typing import List
 
 import matplotlib.pyplot as plt
 import soundfile as sf
@@ -41,7 +40,8 @@ def process(sound_path: str, output_path: str = None, show: bool = False,
         audio_data = transformation_pipeline.transform([audio_data])[0]
 
     if mel:
-        spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
+        spectrogram = gen_mel_spectrogram(audio_data.audio_signal,
+                                          audio_data.sample_rate, show_axis)
     else:
         spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
 
