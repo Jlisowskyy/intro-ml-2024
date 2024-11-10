@@ -9,6 +9,8 @@
     - [Installation](#installation)
    - [Running the Project](#running-the-project)
        - [Frontend](#frontend)
+       - [Testing](#testing)
+       - [Scripts](#scripts)
 4. [Project Description](#project-description)
 5. [Authors](#authors)
 6. [License](#license)
@@ -27,16 +29,22 @@ The project task is to develop CNN model for intercom device detecting authorise
 ├── reports
 └── src
     ├── audio
+    ├── cnn
+    ├── frontend
+    ├── helper_scripts
+    ├── pipelines
     ├── test
-    ├── validation
-    └── frontend
+    └── validation
 ```
 
 - `examples`: Contains example code using jupyter notebooks.
 - `reports`: Contains reports and documentation created for project milestones etc.
 - `src`: Contains the source code for the project.
+    - `audio`: Contains the code for the audio processing part of the project.
+    - `cnn`: Contains code for the CNN model.
   - `frontend`: Contains the code for the frontend of the project.
-  - `audio`: Contains the code for the audio processing part of the project.
+    - `helper_scripts`: Collection of standalone scripts used in the project.
+    - `pipelines`: Contains the code for the data processing pipelines.
   - `test`: Contains the code for testing the project.
   - `validation`: Contains the code for validation of the project.
 
@@ -111,6 +119,20 @@ To run a specific test, run:
 
 ```shell
 python test_runner.py <test_name>
+```
+
+#### Scripts:
+
+To get list of the available scripts, run:
+
+```shell
+python script_runner.py
+```
+
+To run a specific script, run:
+
+```shell
+python script_runner.py <script_name>
 ```
 
 ## Project Description:

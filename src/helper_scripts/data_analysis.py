@@ -9,13 +9,17 @@ from os.path import join
 
 from scipy.io import wavfile
 
-if __name__ == "__main__":
+
+def main() -> None:
+    """
+    Script entry point
+    """
+
     sr_anomaly = False
     min_len = float('inf')
     max_len = 0
 
-    for root, dirs, files in walk('./datasets/daps'):
-        folder = root.rsplit('/')[-1]
+    for root, _, files in walk('./datasets/daps'):
         for i in files:
             if not i.endswith('.wav'):
                 continue
@@ -34,3 +38,7 @@ if __name__ == "__main__":
 
     print(f'Min duration: {min_len} s')
     print(f'Max duration: {max_len} s')
+
+
+if __name__ == "__main__":
+    main()

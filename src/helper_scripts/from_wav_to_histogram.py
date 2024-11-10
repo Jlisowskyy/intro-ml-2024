@@ -5,6 +5,8 @@ Modul for generating histograms from audio files
 """
 
 import os
+import sys
+from pathlib import Path
 
 import numpy as np
 import soundfile as sf
@@ -17,30 +19,29 @@ from src.audio.spectrogram import gen_mel_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
 
 
-
-def cut_audio_to_5_seconds(folder):
+def cut_audio_to_5_seconds(directory):
     """
     Function that cuts audio files to 5 seconds parts
     Args:
-        folder (str): Path to the folder with audio files.
+        directory (str): Path to the directory with audio files.
     """
-    if not os.path.exists(folder):
-        print("Folder does not exist")
+    if not os.path.exists(directory):
+        print("directory does not exist")
         return ""
 
-    output_folder=os.path.join(folder, "_5_seconds_audio")
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+    output_directory = os.path.join(directory, "_5_seconds_audio")
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
 
-    files = os.listdir(folder)
+    files = os.listdir(directory)
     for index,file in enumerate(files):
         if file.endswith(".wav"):
-            data, samplerate = sf.read(os.path.join(folder, file))
+            data, samplerate = sf.read(os.path.join(directory, file))
 
             #cut into 5 seconds parts
             length=len(data)
             for i in range(0,length,samplerate*5):
-                name=os.path.join(output_folder, file[:-4]+"_"+str(i)+".wav")
+                name = os.path.join(output_directory, file[:-4] + "_" + str(i) + ".wav")
                 data_part=data[i:i+samplerate*5]
                 if len(data_part)<samplerate*5:
                     break
@@ -49,22 +50,23 @@ def cut_audio_to_5_seconds(folder):
         print(f"Cutting: Done with {file}, {index}")
 
     print("Done with cutting audio files to 5 seconds parts")
-    return output_folder
+    return output_directory
 
-def create_spectrograms(folder, denoise=False):
+
+def create_spectrograms(directory, denoise=False):
     """
     Function that creates spectrograms from audio files
     Args:
-        folder (str): Path to the folder with audio files.
+        directory (str): Path to the directory with audio files.
     """
-    output_folder=os.path.join(folder, "_spectrograms")
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+    output_directory = os.path.join(directory, "_spectrograms")
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
 
-    files = os.listdir(folder)
+    files = os.listdir(directory)
     for index,file in enumerate(files):
         if file.endswith(".wav"):
-            data, samplerate = sf.read(os.path.join(folder, file))
+            data, samplerate = sf.read(os.path.join(directory, file))
             audio_data = AudioData(data, samplerate)
             if denoise:
                 transformation_pipeline = Pipeline(steps=[
@@ -73,18 +75,19 @@ def create_spectrograms(folder, denoise=False):
                 transformation_pipeline.fit([data])
                 audio_data = transformation_pipeline.transform([audio_data])[0]
             spectrogram = gen_mel_spectrogram(audio_data.audio_signal, samplerate)
-            save_spectrogram(spectrogram, os.path.join(output_folder, file[:-4]+".png"))
+            save_spectrogram(spectrogram, os.path.join(output_directory, file[:-4] + ".png"))
             print(f"Spectrogram: Done with {file}, {index}")
     print("Done with creating spectrograms")
-    return output_folder
+    return output_directory
 
-def create_rgb_histogram(folder): #pylint: disable=too-many-locals
+
+def create_rgb_histogram(directory):  # pylint: disable=too-many-locals
     """
     Function that creates rgb histograms from spectrograms
     Args:
-        folder (str): Path to the folder with spectrograms.
+        directory (str): Path to the directory with spectrograms.
     """
-    files= os.listdir(folder)
+    files = os.listdir(directory)
     class1 = ["f1", "f7", "f8", "m3", "m6", "m8"]
     array_class1 = [[0] * 256 for _ in range(3)]
     array_class0 = [[0] * 256 for _ in range(3)]
@@ -93,7 +96,7 @@ def create_rgb_histogram(folder): #pylint: disable=too-many-locals
     num_class0 = 0
 
     for index, file_name in enumerate(files):
-        image = Image.open(os.path.join(folder, file_name))
+        image = Image.open(os.path.join(directory, file_name))
         image_array = np.array(image)
 
         # Separate the color channels
@@ -174,39 +177,61 @@ def delete_silence(data, threshold):
     """
     return data[np.where(np.abs(data) > threshold)]
 
-def delete_silence_in_files(folder, threshold):
+
+def delete_silence_in_files(directory, threshold):
     """
     Function that deletes silence from audio data
     Args:
         data (np.array): Audio data.
         threshold (float): Threshold for silence.
     """
-    output_folder=os.path.join(folder, "_silence_deleted")
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
-    files= os.listdir(folder)
+    output_directory = os.path.join(directory, "_silence_deleted")
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    files = os.listdir(directory)
     for index,file in enumerate(files):
         if file.endswith(".wav"):
-            data, samplerate = sf.read(os.path.join(folder, file))
+            data, samplerate = sf.read(os.path.join(directory, file))
             data = delete_silence(data, threshold)
-            sf.write(os.path.join(output_folder, file),  data, samplerate)
+            sf.write(os.path.join(output_directory, file), data, samplerate)
             print(f"Silence: Done with {file}, {index}")
     print("Done with deleting silence")
-    return output_folder
+    return output_directory
 
-def main(folder):
+
+def process_directory(directory: str) -> None:
     """
-    Main function that processes the audio files, generates spectrograms, and optionally 
+    Main function that processes the audio files, generates spectrograms, and optionally
     creates rgb histograms.
-    Args:
-        folder (str): Path to the folder with audio files.
+
+    :param directory: Path to the directory with audio files
     """
 
-    output_folder=delete_silence_in_files(folder, 0.01)
-    output_folder=cut_audio_to_5_seconds(output_folder)
-    output_folder=create_spectrograms(output_folder, True)
-    array_class1, array_class0=create_rgb_histogram(output_folder)
+    output_directory = delete_silence_in_files(directory, 0.01)
+    output_directory = cut_audio_to_5_seconds(output_directory)
+    output_directory = create_spectrograms(output_directory, True)
+    array_class1, array_class0 = create_rgb_histogram(output_directory)
     show_rgb_histogram(array_class1, array_class0)
 
-FOLDER1=r"C:\Users\pietr\Desktop\Nowy folder2"
-main(FOLDER1)
+
+DEFAULT_DIR = str(Path.resolve(Path(f'{__file__}/../work_dir')))
+
+
+def main(args: list[str]) -> None:
+    """
+    Program entry point
+
+    :param args: list of arguments
+    """
+
+    if len(args) == 0:
+        directory = DEFAULT_DIR
+    elif len(args) == 1:
+        directory = args[0]
+    else:
+        raise ValueError("Invalid number of arguments")
+    process_directory(directory)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
