@@ -73,7 +73,7 @@ def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
     """
     dpi = 100
     s = feature.melspectrogram(y=audio_data, sr=sample_rate,
-                                       n_fft=4096, hop_length=512, n_mels=512,
+                                       n_fft=4096, hop_length=512, n_mels=128,
                                        fmax=DENOISE_FREQ_HIGH_CUT)
     s_db = librosa.power_to_db(s, ref=np.max)
 

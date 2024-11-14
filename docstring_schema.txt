@@ -1,0 +1,27 @@
+"""
+Author: Name Surname, 2024
+
+Here is a file description and what this file does. 
+"""
+
+class ExampleClass:
+    """
+    Description of the class and what it does.
+
+    Attributes:
+        attribute1 (str): description of attribute1.
+        attribute2 (int): description of attribute2.
+    """
+
+    def ExampleFunction(self, parametr1):
+        """
+        Promotes the employee and increases their salary.
+
+        Parameters:
+            parametr1 (float): description of parametr1.
+            
+        Returns:
+            return_type: description of the return value.
+        """
+        pass
+    
