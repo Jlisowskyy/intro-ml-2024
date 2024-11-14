@@ -16,8 +16,8 @@ import argparse
 import uvicorn
 
 from src.cnn import train
-from src.helper_scripts import validate_dataset
 from src.helper_scripts import prepare_dataset
+from src.helper_scripts import validate_dataset
 
 
 def fastapi_main() -> None:
@@ -111,6 +111,7 @@ def interactive_mode():
     until 'exit' is entered or the program is interrupted. Invalid commands
     will display the help message.
     """
+
     print("Entering interactive mode...")
     display_parse_help()
 

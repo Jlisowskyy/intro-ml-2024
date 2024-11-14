@@ -15,6 +15,9 @@ PNG_NUM_COLORS = 3
 
 
 def manual_test_dataset() -> None:
+    """
+    Manual test for the DAPSDataset
+    """
     d = DAPSDataset(DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH,
                     'cuda')
     print(d[0])

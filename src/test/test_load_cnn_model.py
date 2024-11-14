@@ -6,7 +6,7 @@ and print its details.
 """
 
 import argparse
-from src.pipelines.load_model import load_model
+from src.cnn.cnn import BasicCNN
 
 def main(model_file_path: str):
     """
@@ -17,7 +17,7 @@ def main(model_file_path: str):
     """
     print(f"File path received: {model_file_path}")
 
-    model = load_model(model_file_path)
+    model = BasicCNN.load_model(model_file_path)
     print(model)
 
 if __name__ == "__main__":
