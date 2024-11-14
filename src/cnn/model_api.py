@@ -1,22 +1,21 @@
 """
-Author: Jakub Lisowski, 2024
+Author: Jakub Lisowski, Michal Kwiatkowski, Tomasz Mycielski, Jakub Pietrzak 2024
 
-Simple function classifying whole wav data using provided classifier
+Module for classifying audio data using a CNN model.
+
 """
-
-from typing import Callable
 
 from src.audio.audio_data import AudioData
 from src.audio.wav import FlattenWavIterator
+from src.cnn.cnn import BasicCNN
 from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType
 
-
-def classify_file(file_path: str, classifier: Callable[[AudioData], int]) -> bool:
+def classify_file(file_path: str, model: BasicCNN) -> bool:
     """
     Classify audio data from a file using the provided classifier.
 
     :param file_path: The path to the audio file to classify
-    :param classifier: The classifier function to use
+    :param model: The classifier object to use
 
     :return: True if audio belongs 1 claas, False otherwise
     """
@@ -28,7 +27,7 @@ def classify_file(file_path: str, classifier: Callable[[AudioData], int]) -> boo
     for chunk in it:
         audio_data = AudioData(chunk, int(sr))
 
-        result = classifier(audio_data)
+        result = model.classify(audio_data)
         print(f"Classified as: {result}")
         results[result] += 1
 
