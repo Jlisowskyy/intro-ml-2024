@@ -7,15 +7,11 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
 from src.constants import MODEL_BASE_PATH
-from src.frontend.logger import get_fastapi_logger
 from src.frontend.models import ModelResponse
 from src.pipelines.classify_file import classify_file
 from src.pipelines.load_model import get_classifier
 
 app = FastAPI()
-
-logger = get_fastapi_logger()
-logger.info('API is starting up')
 
 index_path = Path.resolve(Path(f'{__file__}/../index.html'))
 
@@ -38,12 +34,10 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
                 response="Invalid file type. Please upload a WAV file.")
 
         contents = await file.read()
-        logger.info("Received file of size: %d bytes", len(contents))
 
         Path("uploaded_files").mkdir(exist_ok=True)
         with open("uploaded_files/user-uploaded.wav", "wb") as audio_file:
             audio_file.write(contents)
-        logger.info("File saved to uploaded_files/user-uploaded.wav")
 
         result = classify_file("uploaded_files/user-uploaded.wav", classifier)
 

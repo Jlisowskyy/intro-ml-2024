@@ -7,6 +7,7 @@ from datetime import datetime
 from random import randint
 
 import torch
+from src.validation.simple_validation import SimpleValidation
 from torch import nn
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
@@ -18,7 +19,6 @@ from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
-from src.validation.simple_validation import SimpleValidation
 
 
 def train_single_epoch(
@@ -176,7 +176,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Simp
     return validator
 
 
-if __name__ == '__main__':
+def main() -> None:
     if torch.cuda.is_available():
         DEVICE = 'cuda'
     else:
@@ -195,8 +195,8 @@ if __name__ == '__main__':
     GENERATOR = torch.Generator().manual_seed(seed)
     train_dataset, validation_dataset, test_dataset = (
         torch.utils.data.random_split(dataset,
-            [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
-            TRAINING_TEST_SET_SIZE], generator=GENERATOR))
+                                      [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
+                                       TRAINING_TEST_SET_SIZE], generator=GENERATOR))
 
     train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_TRAIN_BATCH_SIZE)
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
@@ -204,7 +204,6 @@ if __name__ == '__main__':
 
     # training
     for index, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-
         cnn = BasicCNN().to(DEVICE)
         print(cnn)
 
@@ -217,3 +216,6 @@ if __name__ == '__main__':
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
         test(cnn, test_dataloader, DEVICE)
+
+if __name__ == '__main__':
+    main()

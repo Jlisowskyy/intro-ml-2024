@@ -6,7 +6,7 @@ Simple class providing a simple validation method
 from torch import Tensor
 
 
-class SimpleValidation:
+class Validator:
     """
     Class providing a simple validation
 
@@ -22,14 +22,14 @@ class SimpleValidation:
         Method initializing the validation
         """
 
-        self.restart()
-
-    def restart(self) -> None:
-        """
-        Method restarting the validation
-        """
-
         self._results = [[0, 0], [0, 0]]
+
+    def get_results(self) -> list[list[int]]:
+        """
+        Method returning the results
+        """
+
+        return self._results
 
     def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
@@ -76,10 +76,10 @@ Macro F1: {macro_f1}
 
         print(self.get_results_str())
 
-    def __add__(self, b):
-        out = SimpleValidation()
-        out._results[0][0] = self._results[0][0] + b._results[0][0]
-        out._results[0][1] = self._results[0][1] + b._results[0][1]
-        out._results[1][0] = self._results[1][0] + b._results[1][0]
-        out._results[1][1] = self._results[1][1] + b._results[1][1]
+    def __add__(self, b : 'Validator') -> 'Validator':
+        out = Validator()
+        out._results[0][0] = self._results[0][0] + b.get_results()[0][0]
+        out._results[0][1] = self._results[0][1] + b.get_results()[0][1]
+        out._results[1][0] = self._results[1][0] + b.get_results()[1][0]
+        out._results[1][1] = self._results[1][1] + b.get_results()[1][1]
         return out
