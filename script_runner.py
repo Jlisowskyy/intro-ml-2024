@@ -10,22 +10,16 @@ from typing import Callable
 
 from src.helper_scripts import data_analysis
 from src.helper_scripts import from_wav_to_histogram
-from src.helper_scripts import generate_csv
 from src.helper_scripts import generate_rgb_histogram
-from src.helper_scripts import prepare_dataset
 from src.helper_scripts import regenerate_csv
 from src.helper_scripts import spectrogram_script
-from src.helper_scripts import validate_dataset
 
 SCRIPTS: dict[str, Callable[..., None]] = {
     "data_analysis": data_analysis.main,
     "from_wav_to_histogram": from_wav_to_histogram.main,
-    "generate_csv": generate_csv.main,
     "generate_rgb_histogram": generate_rgb_histogram.main,
-    "prepare_dataset": prepare_dataset.main,
     "regenerate_csv": regenerate_csv.main,
     "spectrogram_script": spectrogram_script.main,
-    "validate_dataset": validate_dataset.main,
 }
 
 
