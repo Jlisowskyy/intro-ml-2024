@@ -56,16 +56,16 @@ def handle_command(command: str) -> bool:
     :returns: True if the command was recognized and executed successfully,
               False if the command was not recognized.
     """
-    if command == 'train' or command == '-t' or command == '--train':
+    if command in ('train', '-t', '--train'):
         print("Starting training...")
         train.main()
-    elif command == 'validate' or command == '-v' or command == '--validate':
+    elif command in ('validate', '-v', '--validate'):
         print("Starting validation...")
         validate_dataset.main()
-    elif command == 'run' or command == '-r' or command == '--run':
+    elif command in ('run', '-r', '--run'):
         print("Starting frontend...")
         fastapi_main()
-    elif command == 'prepare' or command == '-p' or command == '--prepare':
+    elif command in ('prepare', '-p', '--prepare'):
         print("Starting db preparation...")
         prepare_dataset.main()
     else:
