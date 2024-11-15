@@ -29,15 +29,16 @@ def get_random_audio_path(dir_path: str) -> str:
         files = [f for f in os.listdir(dir_path) if f.endswith(".wav")]
         if files:
             return os.path.join(dir_path, random.choice(files))
-        subdirectories = [d for d in os.listdir(dir_path) 
+        subdirectories = [d for d in os.listdir(dir_path)
                           if os.path.isdir(os.path.join(dir_path, d))]
         if not subdirectories:
             raise FileNotFoundError("No `.wav` files found in the directory or its subdirectories.")
         dir_path = os.path.join(dir_path, random.choice(subdirectories))
 
-def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1, output_path: 
+def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1, output_path:
             str = None, show: bool = False,
             mel: bool = False, clean_data: bool = False, show_axis: bool = False):
+    # pylint: disable=too-many-locals
     """
     Process function that processes the audio file, generates a spectrogram, and optionally
     cleans the data.
@@ -52,12 +53,13 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
         clean_data (bool): Flag to clean and normalize the audio data.
         show_axis (bool): Flag to show axis on the spectrogram plot.
     """
-    
+
     for i in range(number_of_samples):
         new_sound_path = sound_path
         if sound_path == "" or sound_path is None:
             new_sound_path = get_random_audio_path(directory)
         print(new_sound_path)
+
         data, samplerate = sf.read(new_sound_path)
         audio_data = AudioData(data, samplerate)
 
@@ -72,10 +74,12 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
             spectrogram = gen_mel_spectrogram(audio_data.audio_signal,
                                             audio_data.sample_rate, show_axis)
         else:
-            spectrogram = gen_spectrogram(audio_data.audio_signal, audio_data.sample_rate, show_axis)
+            spectrogram = gen_spectrogram(audio_data.audio_signal,
+                                          audio_data.sample_rate, show_axis)
 
         if output_path:
             splited_path=output_path.split(".")
+
             save_spectrogram(spectrogram, splited_path[0]+str(i)+"."+splited_path[1])
 
         if show:
