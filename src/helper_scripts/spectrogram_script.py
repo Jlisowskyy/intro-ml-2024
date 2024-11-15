@@ -79,7 +79,6 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
 
         if output_path:
             splited_path=output_path.split(".")
-
             save_spectrogram(spectrogram, splited_path[0]+str(i)+"."+splited_path[1])
 
         if show:
