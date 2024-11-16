@@ -26,4 +26,4 @@ def is_speech(audio: np.array, silence_tolerance: float = DETECT_SILENCE_TOLERAN
     silent_samples = np.sum(np.abs(audio) < silence_threshold)
     total_samples = len(audio)
     silence_percentage = silent_samples / total_samples
-    return silence_percentage < silence_tolerance
+    return not (silence_percentage >= silence_tolerance)
