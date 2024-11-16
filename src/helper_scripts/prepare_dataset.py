@@ -51,7 +51,7 @@ def main() -> None:
                     if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
                         continue
 
-                    if not detect_speech.is_speech(audio_data.audio_signal, int(sr)):
+                    if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
                     audio_data = denoise.denoise(audio_data.audio_signal, sr)

@@ -10,16 +10,6 @@ from enum import Enum, IntEnum
 # TYPE ENUMS
 # ------------------------------
 
-class DenoiseType(Enum):
-    """
-    Enum for different types of denoising.
-    Future types of denoising can be added here and
-    handled in the denoise function
-    """
-
-    BASIC = 1
-
-
 class NormalizationType(Enum):
     """
     Enum for different types of normalization.
@@ -43,8 +33,6 @@ class WavIteratorType(IntEnum):
 # ------------------------------
 # DENOISE constants
 # ------------------------------
-
-DENOISE_TYPE: DenoiseType = DenoiseType.BASIC
 
 DENOISE_FREQ_LOW_CUT: float = 50.0
 """

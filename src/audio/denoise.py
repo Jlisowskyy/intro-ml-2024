@@ -8,32 +8,35 @@ Currently, supports basic denoising for human speech frequencies.
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DenoiseType
+from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT
 
 
 def denoise(chunk: np.array,
             fs: float,
-            denoise_type: DenoiseType = DenoiseType.BASIC) -> np.array:
+            lowcut: float = DENOISE_FREQ_LOW_CUT,
+            highcut: float = DENOISE_FREQ_HIGH_CUT) -> np.array:
     """
     Denoise the given audio chunk using the specified denoise type.
 
     :param chunk: Audio chunk (numpy array) to be denoised
     :param fs: Sampling rate (frame rate in Hz)
-    :param denoise_type: Type of denoising to perform
+    :param lowcut: Lower bound of the frequency range (Hz)
+    :param highcut: Upper bound of the frequency range (Hz)
+
     :return: Denoised chunk of audio data
     """
 
     assert chunk.dtype in (np.float32, np.float64)
-    if denoise_type == DenoiseType.BASIC:
-        return denoise_basic(chunk, fs)
 
-    raise ValueError(f"Unsupported denoise type: {denoise_type}")
+    return butter_bandpass(chunk, lowcut, highcut, fs)
 
 
-def butter_bandpass(lowcut: float, highcut: float, fs: float, order: int = 6) -> any:
+def butter_bandpass(chunk: np.array, lowcut: float, highcut: float, fs: float,
+                    order: int = 6) -> np.array:
     """
     Create a bandpass filter to allow frequencies within a specified range and block others.
 
+    :param chunk: Audio chunk (numpy array) to be denoised
     :param lowcut: Lower bound of the frequency range (Hz)
     :param highcut: Upper bound of the frequency range (Hz)
     :param fs: Sampling rate (frame rate in Hz)
@@ -47,21 +50,8 @@ def butter_bandpass(lowcut: float, highcut: float, fs: float, order: int = 6) ->
     if low <= 0 or high >= 1:
         raise ValueError(
             f"Invalid critical frequencies: low={low}, high={high}. Ensure 0 < low < high < 1.")
+
     sos = butter(order, [low, high], analog=False, btype='band', output='sos')
-
-    return sos
-
-
-def denoise_basic(chunk: np.array, fs: float) -> np.array:
-    """
-    Perform basic denoising by applying a bandpass filter to the chunk of audio data.
-
-    :param chunk: Audio chunk (numpy array) to be denoised
-    :param fs: Sampling rate (frame rate in Hz)
-    :return: Filtered chunk of audio data
-    """
-
-    sos = butter_bandpass(DENOISE_FREQ_LOW_CUT, DENOISE_FREQ_HIGH_CUT, fs)
     filtered_chunk = sosfilt(sos, chunk)
 
     return filtered_chunk
