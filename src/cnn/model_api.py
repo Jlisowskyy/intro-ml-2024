@@ -6,7 +6,7 @@ Module for classifying audio data using a CNN model.
 """
 
 from src.audio.audio_data import AudioData
-from src.audio.wav import FlattenWavIterator
+from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.cnn.cnn import BasicCNN
 from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType
 
@@ -21,13 +21,11 @@ def classify_file(file_path: str, model: BasicCNN) -> bool:
     """
 
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
-    sr = it.get_first_iter().get_frame_rate()
+    it = AudioDataIterator(it)
 
     results = [0, 0]
     for chunk in it:
-        audio_data = AudioData(chunk, int(sr))
-
-        result = model.classify(audio_data)
+        result = model.classify(chunk)
         print(f"Classified as: {result}")
         results[result] += 1
 
