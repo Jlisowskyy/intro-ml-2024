@@ -11,9 +11,9 @@ from scipy.signal import butter, sosfilt
 from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DenoiseType
 
 
-def denoise(chunk: np.ndarray,
+def denoise(chunk: np.array,
             fs: float,
-            denoise_type: DenoiseType = DenoiseType.BASIC) -> np.ndarray:
+            denoise_type: DenoiseType = DenoiseType.BASIC) -> np.array:
     """
     Denoise the given audio chunk using the specified denoise type.
 
@@ -52,7 +52,7 @@ def butter_bandpass(lowcut: float, highcut: float, fs: float, order: int = 6) ->
     return sos
 
 
-def denoise_basic(chunk: np.ndarray, fs: float) -> np.ndarray:
+def denoise_basic(chunk: np.array, fs: float) -> np.array:
     """
     Perform basic denoising by applying a bandpass filter to the chunk of audio data.
 

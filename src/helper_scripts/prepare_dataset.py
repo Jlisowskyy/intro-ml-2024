@@ -17,7 +17,7 @@ from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
     DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
-    DATABASE_ANNOTATIONS_PATH
+    DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE
 
 
 def main() -> None:
@@ -55,8 +55,7 @@ def main() -> None:
                         continue
 
                     audio_data = denoise.denoise(audio_data.audio_signal, sr)
-                    audio_data = normalize.normalize(audio_data, sr,
-                                                     src.constants.NormalizationType.MEAN_VARIANCE)
+                    audio_data = normalize.normalize(audio_data, sr, NORMALIZATION_TYPE)
                     spectrogram = gen_mel_spectrogram(audio_data, int(sr),
                                                       width=SPECTROGRAM_WIDTH,
                                                       height=SPECTROGRAM_HEIGHT)

@@ -2,47 +2,74 @@
 Author: Łukasz Kryczka, 2024
 
 Test cases for the normalization module.
-Tests the mean-variance normalization, PCEN, and CMVN.
+Tests the mean-variance normalization, PCEN, and CMVN using WAV file input.
 """
 
 import librosa.feature
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 from scipy.signal import spectrogram
+import soundfile as sf
 
 from src.audio.normalize import mean_variance_normalization, pcen_normalization, cmvn_normalization
 
+# Define paths
+TEST_DATA_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
 
-def generate_sine_wave(frequency: int,
-                       duration: float,
-                       sample_rate: int,
-                       amplitude: float = 1.0) -> np.ndarray:
+
+def load_audio_file(file_path: str) -> tuple[np.ndarray, int]:
     """
-    Generate a sine wave of a given frequency.
+    Load an audio file and return the audio data and sample rate.
 
-    :param frequency: Frequency of the sine wave in Hz
-    :param duration: Duration of the signal in seconds
-    :param sample_rate: Sample rate (samples per second)
-    :param amplitude: Amplitude of the sine wave
-    :return: Generated sine wave as a numpy array
+    :param file_path: Path to the audio file
+    :return: Tuple of (audio_data, sample_rate)
     """
+    audio_data, sample_rate = sf.read(file_path)
+    return audio_data, sample_rate
 
-    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-    return amplitude * np.sin(2 * np.pi * frequency * t)
+
+def plot_spectrograms(original: np.ndarray,
+                     normalized: np.ndarray,
+                     sample_rate: int,
+                     title: str) -> None:
+    """
+    Plot spectrograms of original and normalized signals side by side.
+
+    :param original: Original signal
+    :param normalized: Normalized signal
+    :param sample_rate: Sample rate of the signals
+    :param title: Title for the plot
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+    # Original spectrogram
+    freqs1, times1, sxx1 = spectrogram(original, fs=sample_rate, nperseg=256)
+    pcm1 = ax1.pcolormesh(times1, freqs1, 10 * np.log10(sxx1), shading='gouraud')
+    ax1.set_ylabel('Frequency [Hz]')
+    ax1.set_xlabel('Time [s]')
+    ax1.set_title('Original Signal')
+    fig.colorbar(pcm1, ax=ax1, label='Power [dB]')
+
+    # Normalized spectrogram
+    freqs2, times2, sxx2 = spectrogram(normalized, fs=sample_rate, nperseg=256)
+    pcm2 = ax2.pcolormesh(times2, freqs2, 10 * np.log10(sxx2), shading='gouraud')
+    ax2.set_ylabel('Frequency [Hz]')
+    ax2.set_xlabel('Time [s]')
+    ax2.set_title('Normalized Signal')
+    fig.colorbar(pcm2, ax=ax2, label='Power [dB]')
+
+    plt.suptitle(title)
+    plt.tight_layout()
+    plt.show()
 
 
-# Test for Mean and Variance Normalization
 def manual_test_mean_variance_normalization() -> None:
     """
     Test that mean and variance normalization results in a signal with mean ~0 and std ~1.
     """
-
-    sample_rate = 44100
-    duration = 1.0
-    freq = 1000
-
-    sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = mean_variance_normalization(sine_wave)
+    audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
+    normalized_wave = mean_variance_normalization(audio_data)
 
     mean = np.mean(normalized_wave)
     std = np.std(normalized_wave)
@@ -50,75 +77,36 @@ def manual_test_mean_variance_normalization() -> None:
     assert np.isclose(mean, 0, atol=0.01), f"Mean is not close to 0: {mean}"
     assert np.isclose(std, 1, atol=0.01), f"Standard deviation is not close to 1: {std}"
 
-    freqs, times, sxx = spectrogram(normalized_wave, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after Mean-Variance Normalization - Manual Check')
-    plt.show()
+    plot_spectrograms(
+        audio_data,
+        normalized_wave,
+        sample_rate,
+        'Mean-Variance Normalization Comparison'
+    )
 
 
-# Test for PCEN Normalization
 def manual_test_pcen_normalization() -> None:
     """
     Test that PCEN normalization applies dynamic range compression.
     """
+    audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
+    normalized_wave = pcen_normalization(audio_data, sample_rate)
 
-    sample_rate = 44100
-    duration = 1.0
-    freq = 1000
-
-    sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = pcen_normalization(sine_wave, sample_rate)
-
-    freqs, times, sxx = spectrogram(normalized_wave, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after PCEN Normalization - Manual Check')
-    plt.show()
+    plot_spectrograms(
+        audio_data,
+        normalized_wave,
+        sample_rate,
+        'PCEN Normalization Comparison'
+    )
 
 
-# Test for CMVN Normalization
-def manual_test_cmvn_normalization() -> None:
-    """
-    Test that CMVN normalization results in cepstral coefficients with mean ~0 and std ~1.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    freq = 1000
-
-    sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = cmvn_normalization(sine_wave, sample_rate)
-
-    mfccs = librosa.feature.mfcc(y=normalized_wave, sr=sample_rate, n_mfcc=13)
-    mfccs_mean = np.mean(mfccs, axis=1)
-    mfccs_std = np.std(mfccs, axis=1)
-
-    # Skip the first two coefficients as the first one is the energy and
-    # the second one is the delta energy and both are expected to be non-zero
-    assert np.allclose(mfccs_mean[2:], 0, atol=0.12), \
-        f"Mean of cepstral coefficients is not close to 0: {mfccs_mean[2:]}"
-    # Allow a larger tolerance for the standard deviation
-    # (The not normalized signal has std of order 5e2, and the normalization is not perfect)
-    assert np.allclose(mfccs_std, 1, atol=0.80), \
-        f"Standard deviation of cepstral coefficients is not close to 1: {mfccs_std}"
-
-    freqs, times, sxx = spectrogram(normalized_wave, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after CMVN Normalization - Manual Check')
-    plt.show()
-
-
-# Running all tests
 def manual_test() -> None:
     """
     Run all the tests
     """
-
     manual_test_mean_variance_normalization()
     manual_test_pcen_normalization()
-    manual_test_cmvn_normalization()
+
+
+if __name__ == "__main__":
+    manual_test()

@@ -25,29 +25,13 @@ def mean_variance_normalization(signal: np.array) -> np.array:
     normalized_signal = (signal - mean) / std
     return normalized_signal
 
-
-def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
-    """
-    Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
-
-    Source: https://en.wikipedia.org/wiki/Cepstral_mean_and_variance_normalization
-
-    :param signal: Input audio signal (numpy array)
-    :param fs: Sampling rate
-    :return: CMVN normalized audio signal (numpy array)
-    """
-
-    raise NotImplementedError("CMVN normalization is not implemented yet")
-
-
-
-def pcen_normalization(signal: np.ndarray,
+def pcen_normalization(signal: np.array,
                        fs: float,
                        time_constant: float = 0.06,
                        alpha: float = 0.98,
                        delta: float = 2,
                        r: float = 0.5,
-                       eps: float = 1e-6) -> np.ndarray:
+                       eps: float = 1e-6) -> np.array:
     # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
@@ -73,10 +57,10 @@ def pcen_normalization(signal: np.ndarray,
     return normalized_signal
 
 
-def normalize(signal: np.ndarray,
+def normalize(signal: np.array,
               fs: float,
               normalization_type: NormalizationType,
-              *args) -> np.ndarray:
+              *args) -> np.array:
     """
     General normalize function that chooses between currently implemented normalization methods.
 
@@ -93,7 +77,5 @@ def normalize(signal: np.ndarray,
         return mean_variance_normalization(signal)
     if normalization_type == NormalizationType.PCEN:
         return pcen_normalization(signal, fs, *args)
-    if normalization_type == NormalizationType.CMVN:
-        return cmvn_normalization(signal, fs)
 
     raise ValueError("Unsupported normalization type")

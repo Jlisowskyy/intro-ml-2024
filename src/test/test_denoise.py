@@ -17,7 +17,7 @@ from src.constants import DenoiseType
 def generate_sine_wave(frequency: int,
                        duration: float,
                        sample_rate: int,
-                       amplitude: float = 1.0) -> np.ndarray:
+                       amplitude: float = 1.0) -> np.array:
     """
     Generate a sine wave of a given frequency.
 
@@ -32,7 +32,7 @@ def generate_sine_wave(frequency: int,
     return amplitude * np.sin(2 * np.pi * frequency * t)
 
 
-def save_wave(file_name: str, data: np.ndarray, sample_rate: int) -> None:
+def save_wave(file_name: str, data: np.array, sample_rate: int) -> None:
     """
     Save a numpy array as a WAV file.
 
@@ -44,7 +44,7 @@ def save_wave(file_name: str, data: np.ndarray, sample_rate: int) -> None:
     write(file_name, sample_rate, data)
 
 
-def load_wave(file_name: str) -> tuple[int, np.ndarray]:
+def load_wave(file_name: str) -> tuple[int, np.array]:
     """
     Load a WAV file and return its sample rate and data.
 

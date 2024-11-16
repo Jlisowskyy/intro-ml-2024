@@ -39,7 +39,7 @@ class WavIteratorBase(ABC):
     _sample_width: int
     _num_channels: int
 
-    _audio_data: np.ndarray
+    _audio_data: np.array
 
     # ------------------------------
     # class creation
@@ -92,7 +92,7 @@ class WavIteratorBase(ABC):
     # Simple getters
     # ------------------------------
 
-    def random_access(self, index: int) -> np.ndarray:
+    def random_access(self, index: int) -> np.array:
         """
         Plain window access method
 
@@ -167,7 +167,7 @@ class WavIteratorBase(ABC):
 
         return self._num_channels
 
-    def get_data(self) -> np.ndarray:
+    def get_data(self) -> np.array:
         """
         Return the audio data
         """
@@ -208,7 +208,7 @@ class WavIteratorBase(ABC):
     # ------------------------------
 
     @abstractmethod
-    def _get_next(self) -> np.ndarray:
+    def _get_next(self) -> np.array:
         """
         Return the next window of samples
 
@@ -282,7 +282,7 @@ class OverlappingWavIterator(WavIteratorBase):
     # Class interaction
     # ------------------------------
 
-    def _get_next(self) -> np.ndarray:
+    def _get_next(self) -> np.array:
         """
         Return the next window of samples or raise StopIteration if the end of the file is reached
 
@@ -326,7 +326,7 @@ class PlainWavIterator(WavIteratorBase):
     # Class interaction
     # ------------------------------
 
-    def _get_next(self) -> np.ndarray:
+    def _get_next(self) -> np.array:
         """
         Get the next window of samples or raise StopIteration if the end of the file is reached
 
@@ -415,7 +415,7 @@ class FlattenWavIterator:
 
         return self.iterate()
 
-    def iterate(self) -> Generator[np.ndarray, None, None]:
+    def iterate(self) -> Generator[np.array, None, None]:
         """
         Return the next window of samples
 

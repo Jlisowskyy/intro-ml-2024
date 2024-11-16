@@ -35,7 +35,7 @@ class Classifier:
         """
         return self
 
-    def predict(self, x_data: list[np.array]) -> np.ndarray:
+    def predict(self, x_data: list[np.array]) -> np.array:
         """
         Predict labels for the given input data.
 

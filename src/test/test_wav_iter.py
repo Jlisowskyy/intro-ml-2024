@@ -20,7 +20,7 @@ FREQUENCY: int = 960
 FILE = "artificial.wav"
 
 # NOTE: AMPLITUDE is set to 0.5, so the generated wave will be in the range [-0.5, 0.5]
-CONVERTERS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
+CONVERTERS: dict[str, Callable[[np.array], np.array]] = {
     "uint8": lambda x: np.uint8((x + AMPLITUDE) * 255),
     "int16": lambda x: np.int16(x * (2 ** 15 - 1)),
     "int32": lambda x: np.int32(x * (2 ** 31 - 1)),
@@ -28,7 +28,7 @@ CONVERTERS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
 
 
 def generate_artificial_wav(fps: int, duration: float,
-                            np_dtype_converter: Callable[[np.ndarray], np.ndarray]) -> None:
+                            np_dtype_converter: Callable[[np.array], np.array]) -> None:
     """
     Generate an artificial WAV file with a single sine wave
 

@@ -102,12 +102,12 @@ def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
     return image_array
 
 
-def save_spectrogram(spectrogram: np.ndarray, file_path: str):
+def save_spectrogram(spectrogram: np.array, file_path: str):
     """
     Saves a spectrogram image to a file.
 
     Args:
-        spectrogram (np.ndarray): Spectrogram to save as an image.
+        spectrogram (np.array): Spectrogram to save as an image.
         file_path (str): Path to save the spectrogram image file.
     """
     plt.imshow(spectrogram)

@@ -21,7 +21,7 @@ class SpeechDetectionType(Enum):
     SILENCE = 1
 
 
-def is_speech(audio: np.ndarray, sr: int,
+def is_speech(audio: np.array, sr: int,
               speech_detection_type: SpeechDetectionType = SpeechDetectionType.SILENCE) -> bool:
     """
     Detect if the audio contains speech.
@@ -40,7 +40,7 @@ def is_speech(audio: np.ndarray, sr: int,
 
 
 def silence_detection(
-    audio: np.ndarray,
+    audio: np.array,
     sr: int,
     silence_tolerance: float,
     silence_threshold : float) -> bool:
