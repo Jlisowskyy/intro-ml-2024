@@ -145,22 +145,26 @@ def test_wav_iter_count_plain() -> None:
 
 
 def test_audio_data_returns_same() -> None:
-    for fps, duration, np_dtype, window_seconds, expected_iterations in PLAIN_CASES:
+    """
+    Test if the AudioData object returns the same audio signal as the raw audio data
+    """
+
+    for fps, duration, np_dtype, window_seconds, _ in PLAIN_CASES:
         with artificial_wav(fps, duration, np_dtype):
             iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.PLAIN)
             iterator1 = AudioDataIterator(iterator)
 
-            for i, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
+            for _, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
                 assert np.array_equal(
                     AudioData(audio_data1, int(iterator.get_frame_rate())).audio_signal,
                     audio_data2.audio_signal)
 
-    for fps, duration, np_dtype, window_seconds, expected_iterations in PLAIN_CASES:
+    for fps, duration, np_dtype, window_seconds, _ in PLAIN_CASES:
         with artificial_wav(fps, duration, np_dtype):
             iterator = FlattenWavIterator(FILE, window_seconds, WavIteratorType.PLAIN)
             iterator1 = AudioDataIterator(iterator)
 
-            for i, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
+            for _, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
                 assert np.array_equal(AudioData(audio_data1,
-                                                int(iterator.get_first_iter().get_frame_rate())).audio_signal,
+                                    int(iterator.get_first_iter().get_frame_rate())).audio_signal,
                                       audio_data2.audio_signal)

@@ -5,7 +5,6 @@ Module for classifying audio data using a CNN model.
 
 """
 
-from src.audio.audio_data import AudioData
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.cnn.cnn import BasicCNN
 from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType

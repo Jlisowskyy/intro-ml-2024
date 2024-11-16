@@ -10,9 +10,7 @@ from os import walk, path, makedirs
 import numpy as np
 from tqdm import tqdm
 
-import src.constants
 from src.audio import normalize, denoise, detect_speech
-from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \

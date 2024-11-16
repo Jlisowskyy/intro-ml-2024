@@ -5,17 +5,18 @@ Test cases for the normalization module.
 Tests the mean-variance normalization, PCEN, and CMVN using WAV file input.
 """
 
-import librosa.feature
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path
-from scipy.signal import spectrogram
 import soundfile as sf
+from scipy.signal import spectrogram
 
-from src.audio.normalize import mean_variance_normalization, pcen_normalization, cmvn_normalization
+from src.audio.normalize import mean_variance_normalization, pcen_normalization
 
 # Define paths
-TEST_DATA_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
+TEST_DATA_PATH = (
+    str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav'))))
 
 
 def load_audio_file(file_path: str) -> tuple[np.ndarray, int]:
