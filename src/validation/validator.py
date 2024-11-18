@@ -1,139 +1,93 @@
 """
-Author: Jakub Lisowski, 2024
+Author: Jakub Lisowski, Tomasz Mycielski, 2024
 
-Mail validation function
+Simple class providing a simple validation method
 """
+from collections.abc import Iterable, Sequence
 
-from abc import ABC, abstractmethod
-from typing import Callable, Type
-
-import numpy as np
-
-
-class ValidatorObj(ABC):
-    """
-    ValidatorObj class
-
-    Base class for all various validation objects that will be used to validate the classifier
-    """
-
-    # ------------------------------
-    # Class fields
-    # ------------------------------
-
-    _classifier: Callable[[np.ndarray], int]
-
-    # ------------------------------
-    # Class creation
-    # ------------------------------
-
-    def __init__(self, classifier: Callable[[np.ndarray], int]) -> None:
-        """
-        Create a new ValidatorObj object
-
-        :param classifier: The classifier function to validate
-        """
-        self._classifier = classifier
-
-    # ------------------------------
-    # Class abstract methods
-    # ------------------------------
-
-    @abstractmethod
-    def validate(self, input_data: tuple[np.ndarray, int]) -> None:
-        """
-        Save the validation result to the internal state
-
-        :param input_data: The input data to validate the classifier [data, expected_output]
-        """
-
-        return
-
-    @abstractmethod
-    def display_graphical_result(self) -> None:
-        """
-        Display the validation result in a graphical form
-        """
-
-        return
-
-    @abstractmethod
-    def get_textual_result(self) -> str:
-        """
-        Get the validation result in a textual form
-        """
-
-        return ""
+import pandas as pd
+from tabulate import tabulate
+from torch import Tensor
 
 class Validator:
     """
-    Validator class
+    Class providing a simple validation
 
-    Class used to validate the classifier by measuring various metrics and displaying them at the
-    end
-
-    :param classifier: The classifier function to validate
+    Class performs:
+    - counting the number of true positives, false positives, false negatives, true negatives
+    - calculating the accuracy, F1 score, macro F1 score
     """
 
-    # ------------------------------
-    # Class fields
-    # ------------------------------
+    _results: pd.DataFrame
 
-    _classifier: Callable[[np.ndarray], int]
-    _validator_objects: list[ValidatorObj]
-
-    # ------------------------------
-    # Class creation
-    # ------------------------------
-
-    def __init__(self, classifier: Callable[[np.ndarray], int],
-                 validator_objects: list[Type[ValidatorObj]]) -> None:
+    def __init__(self, classes: Iterable[any]=None) -> None:
         """
-        Create a new Validator object
-
-        :param classifier: The classifier function to validate
-        :param validator_objects: List of validator objects to use
+        Method initializing the validation
         """
+        if not classes:
+            classes = [0, 1]
 
-        self._classifier = classifier
-        self._validator_objects = [validator(classifier) for validator in validator_objects]
+        self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
-    # ------------------------------
-    # Class interaction
-    # ------------------------------
+    # def restart(self, classes) -> None:
+    #     """
+    #     Method restarting the validation
+    #     """
 
-    def validate(self, input_data: tuple[np.ndarray, int]) -> None:
+    #     # init an n * n array using a list of lists
+
+    def validate(self, predictions: Tensor, target: Tensor,
+                 mapping: Sequence[int]=None) -> None:
         """
-        Validate the classifier using the input data
-
-        :param input_data: The input data to validate the classifier [data, expected_output]
+        Method saving the results of the validation
         """
+        if not mapping:
+            for response, answer in zip(predictions, target):
+                self._results[response.argmax(0).item()][answer.item()] += 1
+        else:
+            for response, answer in zip(predictions, target):
+                self._results[mapping[response.argmax(0).item()]][mapping[answer.item()]] += 1
 
-        for validator in self._validator_objects:
-            validator.validate(input_data)
-
-    def display_graphical_result(self) -> None:
+    def get_results_str(self) -> str:
         """
-        Display the validation result in a graphical form
+        Method returning the results as a string
         """
 
-        for validator in self._validator_objects:
-            validator.display_graphical_result()
+        # F1 is only relvant when there's a nega
+        f1 = 'N/A'
+        if (len(self._results.columns) == 2 and
+            (self._results.columns == [0, 1]).all()):
+            f1 = 2 * self._results[1][1] / (
+                    2 * self._results[1][1] + self._results[0][1] + self._results[1][0])
 
-    def get_textual_result(self) -> list[str]:
+        # macro F1 score which assumes that both classes are positive
+        macro_f1 = 0
+        for i in self._results:
+            numerator = 2 * self._results[i][i]
+            # fn + fp + 2tp of a class is the sum of its row + sum of its column
+            denominator = self._results.sum(axis=0)[i] + self._results.sum(axis=1)[i]
+            macro_f1 += numerator/denominator
+        macro_f1 /= len(self._results)
+        accuracy = (self._results[1][1] + self._results[0][0]) / (
+                sum(self._results[0]) + sum(self._results[1]))
+        table = tabulate(self._results,
+                         ['Pred. ' + i for i in self._results.columns],
+                         tablefmt='heavy_grid')
+        return f'''{table}
+
+Accuracy: {accuracy}
+F1 score: {f1}
+Macro F1: {macro_f1}
+'''
+
+    def display_results(self) -> None:
         """
-        Get the validation result in a textual form
-
-        :return: List of textual results
+        Method displaying the results
         """
 
-        return [validator.get_textual_result() for validator in self._validator_objects]
+        print(self.get_results_str())
 
-    def display_textual_result(self) -> None:
-        """
-        Display the validation result in a textual form in pretty format
-        """
-
-        for validator in self._validator_objects:
-            print(f"Validator: {validator.__class__.__name__} result:")
-            print("\t\t" + validator.get_textual_result().replace("\n", "\n\t\t"))
+    def __add__(self, b: 'Validator'):
+        out = Validator()
+        out._results = self._results + b._results
+        return out
