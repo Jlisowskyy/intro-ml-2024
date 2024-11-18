@@ -13,7 +13,7 @@ import soundfile as sf
 from sklearn.pipeline import Pipeline
 
 from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_mel_spectrogram, gen_spectrogram, save_spectrogram
+from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
 
 def get_random_audio_path(dir_path: str) -> str:
@@ -53,6 +53,8 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
         clean_data (bool): Flag to clean and normalize the audio data.
         show_axis (bool): Flag to show axis on the spectrogram plot.
     """
+    if  not isinstance(number_of_samples, int) or number_of_samples < 1:
+        number_of_samples=1
 
     for i in range(number_of_samples):
         new_sound_path = sound_path
@@ -70,12 +72,8 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
             transformation_pipeline.fit([audio_data])
             audio_data = transformation_pipeline.transform([audio_data])[0]
 
-        if mel:
-            spectrogram = gen_mel_spectrogram(audio_data.audio_signal,
-                                            audio_data.sample_rate, show_axis)
-        else:
-            spectrogram = gen_spectrogram(audio_data.audio_signal,
-                                          audio_data.sample_rate, show_axis)
+
+        spectrogram = gen_spectrogram(audio_data, mel, show_axis)
 
         if output_path:
             splited_path=output_path.split(".")

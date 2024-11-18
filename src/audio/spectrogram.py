@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image
 from librosa import feature
 from matplotlib import pyplot as plt
-from audio_data import AudioData
+from src.audio.audio_data import AudioData
 
 from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT
 
@@ -31,7 +31,7 @@ def gen_spectrogram(audio:AudioData, mel:bool=False,
     """
     dpi = 100
     if mel:
-        s=feature.melspectrogram(y=audio.audio_data, sr=audio.sample_rate,
+        s=feature.melspectrogram(y=audio.audio_signal, sr=audio.sample_rate,
                                        n_fft=4096, hop_length=512, n_mels=512,
                                        fmax=DENOISE_FREQ_HIGH_CUT)
         s_db = librosa.power_to_db(s, ref=np.max)
@@ -47,7 +47,7 @@ def gen_spectrogram(audio:AudioData, mel:bool=False,
     else:
         img = librosa.display.specshow(s_db, sr=audio.sample_rate, x_axis='time',
                                        y_axis='log', ax=ax)
-    
+
     if show_axis:
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Spectrogram')
