@@ -22,12 +22,12 @@ class Classifier:
         return
 
     # pylint: disable=unused-argument
-    def fit(self, x_data: list[np.array], y_data: list[int]):
+    def fit(self, x_data: list[np.ndarray], y_data: list[int]):
         """
         Fit the classifier to the training data.
 
         Args:
-            x_data (list[np.array]): A list of input data arrays (features).
+            x_data (list[np.ndarray]): A list of input data arrays (features).
             y_data (list[int]): A list of labels corresponding to the input data.
 
         Returns:
@@ -35,12 +35,12 @@ class Classifier:
         """
         return self
 
-    def predict(self, x_data: list[np.array]) -> np.array:
+    def predict(self, x_data: list[np.ndarray]) -> np.ndarray:
         """
         Predict labels for the given input data.
 
         Args:
-            x_data (list[np.array]): A list of input data arrays (features) 
+            x_data (list[np.ndarray]): A list of input data arrays (features) 
             to predict labels for.
 
         Returns:

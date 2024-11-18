@@ -18,12 +18,12 @@ class TensorTransform:
         return
 
     # pylint: disable=unused-argument
-    def fit(self, x_data: list[np.array], y_data: list[int] = None):
+    def fit(self, x_data: list[np.ndarray], y_data: list[int] = None):
         """
         Placeholder fit method. Does nothing as no fitting is needed.
         
         Parameters:
-        x_data (list[np.array]): List of input spectrogram data.
+        x_data (list[np.ndarray]): List of input spectrogram data.
         y_data (list[int], optional): List of labels. Defaults to None.
         
         Returns:
@@ -31,12 +31,12 @@ class TensorTransform:
         """
         return self
 
-    def transform(self, x_data: list[np.array], y_data: list[int] = None) -> list[torch.Tensor]:
+    def transform(self, x_data: list[np.ndarray], y_data: list[int] = None) -> list[torch.Tensor]:
         """
         Transforms a list of spectrograms into PyTorch tensors.
 
         Parameters:
-        x_data (list[np.array]): List of input spectrogram data.
+        x_data (list[np.ndarray]): List of input spectrogram data.
 
         Returns:
         list[torch.Tensor]: List of transformed spectrograms as tensors.

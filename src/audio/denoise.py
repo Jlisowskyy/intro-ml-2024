@@ -11,10 +11,10 @@ from scipy.signal import butter, sosfilt
 from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT
 
 
-def denoise(chunk: np.array,
+def denoise(chunk: np.ndarray,
             fs: float,
             lowcut: float = DENOISE_FREQ_LOW_CUT,
-            highcut: float = DENOISE_FREQ_HIGH_CUT) -> np.array:
+            highcut: float = DENOISE_FREQ_HIGH_CUT) -> np.ndarray:
     """
     Denoise the given audio chunk using the specified denoise type.
 
@@ -31,8 +31,8 @@ def denoise(chunk: np.array,
     return butter_bandpass(chunk, lowcut, highcut, fs)
 
 
-def butter_bandpass(chunk: np.array, lowcut: float, highcut: float, fs: float,
-                    order: int = 6) -> np.array:
+def butter_bandpass(chunk: np.ndarray, lowcut: float, highcut: float, fs: float,
+                    order: int = 6) -> np.ndarray:
     """
     Create a bandpass filter to allow frequencies within a specified range and block others.
 

@@ -39,7 +39,7 @@ class SpectrogramGenerator:
         """
         return self
 
-    def transform(self, audio_data_list: list[AudioData]) -> list[np.array]:
+    def transform(self, audio_data_list: list[AudioData]) -> list[np.ndarray]:
         """
         Transform audio data into mel-frequency spectrogram's.
 
@@ -48,7 +48,7 @@ class SpectrogramGenerator:
             to be transformed into spectrogram's.
 
         Returns:
-            list[np.array]: A list of NumPy arrays representing the spectrogram's.
+            list[np.ndarray]: A list of NumPy arrays representing the spectrogram's.
         """
         spectrogram_data = []
         for audio_data in audio_data_list:

@@ -10,7 +10,7 @@ import numpy as np
 from src.constants import NormalizationType
 
 
-def mean_variance_normalization(signal: np.array) -> np.array:
+def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
     """
     Apply mean and variance normalization to the signal.
     Adjusts the signal to have a mean of 0 and a standard deviation of 1.
@@ -25,13 +25,13 @@ def mean_variance_normalization(signal: np.array) -> np.array:
     normalized_signal = (signal - mean) / std
     return normalized_signal
 
-def pcen_normalization(signal: np.array,
+def pcen_normalization(signal: np.ndarray,
                        fs: float,
                        time_constant: float = 0.06,
                        alpha: float = 0.98,
                        delta: float = 2,
                        r: float = 0.5,
-                       eps: float = 1e-6) -> np.array:
+                       eps: float = 1e-6) -> np.ndarray:
     # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
@@ -57,10 +57,10 @@ def pcen_normalization(signal: np.array,
     return normalized_signal
 
 
-def normalize(signal: np.array,
+def normalize(signal: np.ndarray,
               fs: float,
               normalization_type: NormalizationType,
-              *args) -> np.array:
+              *args) -> np.ndarray:
     """
     General normalize function that chooses between currently implemented normalization methods.
 

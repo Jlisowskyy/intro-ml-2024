@@ -9,7 +9,7 @@ import numpy as np
 from src.audio.detect_speech import is_speech
 
 
-def generate_silence(duration: float, sample_rate: int) -> np.array:
+def generate_silence(duration: float, sample_rate: int) -> np.ndarray:
     """
     Generate an array of silence (zeros).
 
@@ -23,7 +23,7 @@ def generate_silence(duration: float, sample_rate: int) -> np.array:
 def generate_noisy_audio(
     duration: float,
     sample_rate: int,
-    noise_amplitude: float = 0.5) -> np.array:
+    noise_amplitude: float = 0.5) -> np.ndarray:
     """
     Generate a noisy audio signal.
 

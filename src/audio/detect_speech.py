@@ -9,7 +9,7 @@ import numpy as np
 from src.constants import DETECT_SILENCE_THRESHOLD, DETECT_SILENCE_TOLERANCE
 
 
-def is_speech(audio: np.array, silence_tolerance: float = DETECT_SILENCE_TOLERANCE,
+def is_speech(audio: np.ndarray, silence_tolerance: float = DETECT_SILENCE_TOLERANCE,
               silence_threshold: float = DETECT_SILENCE_THRESHOLD) -> bool:
     """
     Detects if there is speech in the audio signal.
