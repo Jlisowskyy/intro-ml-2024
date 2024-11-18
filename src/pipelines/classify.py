@@ -10,11 +10,11 @@ through a series of transformations and passes it to a CNN model for prediction.
 import torch
 
 from src.audio.audio_data import AudioData
-from src.audio.denoise import denoise
-from src.audio.normalize import normalize
-from src.audio.spectrogram import gen_mel_spectrogram
 from src.cnn.cnn import BasicCNN
 from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
+from src.pipelines.audio_cleaner import AudioCleaner
+from src.pipelines.audio_normalizer import AudioNormalizer
+from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
 
 def classify(audio_data: AudioData, model: BasicCNN) -> int:
@@ -31,9 +31,9 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
 
     sr = audio_data.sample_rate
     chunk = audio_data.audio_signal
-    chunk = denoise(chunk, sr)
-    chunk = normalize(chunk, sr, NORMALIZATION_TYPE)
-    spectrogram = gen_mel_spectrogram(chunk, int(sr),
+    chunk = AudioCleaner.denoise(chunk, sr)
+    chunk = AudioNormalizer.normalize(chunk, sr, NORMALIZATION_TYPE)
+    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(chunk, int(sr),
                                       width=SPECTROGRAM_WIDTH,
                                       height=SPECTROGRAM_HEIGHT)
     tens = torch.from_numpy(spectrogram).type(torch.float32)

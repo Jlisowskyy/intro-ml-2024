@@ -11,13 +11,15 @@ import numpy as np
 from tqdm import tqdm
 
 import src.constants
-from src.audio import normalize, denoise, detect_speech
+from src.audio import detect_speech
 from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
     DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH
+from src.pipelines.audio_cleaner import AudioCleaner
+from src.pipelines.audio_normalizer import AudioNormalizer
+from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
 
 def main() -> None:
@@ -55,10 +57,10 @@ def main() -> None:
                     if not detect_speech.is_speech(audio_data, int(sr)):
                         continue
 
-                    audio_data = denoise.denoise(audio_data, sr)
-                    audio_data = normalize.normalize(audio_data, sr,
+                    audio_data = AudioCleaner.denoise(audio_data, sr)
+                    audio_data = AudioNormalizer.normalize(audio_data, sr,
                                                      src.constants.NormalizationType.MEAN_VARIANCE)
-                    spectrogram = gen_mel_spectrogram(audio_data, int(sr),
+                    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data, int(sr),
                                                       width=SPECTROGRAM_WIDTH,
                                                       height=SPECTROGRAM_HEIGHT)
 

@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import spectrogram
 
-from src.audio.normalize import mean_variance_normalization, pcen_normalization, cmvn_normalization
-
+from src.pipelines.audio_normalizer import AudioNormalizer
 
 def generate_sine_wave(frequency: int,
                        duration: float,
@@ -42,7 +41,7 @@ def manual_test_mean_variance_normalization() -> None:
     freq = 1000
 
     sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = mean_variance_normalization(sine_wave)
+    normalized_wave = AudioNormalizer.mean_variance_normalization(sine_wave)
 
     mean = np.mean(normalized_wave)
     std = np.std(normalized_wave)
@@ -69,7 +68,7 @@ def manual_test_pcen_normalization() -> None:
     freq = 1000
 
     sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = pcen_normalization(sine_wave, sample_rate)
+    normalized_wave = AudioNormalizer.pcen_normalization(sine_wave, sample_rate)
 
     freqs, times, sxx = spectrogram(normalized_wave, fs=sample_rate, nperseg=256)
     plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
@@ -90,7 +89,7 @@ def manual_test_cmvn_normalization() -> None:
     freq = 1000
 
     sine_wave = generate_sine_wave(freq, duration, sample_rate)
-    normalized_wave = cmvn_normalization(sine_wave, sample_rate)
+    normalized_wave = AudioNormalizer.cmvn_normalization(sine_wave, sample_rate)
 
     mfccs = librosa.feature.mfcc(y=normalized_wave, sr=sample_rate, n_mfcc=13)
     mfccs_mean = np.mean(mfccs, axis=1)
