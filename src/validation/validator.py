@@ -43,7 +43,7 @@ class Validator:
         """
         if not mapping:
             for response, answer in zip(predictions, target):
-                self._results[response.argmax(0).item()][answer.item()] += 1
+                self._results.loc[answer.item(), response.argmax(0).item()] += 1
         else:
             for response, answer in zip(predictions, target):
                 self._results[mapping[response.argmax(0).item()]][mapping[answer.item()]] += 1
@@ -71,7 +71,7 @@ class Validator:
         accuracy = (self._results[1][1] + self._results[0][0]) / (
                 sum(self._results[0]) + sum(self._results[1]))
         table = tabulate(self._results,
-                         ['Pred. ' + i for i in self._results.columns],
+                         ['Pred. ' + str(i) for i in self._results.columns],
                          tablefmt='heavy_grid')
         return f'''{table}
 
