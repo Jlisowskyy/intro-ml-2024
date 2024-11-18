@@ -7,17 +7,19 @@ This module contains the classify function which processes audio data
 through a series of transformations and passes it to a CNN model for prediction.
 """
 
+from sklearn.pipeline import Pipeline
 import torch
 
 from src.audio.audio_data import AudioData
 from src.cnn.cnn import BasicCNN
-from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
+from src.pipelines.classifier import Classifier
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipelines.tensor_transform import TensorTransform
 
 
-def classify(audio_data: AudioData, model: BasicCNN) -> int:
+def classify(audio_data: list[AudioData], model: BasicCNN) -> list[int]:
     """
     Classify audio data using the provided CNN model.
 
@@ -29,25 +31,16 @@ def classify(audio_data: AudioData, model: BasicCNN) -> int:
         int: user's class.
     """
 
-    sr = audio_data.sample_rate
-    chunk = audio_data.audio_signal
-    chunk = AudioCleaner.denoise(chunk, sr)
-    chunk = AudioNormalizer.normalize(chunk, sr, NORMALIZATION_TYPE)
-    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(chunk, int(sr),
-                                      width=SPECTROGRAM_WIDTH,
-                                      height=SPECTROGRAM_HEIGHT)
-    tens = torch.from_numpy(spectrogram).type(torch.float32)
-    tens = torch.rot90(tens, dims=(0, 2))
-    tens = tens[None, :, :, :]
+    transformation_pipeline = Pipeline(steps=[
+        ('AudioCleaner', AudioCleaner()),
+        ('AudioNormalizer', AudioNormalizer()),
+        ('SpectrogramGenerator', SpectrogramGenerator()),
+        ('TensorTransform', TensorTransform()),
+        ('Classifier', Classifier(model))
+    ])
 
-    # checking device
-    if torch.cuda.is_available():
-        device = 'cuda'
-    else:
-        device = 'cpu'
-    tens.to(device)
+    # Transformed data
+    transformation_pipeline.fit([audio_data])
+    predictions = transformation_pipeline.predict([audio_data])
 
-    # prediction
-    with torch.no_grad():
-        prediction = model(tens)
-    return prediction[0].argmax(0).item()
+    return predictions

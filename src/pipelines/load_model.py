@@ -36,7 +36,7 @@ def load_model(model_file_path: str) -> BasicCNN:
     return cnn
 
 
-def get_classifier(model_path: str) -> Callable[[AudioData], int]:
+def get_classifier(model_path: str) -> Callable[[list[AudioData]], list[int]]:
     """
     Function loads the classifiers and return simple classification function
 

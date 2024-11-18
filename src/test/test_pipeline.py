@@ -15,8 +15,9 @@ from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.classifier import Classifier
 from src.audio.audio_data import AudioData
 from src.constants import SPEAKER_CLASSES
+from src.pipelines.tensor_transform import TensorTransform
 
-AUDIO_DIRECTORY_PATH = "generated_files"
+AUDIO_DIRECTORY_PATH = "/home/michal/studia/sem5/ml/daps/clean"
 def gen_random_audio_data():
     """
     Generates random wav files for testing purposes.
@@ -36,6 +37,7 @@ def example_test_run():
         ('AudioCleaner', AudioCleaner()),
         ('AudioNormalizer', AudioNormalizer()),
         ('SpectrogramGenerator', SpectrogramGenerator()),
+        ('TensorTransform', TensorTransform()),
         ('Classifier', Classifier())
     ])
 
@@ -56,7 +58,6 @@ def get_data(audio_directory_path):
     Returns:
         tuple: A tuple containing a list of AudioData instances and their corresponding labels.
     """
-    gen_random_audio_data()
     wav_files = glob(os.path.join(audio_directory_path, "*.wav"))
 
     x_train = []
@@ -70,7 +71,8 @@ def get_data(audio_directory_path):
             audio_data_wav, sample_rate = sf.read(wav_file_path)
             audio_data = AudioData(np.array(audio_data_wav), sample_rate)
 
-            speaker = wav_file_path.split('_')[0]
+            speaker = speaker = wav_file_path.split('/')[-1].split('_')[0]
+
             speaker_class = SPEAKER_CLASSES[speaker.lower()]
 
             x_train.append(audio_data)

@@ -16,6 +16,8 @@ from src.helper_scripts import prepare_dataset
 from src.helper_scripts import regenerate_csv
 from src.helper_scripts import spectrogram_script
 from src.helper_scripts import validate_dataset
+from src.test import test_pipeline
+from src.test import test_classify
 
 SCRIPTS: dict[str, Callable[..., None]] = {
     "data_analysis": data_analysis.main,
@@ -26,6 +28,8 @@ SCRIPTS: dict[str, Callable[..., None]] = {
     "regenerate_csv": regenerate_csv.main,
     "spectrogram_script": spectrogram_script.main,
     "validate_dataset": validate_dataset.main,
+    "test_pipeline": test_pipeline.example_test_run,
+    "test_classify": test_classify.example_test_run
 }
 
 
