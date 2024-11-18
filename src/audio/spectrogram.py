@@ -80,3 +80,4 @@ def save_spectrogram(spectrogram: np.ndarray, file_path: str):
     plt.imshow(spectrogram)
     plt.axis('off')
     plt.savefig(file_path, bbox_inches='tight', pad_inches=0)
+    plt.close()
