@@ -2,7 +2,7 @@
 Author: Łukasz Kryczka, 2024
 
 Test cases for the normalization module.
-Tests the mean-variance normalization, PCEN, and CMVN using WAV file input.
+Tests the mean-variance normalization and PCEN using WAV file input.
 """
 
 from pathlib import Path
