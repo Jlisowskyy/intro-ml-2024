@@ -34,12 +34,14 @@ def gen_spectrogram(audio_data: AudioData,
 
     """
     dpi = SPECTROGRA_DPI
-    s = librosa.stft(audio_data.audio_signal, n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH)
+    s = librosa.stft(audio_data.audio_signal, n_fft=SPECTROGRAM_N_FFT,
+                     hop_length=SPECTROGRAM_HOP_LENGTH)
     s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-    img = librosa.display.specshow(s_db, sr=audio_data.sample_rate, x_axis='time', y_axis='log', ax=ax)
+    img = librosa.display.specshow(s_db, sr=audio_data.sample_rate,
+                                   x_axis='time', y_axis='log', ax=ax)
     if show_axis:
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Spectrogram')

@@ -70,7 +70,8 @@ def test_denoise_basic_low_freq_filtering() -> None:
     sine_wave = AudioData(sine_wave, sample_rate)
     filtered_wave = denoise(sine_wave)
 
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, "Low frequencies were not properly reduced"
+    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
+        "Low frequencies were not properly reduced"
 
 
 def test_denoise_basic_high_freq_filtering() -> None:
@@ -86,7 +87,8 @@ def test_denoise_basic_high_freq_filtering() -> None:
     sine_wave = AudioData(sine_wave, sample_rate)
     filtered_wave = denoise(sine_wave)
 
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, "High frequencies were not properly reduced"
+    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
+        "High frequencies were not properly reduced"
 
 
 def manual_test_denoise_basic_passband_freq() -> None:
