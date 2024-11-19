@@ -12,12 +12,12 @@ from src.frontend.app_state import AppState
 from src.frontend.models import ModelResponse
 from src.cnn.model_api import classify_file
 app = FastAPI()
-app_sate = AppState()
+app_state = AppState()
 
 @app.get("/")
 async def root():
     """GET / response"""
-    return HTMLResponse(app_sate.page)
+    return HTMLResponse(app_state.page)
 
 
 @app.post("/run/model/wav")
@@ -34,7 +34,7 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
         with open("uploaded_files/user-uploaded.wav", "wb") as audio_file:
             audio_file.write(contents)
 
-        result = classify_file("uploaded_files/user-uploaded.wav", app_sate.classifier)
+        result = classify_file("uploaded_files/user-uploaded.wav", app_state.classifier)
 
         return ModelResponse(response=str(result))
     except Exception as e:  # pylint: disable=broad-exception-caught

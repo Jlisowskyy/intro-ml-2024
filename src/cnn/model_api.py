@@ -1,5 +1,5 @@
 """
-Author: Jakub Lisowski, Michal Kwiatkowski, Tomasz Mycielski, Jakub Pietrzak 2024
+Author: Jakub Lisowski, Michał Kwiatkowski, Tomasz Mycielski, Jakub Pietrzak 2024
 
 Module for classifying audio data using a CNN model.
 

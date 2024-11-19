@@ -15,7 +15,8 @@ class AppState:
     Class representing the state of the application
     """
 
-    index_path: Path
+    PAGE_PATH: Path = Path.resolve(Path(f'{__file__}/../index.html'))
+
     page: str
     classifier: BasicCNN
 
@@ -24,9 +25,7 @@ class AppState:
         Initialize the application state
         """
 
-        self.index_path = Path.resolve(Path(f'{__file__}/../index.html'))
-
-        with open(self.index_path, 'r', encoding='utf-8') as f:
+        with open(AppState.PAGE_PATH, 'r', encoding='utf-8') as f:
             self.page = f.read()
 
         self.classifier = BasicCNN.load_model(MODEL_BASE_PATH)
