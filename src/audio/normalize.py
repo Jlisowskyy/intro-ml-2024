@@ -7,7 +7,9 @@ This module provides functionality for normalizing audio signals.
 import librosa.feature
 import numpy as np
 
-from src.constants import NormalizationType
+from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT, \
+                           NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA, \
+                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
 
 
 def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
@@ -21,17 +23,17 @@ def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
 
     mean = np.mean(signal)
     std = np.std(signal)
-    std = np.maximum(std, 1e-8)
+    std = np.maximum(std, EPSILON)
     normalized_signal = (signal - mean) / std
     return normalized_signal
 
 def pcen_normalization(signal: np.ndarray,
                        fs: float,
-                       time_constant: float = 0.06,
-                       alpha: float = 0.98,
-                       delta: float = 2,
-                       r: float = 0.5,
-                       eps: float = 1e-6) -> np.ndarray:
+                       time_constant: float = NORMALIZATION_PCEN_TIME_CONSTANT,
+                       alpha: float = NORMALIZATION_PCEN_ALPHA,
+                       delta: float = NORMALIZATION_PCEN_DELTA,
+                       r: float = NORMALIZATION_PCEN_R,
+                       eps: float = EPSILON) -> np.ndarray:
     # pylint: disable=line-too-long
     """
     Apply Per-Channel Energy Normalization (PCEN) to the signal.
@@ -49,7 +51,7 @@ def pcen_normalization(signal: np.ndarray,
     """
 
     s = np.abs(librosa.stft(signal)) ** 2
-    m = librosa.pcen(s, sr=fs, hop_length=512,
+    m = librosa.pcen(s, sr=fs, hop_length=NORMALIZATION_PCEN_HOP_LENGTH,
                      gain=alpha, bias=delta,
                      eps=eps, power=r,
                      time_constant=time_constant)

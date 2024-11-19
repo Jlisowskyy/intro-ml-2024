@@ -15,7 +15,7 @@ from src.audio.spectrogram import gen_mel_spectrogram
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
     DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
-    DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE
+    DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
 
 
 def main() -> None:
@@ -28,7 +28,7 @@ def main() -> None:
 
         for root, _, files in walk(DATABASE_PATH):
             folder = root.rsplit('/')[-1]
-            new_root = root.replace('daps', DATABASE_OUT_NAME)
+            new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in tqdm(files, colour='magenta'):
                 # Omit annoying hidden mac files

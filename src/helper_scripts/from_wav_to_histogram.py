@@ -16,6 +16,9 @@ from src.helper_scripts.generate_rgb_histogram import generate_rgb_histogram
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 
+from src.constants import HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX, \
+                          HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR
+
 
 def create_spectrogram(directory, denoise=False):
     """
@@ -23,12 +26,12 @@ def create_spectrogram(directory, denoise=False):
     Args:
         directory (str): Path to the directory with audio files.
     """
-    output_directory = os.path.join(directory, "_spectrograms")
+    output_directory = os.path.join(directory, HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
     files = os.listdir(directory)
-    for index,file in enumerate(files):
+    for index, file in enumerate(files):
         if file.endswith(".wav"):
             data, samplerate = sf.read(os.path.join(directory, file))
             audio_data = AudioData(data, samplerate)
@@ -45,6 +48,7 @@ def create_spectrogram(directory, denoise=False):
     print("Done with creating spectrograms")
     return output_directory
 
+
 def process_directory(directory: str) -> None:
     """
     Main function that processes the audio files, generates spectrograms, and optionally
@@ -58,7 +62,7 @@ def process_directory(directory: str) -> None:
         generate_rgb_histogram(spectrogram_path)
 
 
-DEFAULT_DIR = str(Path.resolve(Path(f'{__file__}/../work_dir')))
+DEFAULT_DIR = str(Path.resolve(Path(f'{__file__}/../{HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR}')))
 
 
 def main(args: list[str]) -> None:

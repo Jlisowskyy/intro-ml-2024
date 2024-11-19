@@ -8,7 +8,7 @@ Currently, supports basic denoising for human speech frequencies.
 import numpy as np
 from scipy.signal import butter, sosfilt
 
-from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT
+from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DENOISE_NYQUIST_COEFFICIENT
 
 
 def denoise(chunk: np.ndarray,
@@ -44,7 +44,7 @@ def butter_bandpass(chunk: np.ndarray, lowcut: float, highcut: float, fs: float,
     :return: Second-order sections for the bandpass filter
     """
 
-    nyquist = 0.5 * fs
+    nyquist = DENOISE_NYQUIST_COEFFICIENT * fs
     low = lowcut / nyquist
     high = highcut / nyquist
     if low <= 0 or high >= 1:

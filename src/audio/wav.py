@@ -15,7 +15,7 @@ from typing import Iterator, Union
 import numpy as np
 
 from src.audio.audio_data import AudioData
-from src.constants import WavIteratorType
+from src.constants import WavIteratorType, WINDOW_SIZE_FRAMES_DIVISOR
 
 
 class WavIteratorBase(ABC):
@@ -66,7 +66,7 @@ class WavIteratorBase(ABC):
             self._sample_width = wav_file.getsampwidth()
             self._num_channels = wav_file.getnchannels()
 
-            self._window_size_frames = self._frame_rate // 10
+            self._window_size_frames = self._frame_rate // WINDOW_SIZE_FRAMES_DIVISOR
 
             if self._num_channels <= self._channel_index:
                 raise ValueError(f"Channel index out of range: {self._channel_index}")

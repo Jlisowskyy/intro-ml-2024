@@ -3,6 +3,8 @@ Author: Tomasz Mycielski, 2024
 
 Implementation of the CNN
 """
+from abc import ABC, abstractmethod
+
 import torch
 import torch.nn.functional as tnnf
 from torch import nn
@@ -14,7 +16,7 @@ from src.audio.spectrogram import gen_mel_spectrogram
 from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 
 
-class BaseCNN(nn.Module):
+class BaseCNN(nn.Module, ABC):
     """
     Base class defining the CNN model functionality.
     """
@@ -51,6 +53,12 @@ class BaseCNN(nn.Module):
         with torch.no_grad():
             prediction = self(tens)
         return prediction[0].argmax(0).item()
+
+    @abstractmethod
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass method for the CNN model.
+        """
 
     @classmethod
     def load_model(cls, model_file_path: str) -> 'BaseCNN':
@@ -100,4 +108,3 @@ class BasicCNN(BaseCNN):
         x = tnnf.relu(self.fc2(x))
         x = self.fc3(x)
         return x
-   

@@ -6,6 +6,7 @@ File collects various constants used in the project as well as enums used for co
 
 from enum import Enum, IntEnum
 
+
 # ------------------------------
 # TYPE ENUMS
 # ------------------------------
@@ -30,9 +31,24 @@ class WavIteratorType(IntEnum):
     PLAIN = 0
     OVERLAPPING = 1
 
+
+# ------------------------------
+# GENERAL constants
+# ------------------------------
+
+EPSILON: float = 1e-8
+"""
+Small constant to avoid division by zero
+"""
+
 # ------------------------------
 # DENOISE constants
 # ------------------------------
+
+DENOISE_NYQUIST_COEFFICIENT: float = 0.5
+"""
+Nyquist coefficient is 0.5, as it is a half of the sampling rate
+"""
 
 DENOISE_FREQ_LOW_CUT: float = 50.0
 """
@@ -55,7 +71,29 @@ DETECT_SILENCE_THRESHOLD: float = 0.015
 # NORMALIZE constants
 # ------------------------------
 
+
 NORMALIZATION_TYPE: NormalizationType = NormalizationType.MEAN_VARIANCE
+
+NORMALIZATION_PCEN_TIME_CONSTANT: float = 0.06
+"""
+Time constant for the PCEN filter, controls the smoothing of the signal.
+"""
+
+NORMALIZATION_PCEN_ALPHA: float = 0.98
+"""
+Gain factor for the PCEN filter, determines the strength of the gain normalization.
+"""
+
+NORMALIZATION_PCEN_DELTA: float = 2.0
+"""
+Bias for the PCEN filter, added to the signal to avoid taking the logarithm of zero.
+"""
+
+NORMALIZATION_PCEN_R: float = 0.5
+"""
+Exponent for the PCEN filter, controls the compression of the signal.
+"""
+NORMALIZATION_PCEN_HOP_LENGTH: int = 512
 
 # ------------------------------
 # TRAINING constants
@@ -74,8 +112,8 @@ TRAINING_TEST_SET_SIZE: float = 0.2
 
 # torch split does *not* like epsilon, requires the sum to be exactly 1.0
 assert (TRAINING_TRAIN_SET_SIZE +
-           TRAINING_VALIDATION_SET_SIZE +
-           TRAINING_TEST_SET_SIZE == 1.0), \
+        TRAINING_VALIDATION_SET_SIZE +
+        TRAINING_TEST_SET_SIZE == 1.0), \
     "All set sizes should sum to 1"
 
 TRAINING_MOMENTUM: float = 0.9
@@ -86,6 +124,18 @@ TRAINING_MOMENTUM: float = 0.9
 
 SPECTROGRAM_WIDTH: int = 300
 SPECTROGRAM_HEIGHT: int = 400
+SPECTROGRA_DPI: int = 10
+SPECTROGRAM_N_FFT: int = 4096
+SPECTROGRAM_HOP_LENGTH: int = 512
+SPECTROGRAM_N_MELS: int = 5120
+
+# ------------------------------
+# WAV ITERATOR constants
+# ------------------------------
+WINDOW_SIZE_FRAMES_DIVISOR: int = 10
+"""
+Divisor to calculate the window size in frames for WAV iterators.
+"""
 
 # ------------------------------
 # DATABASE constants
@@ -101,7 +151,7 @@ SPEAKER_CLASSES = {
     'm7': 0,
     'm8': 1,
     'm9': 0,
-    'm10':0,
+    'm10': 0,
     'f1': 1,
     'f2': 0,
     'f3': 0,
@@ -111,7 +161,7 @@ SPEAKER_CLASSES = {
     'f7': 1,
     'f8': 1,
     'f9': 0,
-    'f10':0
+    'f10': 0
 }
 
 # CLASSES = [
@@ -131,9 +181,11 @@ SPEAKER_CLASSES = {
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_PATH: str = './datasets/daps'
+DATABASE_NAME: str = 'daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
 DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
 DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
+DATABASE_VALID_WAV_SR: int = 44100
 
 # ------------------------------
 # MODEL constants
@@ -141,3 +193,19 @@ DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
 
 MODEL_WINDOW_LENGTH: int = 3
 MODEL_BASE_PATH: str = './models/model.pth'
+MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
+
+MAJORITY_THRESHOLD: float = 0.7
+"""
+How many chunks need to be classified as 1 to classify the whole file as 1
+"""
+
+# ------------------------------
+# HELPER SCRIPTS constants
+# ------------------------------
+
+# From Wav to Histogram
+HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX: str = '_spectrograms'
+HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR: str = 'work_dir'
+HELPER_SCRIPTS_HISTOGRAM_N_BINS: int = 256
+HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
