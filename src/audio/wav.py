@@ -534,7 +534,7 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
 
     for index, chunk in enumerate(it):
         output_file = os.path.join(destination_dir,
-                                   f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")  # pylint: disable=line-too-long
+           f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
 
         try:
             with wave.open(output_file, 'wb') as wav_file:
