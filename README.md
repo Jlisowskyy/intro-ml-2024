@@ -33,8 +33,7 @@ The project task is to develop CNN model for intercom device detecting authorise
     ├── frontend
     ├── helper_scripts
     ├── pipelines
-    ├── test
-    └── validation
+    └── test
 ```
 
 - `examples`: Contains example code using jupyter notebooks.
@@ -46,7 +45,6 @@ The project task is to develop CNN model for intercom device detecting authorise
     - `helper_scripts`: Collection of standalone scripts used in the project.
     - `pipelines`: Contains the code for the data processing pipelines.
   - `test`: Contains the code for testing the project.
-  - `validation`: Contains the code for validation of the project.
 
 ## Usage:
 
@@ -99,41 +97,13 @@ pip install -r requirements.txt
 
 ### Running the project:
 
-#### Frontend:
-
-Simply run:
+Running the project is easy as never! Simply run:
 
 ```shell
-fastapi dev src/frontend/main.py
+python main.py
 ```
 
-#### Testing:
-
-To get list of the available tests, run:
-
-```shell
-python test_runner.py
-```
-
-To run a specific test, run:
-
-```shell
-python test_runner.py <test_name>
-```
-
-#### Scripts:
-
-To get list of the available scripts, run:
-
-```shell
-python script_runner.py
-```
-
-To run a specific script, run:
-
-```shell
-python script_runner.py <script_name>
-```
+To start our CLI (interactive mode and argument mode) to get detailed description on running specific functionalities.
 
 ## Project Description:
 
