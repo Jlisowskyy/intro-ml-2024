@@ -25,7 +25,6 @@ class Classifier:
         self.model = model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device)
-        return
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[torch.Tensor], y_data: list[int]):
