@@ -12,23 +12,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def get_random_npy_path(dir_path: str) -> str:
+def get_random_file_path(dir_path: str, file_type: str) -> str:
     """
     Gets a random audio file path from a directory.
     Args:
         dir_path (str): path to direstory with audio files
+        file_type (str): type of file to search for example '.npy'
 
     Returns:
         str: file path to a random audio file.
     """
     while True:
-        files = [f for f in os.listdir(dir_path) if f.endswith(".npy")]
+        files = [f for f in os.listdir(dir_path) if f.endswith(file_type)]
         if files:
             return os.path.join(dir_path, random.choice(files))
         subdirectories = [d for d in os.listdir(dir_path)
                           if os.path.isdir(os.path.join(dir_path, d))]
         if not subdirectories:
-            raise FileNotFoundError("No `.npy` files found in the directory or its subdirectories.")
+            raise FileNotFoundError(f"No {file_type} files found in the directory or its subdirectories.")
         dir_path = os.path.join(dir_path, random.choice(subdirectories))
 
 def process(file_path: str = "", directory: str = "", number_of_samples: int = 1):
@@ -49,11 +50,7 @@ def process(file_path: str = "", directory: str = "", number_of_samples: int = 1
     for _ in range(number_of_samples):
         new_npy_path = file_path
         if directory:
-            new_npy_path = get_random_npy_path(directory)
-
-        new_npy_path = file_path
-        if directory:
-            new_npy_path = get_random_npy_path(directory)
+            new_npy_path = get_random_file_path(directory, ".npy")
 
         data = np.load(new_npy_path)
         plt.figure(figsize=(10, 4))
