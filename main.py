@@ -29,9 +29,6 @@ import pytest
 import uvicorn
 from colorama import Fore, Style, init
 
-# Initialize colorama
-init()
-
 from src.cnn import train
 from src.helper_scripts import data_analysis
 from src.helper_scripts import from_wav_to_histogram
@@ -49,6 +46,8 @@ from src.test import test_pipeline
 from src.test import test_transformation_pipeline
 from src.test import test_wav
 
+# Initialize colorama
+init()
 
 def print_error(message: str) -> None:
     """
@@ -121,7 +120,8 @@ def validate_scripts() -> None:
         signature = inspect.signature(func)
         params = list(signature.parameters.values())
         if not (len(params) == 0 or (len(params) == 1 and params[0].annotation == list[str])):
-            raise TypeError(f"Function '{name}' must take no arguments or a single argument of type list[str].")
+            raise TypeError(
+                f"Function '{name}' must take no arguments or a single argument of type list[str].")
 
 
 def fastapi_main() -> None:
@@ -250,6 +250,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             print_error("Invalid command!")
             return False
         return True
+    # pylint: disable=broad-except
     except Exception as e:
         print_error(f"Error executing command: {str(e)}")
         return False
@@ -270,7 +271,8 @@ def parse_arguments() -> None:
     main_group.add_argument('-r', '--run', action='store_true', help='Start running')
     main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
 
-    parser.add_argument('command', nargs='?', help='Command to execute (train/validate/run/prepare/script/test)')
+    parser.add_argument('command', nargs='?',
+                        help='Command to execute (train/validate/run/prepare/script/test)')
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
@@ -300,7 +302,8 @@ def interactive_mode() -> None:
 
     while True:
         try:
-            cmd_input = input(f"\n{Fore.CYAN}Enter command (or 'exit' to quit):{Style.RESET_ALL} ").lower().strip().split()
+            cmd_input = input(f"\n{Fore.CYAN}Enter command"
+                              f" (or 'exit' to quit):{Style.RESET_ALL} ").lower().strip().split()
             if not cmd_input:
                 continue
 
