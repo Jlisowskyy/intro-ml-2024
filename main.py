@@ -27,6 +27,10 @@ from typing import Callable
 
 import pytest
 import uvicorn
+from colorama import Fore, Style, init
+
+# Initialize colorama
+init()
 
 from src.cnn import train
 from src.helper_scripts import data_analysis
@@ -44,6 +48,36 @@ from src.test import test_normalize
 from src.test import test_pipeline
 from src.test import test_transformation_pipeline
 from src.test import test_wav
+
+
+def print_error(message: str) -> None:
+    """
+    Prints error message in red color.
+
+    Parameters:
+        message (str): Error message to display
+    """
+    print(f"{Fore.RED}{message}{Style.RESET_ALL}")
+
+
+def print_warning(message: str) -> None:
+    """
+    Prints warning message in yellow color.
+
+    Parameters:
+        message (str): Warning message to display
+    """
+    print(f"{Fore.YELLOW}{message}{Style.RESET_ALL}")
+
+
+def print_success(message: str) -> None:
+    """
+    Prints success message in green color.
+
+    Parameters:
+        message (str): Success message to display
+    """
+    print(f"{Fore.GREEN}{message}{Style.RESET_ALL}")
 
 
 def run_pytest() -> None:
@@ -102,19 +136,23 @@ def display_help() -> None:
     Displays help message showing all available commands and their corresponding
     command-line arguments.
     """
-    print("Available commands:")
+    print("\n" + "=" * 80)
+    print(f"{Fore.CYAN}Available commands:{Style.RESET_ALL}")
     print("  train    - Start training")
     print("  validate - Start validation")
     print("  run      - Start running")
     print("  prepare  - Prepare database")
-    print("\nOr use command line arguments:")
-    print("  -t, --train    - Start training")
-    print("  -v, --validate - Start validation")
-    print("  -r, --run      - Start running")
-    print("  -p, --prepare  - Prepare database")
+    print(f"\n{Fore.CYAN}Command line usage:{Style.RESET_ALL}")
+    print("  python main.py [-h] [-t | -v | -r | -p | command [args ...]]")
+    print("  -h, --help    - Show this help message")
+    print("  -t, --train   - Start training")
+    print("  -v, --validate- Start validation")
+    print("  -r, --run     - Start running")
+    print("  -p, --prepare - Prepare database")
 
-    print('\n' + '--' * 20 + 'Script help' + '--' * 20)
+    print('\n' + '==' * 17 + f' {Fore.CYAN}Script help{Style.RESET_ALL} ' + '==' * 17)
     print("Usage: python main.py script <script_name> [args...]")
+    print("Scripts path: ./src/helper_scripts/")
     print("Available scripts:")
     for script_name, func in SCRIPTS.items():
         signature = inspect.signature(func)
@@ -124,11 +162,13 @@ def display_help() -> None:
         else:
             print(f"\t{script_name}")
 
-    print('\n' + '--' * 20 + 'Test help' + '--' * 20)
+    print('\n' + '==' * 18 + f' {Fore.CYAN}Test help{Style.RESET_ALL} ' + '==' * 17)
     print("Usage: python main.py test <test_name>")
+    print("Tests path: ./src/test/")
     print("Available tests:")
     for test_name in TEST_CASES:
         print(f"\t{test_name}")
+    print("=" * 80 + "\n")
 
 
 def run_script(script_name: str, args: list[str]) -> None:
@@ -154,7 +194,7 @@ def run_script(script_name: str, args: list[str]) -> None:
         else:
             raise TypeError(f"Function '{script_name}' has an invalid signature.")
     else:
-        print(f"Script '{script_name}' not found")
+        print_error(f"Script '{script_name}' not found")
         display_help()
 
 
@@ -164,12 +204,11 @@ def run_test(test_name: str) -> None:
 
     Parameters:
         test_name (str): Name of test from TEST_CASES dictionary
-
     """
     if test_name in TEST_CASES:
         TEST_CASES[test_name]()
     else:
-        print(f"Test '{test_name}' not found")
+        print_error(f"Test '{test_name}' not found")
         display_help()
 
 
@@ -184,28 +223,36 @@ def handle_command(command: str, args: list[str] = None) -> bool:
     Returns:
         bool: True if command was valid and executed successfully
     """
-    if command in ('train', '-t', '--train'):
-        print("Starting training...")
-        train.main()
-    elif command in ('validate', '-v', '--validate'):
-        print("Starting validation...")
-        validate_dataset.main()
-    elif command in ('run', '-r', '--run'):
-        print("Starting frontend...")
-        fastapi_main()
-    elif command in ('prepare', '-p', '--prepare'):
-        print("Starting db preparation...")
-        prepare_dataset.main()
-    elif command == 'script' and args:
-        print(f"Running script '{args[0]}'...")
-        run_script(args[0], args[1:])
-    elif command == 'test' and args:
-        print(f"Running test '{args[0]}'...")
-        run_test(args[0])
-    else:
-        print("Invalid command!")
+    try:
+        if command in ('train', '-t', '--train'):
+            print_success("Starting training...")
+            train.main()
+        elif command in ('validate', '-v', '--validate'):
+            print_success("Starting validation...")
+            validate_dataset.main()
+        elif command in ('run', '-r', '--run'):
+            print_success("Starting frontend...")
+            fastapi_main()
+        elif command in ('prepare', '-p', '--prepare'):
+            print_success("Starting db preparation...")
+            prepare_dataset.main()
+        elif command == 'script' and args:
+            print_success(f"Running script '{args[0]}'...")
+            run_script(args[0], args[1:])
+        elif command == 'test':
+            if not args:
+                print_error("No test name provided!")
+                display_help()
+                return False
+            print_success(f"Running test '{args[0]}'...")
+            run_test(args[0])
+        else:
+            print_error("Invalid command!")
+            return False
+        return True
+    except Exception as e:
+        print_error(f"Error executing command: {str(e)}")
         return False
-    return True
 
 
 def parse_arguments() -> None:
@@ -216,13 +263,15 @@ def parse_arguments() -> None:
 
     parser = argparse.ArgumentParser(
         description='Process training, validation, running, and database preparation commands.')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-t', '--train', action='store_true', help='Start training')
-    group.add_argument('-v', '--validate', action='store_true', help='Start validation')
-    group.add_argument('-r', '--run', action='store_true', help='Start running')
-    group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
-    group.add_argument('command', nargs='?', help='Command to execute (train/validate/run/prepare/script/test)')
-    group.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments for scripts')
+
+    main_group = parser.add_mutually_exclusive_group()
+    main_group.add_argument('-t', '--train', action='store_true', help='Start training')
+    main_group.add_argument('-v', '--validate', action='store_true', help='Start validation')
+    main_group.add_argument('-r', '--run', action='store_true', help='Start running')
+    main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
+
+    parser.add_argument('command', nargs='?', help='Command to execute (train/validate/run/prepare/script/test)')
+    parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
 
@@ -236,7 +285,6 @@ def parse_arguments() -> None:
         handle_command('prepare')
     elif args.command:
         if not handle_command(args.command, args.args):
-            print("Invalid command!")
             display_help()
     else:
         interactive_mode()
@@ -247,12 +295,12 @@ def interactive_mode() -> None:
     Starts interactive command line interface that continuously prompts for commands
     until 'exit' is entered or the program is interrupted.
     """
-    print("Entering interactive mode...")
+    print_success("Entering interactive mode...")
     display_help()
 
     while True:
         try:
-            cmd_input = input("\nEnter command (or 'exit' to quit): ").lower().strip().split()
+            cmd_input = input(f"\n{Fore.CYAN}Enter command (or 'exit' to quit):{Style.RESET_ALL} ").lower().strip().split()
             if not cmd_input:
                 continue
 
@@ -260,11 +308,11 @@ def interactive_mode() -> None:
             args = cmd_input[1:] if len(cmd_input) > 1 else None
 
             if command == 'exit':
-                print("Exiting...")
+                print_success("Exiting...")
                 break
 
             if not handle_command(command, args):
-                print("Invalid command!")
+                print_error("Invalid command!")
                 display_help()
 
         except KeyboardInterrupt:
@@ -280,6 +328,7 @@ def main() -> None:
     Entry Function
     """
     parse_arguments()
+
 
 if __name__ == "__main__":
     main()
