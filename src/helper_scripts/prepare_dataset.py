@@ -66,6 +66,3 @@ def main() -> None:
                         f'{speaker},{folder},{file},{sub_file_counter},{data_class_id}\n')  # pylint: disable=line-too-long
                     sub_file_counter += 1
 
-
-if __name__ == "__main__":
-    main()

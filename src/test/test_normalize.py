@@ -107,7 +107,3 @@ def manual_test() -> None:
     """
     manual_test_mean_variance_normalization()
     manual_test_pcen_normalization()
-
-
-if __name__ == "__main__":
-    manual_test()

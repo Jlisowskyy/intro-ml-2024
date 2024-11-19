@@ -76,7 +76,3 @@ def main(args: list[str]) -> None:
     else:
         raise ValueError("Invalid number of arguments")
     process_directory(directory)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

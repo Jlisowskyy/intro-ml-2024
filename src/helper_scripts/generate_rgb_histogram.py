@@ -49,7 +49,3 @@ def main(args: list[str]) -> None:
 
     spectrogram_path = args[0]
     generate_rgb_histogram(spectrogram_path)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

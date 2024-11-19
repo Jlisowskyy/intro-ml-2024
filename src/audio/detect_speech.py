@@ -1,7 +1,7 @@
 """
 Author: Łukasz Kryczka, 2024
 
-Simple speech detection module.
+Module contains functions to detect speech or silence in the audio signal.
 """
 
 import numpy as np

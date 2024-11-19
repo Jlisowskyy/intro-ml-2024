@@ -221,5 +221,3 @@ def main() -> None:
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
         test(cnn, test_dataloader, device)
 
-if __name__ == '__main__':
-    main()
