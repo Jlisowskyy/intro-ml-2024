@@ -4,8 +4,6 @@ Author: Jakub Pietrzak, 2024
 Modul for generating spectrograms and showing/saving it
 """
 
-import os
-import random
 import argparse
 
 import matplotlib.pyplot as plt
