@@ -12,6 +12,7 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import spectrogram
 
+from src.audio.audio_data import AudioData
 from src.audio.normalize import mean_variance_normalization, pcen_normalization
 
 # Define paths
@@ -31,9 +32,9 @@ def load_audio_file(file_path: str) -> tuple[np.ndarray, int]:
 
 
 def plot_spectrograms(original: np.ndarray,
-                     normalized: np.ndarray,
-                     sample_rate: int,
-                     title: str) -> None:
+                      normalized: np.ndarray,
+                      sample_rate: int,
+                      title: str) -> None:
     """
     Plot spectrograms of original and normalized signals side by side.
 
@@ -70,17 +71,18 @@ def manual_test_mean_variance_normalization() -> None:
     Test that mean and variance normalization results in a signal with mean ~0 and std ~1.
     """
     audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
+    audio_data = AudioData(audio_data, sample_rate)
     normalized_wave = mean_variance_normalization(audio_data)
 
-    mean = np.mean(normalized_wave)
-    std = np.std(normalized_wave)
+    mean = np.mean(normalized_wave.audio_signal)
+    std = np.std(normalized_wave.audio_signal)
 
     assert np.isclose(mean, 0, atol=0.01), f"Mean is not close to 0: {mean}"
     assert np.isclose(std, 1, atol=0.01), f"Standard deviation is not close to 1: {std}"
 
     plot_spectrograms(
-        audio_data,
-        normalized_wave,
+        audio_data.audio_signal,
+        normalized_wave.audio_signal,
         sample_rate,
         'Mean-Variance Normalization Comparison'
     )
@@ -91,11 +93,12 @@ def manual_test_pcen_normalization() -> None:
     Test that PCEN normalization applies dynamic range compression.
     """
     audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
-    normalized_wave = pcen_normalization(audio_data, sample_rate)
+    audio_data = AudioData(audio_data, sample_rate)
+    normalized_wave = pcen_normalization(audio_data)
 
     plot_spectrograms(
-        audio_data,
-        normalized_wave,
+        audio_data.audio_signal,
+        normalized_wave.audio_signal,
         sample_rate,
         'PCEN Normalization Comparison'
     )

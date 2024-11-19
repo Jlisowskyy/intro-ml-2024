@@ -9,6 +9,7 @@ import pandas as pd
 from tabulate import tabulate
 from torch import Tensor
 
+
 class Validator:
     """
     Class providing a simple validation
@@ -20,7 +21,7 @@ class Validator:
 
     _results: pd.DataFrame
 
-    def __init__(self, classes: Iterable[any]=None) -> None:
+    def __init__(self, classes: Iterable[any] = None) -> None:
         """
         Method initializing the validation
         """
@@ -29,9 +30,8 @@ class Validator:
 
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
-
     def validate(self, predictions: Tensor, target: Tensor,
-                 mapping: Sequence[int]=None) -> None:
+                 mapping: Sequence[int] = None) -> None:
         """
         Method saving the results of the validation
         """
@@ -50,7 +50,7 @@ class Validator:
         # F1 is only relvant when there's a nega
         f1 = 'N/A'
         if (len(self._results.columns) == 2 and
-            (self._results.columns == [0, 1]).all()):
+                (self._results.columns == [0, 1]).all()):
             f1 = 2 * self._results[1][1] / (
                     2 * self._results[1][1] + self._results[0][1] + self._results[1][0])
 
@@ -60,7 +60,7 @@ class Validator:
             numerator = 2 * self._results[i][i]
             # fn + fp + 2tp of a class is the sum of its row + sum of its column
             denominator = self._results.sum(axis=0)[i] + self._results.sum(axis=1)[i]
-            macro_f1 += numerator/denominator
+            macro_f1 += numerator / denominator
         macro_f1 /= len(self._results)
         accuracy = (self._results[1][1] + self._results[0][0]) / (
                 sum(self._results[0]) + sum(self._results[1]))

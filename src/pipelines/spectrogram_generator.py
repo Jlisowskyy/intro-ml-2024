@@ -52,6 +52,6 @@ class SpectrogramGenerator:
         """
         spectrogram_data = []
         for audio_data in audio_data_list:
-            spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+            spectrogram = gen_mel_spectrogram(audio_data)
             spectrogram_data.append(spectrogram)
         return spectrogram_data

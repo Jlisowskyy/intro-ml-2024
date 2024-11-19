@@ -11,7 +11,7 @@ from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import DAPSDataset
 from src.cnn.train import test
 from src.constants import TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE, \
-    TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH
+    TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, MODEL_PRETRAINED_PATH
 
 
 def main() -> None:
@@ -22,7 +22,7 @@ def main() -> None:
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     cnn = BasicCNN()
-    cnn.load_state_dict(torch.load('./models/cnn_e9_4460117552633912135_2024-10-30T07:55.pth',
+    cnn.load_state_dict(torch.load(MODEL_PRETRAINED_PATH,
                                    map_location=torch.device(device),
                                    weights_only=True))
     cnn.to(device)

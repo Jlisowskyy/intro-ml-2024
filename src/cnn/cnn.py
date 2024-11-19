@@ -3,6 +3,7 @@ Author: Tomasz Mycielski, 2024
 
 Implementation of the CNN
 """
+
 import torch
 import torch.nn.functional as tnnf
 from torch import nn
@@ -14,6 +15,9 @@ from src.audio.spectrogram import gen_mel_spectrogram
 from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 
 
+# Disable pylint warning about the class not implementing abstract methods since
+# it's just wrong in this case
+# pylint: disable=W0223
 class BaseCNN(nn.Module):
     """
     Base class defining the CNN model functionality.
@@ -24,18 +28,15 @@ class BaseCNN(nn.Module):
         Classify audio data using the provided CNN model.
 
         Args:
-            data (AudioData): The audio data to classify.
-            model (BasicCNN): The CNN model used for classification.
+            audio_data (AudioData): The audio data to classify.
 
         Returns:
             int: user's class.
         """
 
-        sr = audio_data.sample_rate
-        chunk = audio_data.audio_signal
-        chunk = denoise(chunk, sr)
-        chunk = normalize(chunk, sr, NORMALIZATION_TYPE)
-        spectrogram = gen_mel_spectrogram(chunk, int(sr),
+        audio_data = denoise(audio_data)
+        audio_data = normalize(audio_data, NORMALIZATION_TYPE)
+        spectrogram = gen_mel_spectrogram(audio_data,
                                           width=SPECTROGRAM_WIDTH,
                                           height=SPECTROGRAM_HEIGHT)
         tens = torch.from_numpy(spectrogram).type(torch.float32)
@@ -95,9 +96,8 @@ class BasicCNN(BaseCNN):
         """
         x = self.pool(tnnf.relu(self.conv1(x)))
         x = self.pool(tnnf.relu(self.conv2(x)))
-        x = torch.flatten(x, 1) # flatten all dimensions except batch
+        x = torch.flatten(x, 1)  # flatten all dimensions except batch
         x = tnnf.relu(self.fc1(x))
         x = tnnf.relu(self.fc2(x))
         x = self.fc3(x)
         return x
-   
