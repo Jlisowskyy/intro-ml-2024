@@ -18,7 +18,7 @@ from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
-from src.validation.simple_validation import SimpleValidation
+from src.validation.validator import Validator
 
 
 def train_single_epoch(
@@ -50,7 +50,7 @@ def train_single_epoch(
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = SimpleValidation()
+    validator = Validator()
     train_loss = 0.0
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
@@ -99,6 +99,7 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
+        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
@@ -146,7 +147,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     print("Finished training")
 
 
-def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> SimpleValidation:
+def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -163,7 +164,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Simp
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = SimpleValidation()
+    validator = Validator()
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):

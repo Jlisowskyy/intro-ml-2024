@@ -4,6 +4,7 @@ Author: Tomasz Mycielski
 Module for classifying datasets with pretrained models
 """
 import torch
+import torch.utils
 from torch.utils.data import DataLoader
 
 from src.cnn.cnn import BasicCNN
