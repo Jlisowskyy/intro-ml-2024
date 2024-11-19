@@ -116,4 +116,3 @@ def main(argv: list[str]) -> None:
     args = parser.parse_args(argv)
     process(args.file_path, args.directory, args.number, args.output, args.show, args.mel,
             args.clean, args.show_axis)
-

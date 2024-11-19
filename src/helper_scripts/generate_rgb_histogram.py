@@ -4,8 +4,6 @@ Author: Jakub Pietrzak, 2024
 Modul for generating rgb histgram of spectrogram 
 """
 
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
