@@ -38,7 +38,3 @@ def main() -> None:
 
     print(f'Min duration: {min_len} s')
     print(f'Max duration: {max_len} s')
-
-
-if __name__ == "__main__":
-    main()

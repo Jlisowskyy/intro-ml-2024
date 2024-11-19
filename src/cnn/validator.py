@@ -29,12 +29,6 @@ class Validator:
 
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
-    # def restart(self, classes) -> None:
-    #     """
-    #     Method restarting the validation
-    #     """
-
-    #     # init an n * n array using a list of lists
 
     def validate(self, predictions: Tensor, target: Tensor,
                  mapping: Sequence[int]=None) -> None:
@@ -87,7 +81,7 @@ Macro F1: {macro_f1}
 
         print(self.get_results_str())
 
-    def __add__(self, b: 'Validator'):
+    def __add__(self, b: 'Validator') -> 'Validator':
         out = Validator()
         out._results = self._results + b._results
         return out

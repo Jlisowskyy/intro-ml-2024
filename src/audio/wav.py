@@ -10,9 +10,11 @@ import os
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Generator
+from typing import Iterator, Union
 
 import numpy as np
 
+from src.audio.audio_data import AudioData
 from src.constants import WavIteratorType
 
 
@@ -241,7 +243,7 @@ class WavIteratorBase(ABC):
 
         return self
 
-    def __next__(self) -> np.array:
+    def __next__(self) -> np.ndarray:
         """
         Return the next window of samples
 
@@ -427,6 +429,52 @@ class FlattenWavIterator:
             dtype = stacked_array.dtype
             flat_chunk = meaned_array.flatten().astype(dtype)
             yield flat_chunk
+
+
+class AudioDataIterator:
+    """
+    A wrapper class that converts WAV iterator output into AudioData objects.
+    Works with both WavIteratorBase and FlattenWavIterator instances.
+    """
+
+    _wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']
+    _sample_rate: int
+
+    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']):
+        """
+        Initialize the AudioData iterator.
+
+        :param wav_iterator: WavIteratorBase or FlattenWavIterator instance
+        """
+        self._wav_iterator = wav_iterator
+
+        if hasattr(wav_iterator, 'get_first_iter'):
+            self._sample_rate = int(wav_iterator.get_first_iter().get_frame_rate())
+        else:
+            self._sample_rate = int(wav_iterator.get_frame_rate())
+
+    def __iter__(self) -> Iterator[AudioData]:
+        """
+        :return: Iterator over AudioData objects
+        """
+        if hasattr(self._wav_iterator, 'iterate'):
+            return self._iter_flatten()
+        return self._iter_base()
+
+    def _iter_base(self) -> Generator[AudioData, None, None]:
+        """
+        Iterator for WavIteratorBase instances.
+        """
+        for chunk in self._wav_iterator:
+            yield AudioData(chunk, self._sample_rate)
+
+    def _iter_flatten(self) -> Generator[AudioData, None, None]:
+        """
+        Iterator for FlattenWavIterator instances.
+        """
+        for chunk in self._wav_iterator.iterate():
+            yield AudioData(chunk, self._sample_rate)
+
 
 
 def load_wav(file_path: str, channel_index: int = 0,

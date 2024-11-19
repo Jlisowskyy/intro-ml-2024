@@ -51,7 +51,3 @@ def main() -> None:
     res += test(cnn, test_dataloader, device)
     print('Full dataset')
     res.display_results()
-
-
-if __name__ == "__main__":
-    main()

@@ -5,15 +5,14 @@ Modul for generating histograms from audio files
 """
 
 import os
-import sys
 from pathlib import Path
 
 import soundfile as sf
 from sklearn.pipeline import Pipeline
 
-from src.helper_scripts.generate_rgb_histogram import generate_rgb_histogram
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram, save_spectrogram
+from src.helper_scripts.generate_rgb_histogram import generate_rgb_histogram
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 
@@ -76,7 +75,3 @@ def main(args: list[str]) -> None:
     else:
         raise ValueError("Invalid number of arguments")
     process_directory(directory)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

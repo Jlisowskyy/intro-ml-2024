@@ -6,7 +6,7 @@ Tests the silence detection feature.
 """
 
 import numpy as np
-from src.audio.detect_speech import is_speech, SpeechDetectionType
+from src.audio.detect_speech import is_speech
 
 
 def generate_silence(duration: float, sample_rate: int) -> np.ndarray:
@@ -44,7 +44,7 @@ def test_silence_detection_pure_silence() -> None:
     duration = 1.0
 
     silence = generate_silence(duration, sample_rate)
-    is_speech_detected = is_speech(silence, sample_rate, SpeechDetectionType.SILENCE)
+    is_speech_detected = is_speech(silence)
 
     assert is_speech_detected is False, "Silence detection failed for pure silence"
 
@@ -58,7 +58,7 @@ def test_silence_detection_noisy_audio() -> None:
     duration = 1.0
 
     noisy_audio = generate_noisy_audio(duration, sample_rate)
-    is_speech_detected = is_speech(noisy_audio, sample_rate, SpeechDetectionType.SILENCE)
+    is_speech_detected = is_speech(noisy_audio)
 
     assert is_speech_detected is True, "Silence detection incorrectly identified noise as silence"
 
@@ -77,7 +77,7 @@ def test_silence_detection_mixed_audio() -> None:
     noise = generate_noisy_audio(noise_duration, sample_rate)
 
     mixed_audio = np.concatenate((silence, noise))
-    is_speech_detected = is_speech(mixed_audio, sample_rate, SpeechDetectionType.SILENCE)
+    is_speech_detected = is_speech(mixed_audio)
 
     assert is_speech_detected is False, \
         "Silence detection failed for mixed audio with significant silence"
@@ -89,7 +89,7 @@ def test_silence_detection_mixed_audio() -> None:
     noise = generate_noisy_audio(noise_duration, sample_rate)
 
     mixed_audio = np.concatenate((silence, noise))
-    is_speech_detected = is_speech(mixed_audio, sample_rate, SpeechDetectionType.SILENCE)
+    is_speech_detected = is_speech(mixed_audio)
 
     assert is_speech_detected is True, \
         "Silence detection failed for mixed audio with significant noise"

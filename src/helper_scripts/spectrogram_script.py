@@ -4,9 +4,9 @@ Author: Jakub Pietrzak, 2024
 Modul for generating spectrograms and showing/saving it
 """
 
+import argparse
 import os
 import random
-import argparse
 
 import matplotlib.pyplot as plt
 import soundfile as sf
@@ -15,6 +15,7 @@ from sklearn.pipeline import Pipeline
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_mel_spectrogram, gen_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
+
 
 def get_random_audio_path(dir_path: str) -> str:
     """
@@ -115,9 +116,3 @@ def main(argv: list[str]) -> None:
     args = parser.parse_args(argv)
     process(args.file_path, args.directory, args.number, args.output, args.show, args.mel,
             args.clean, args.show_axis)
-
-
-if __name__ == "__main__":
-    import sys
-
-    main(sys.argv[1:])

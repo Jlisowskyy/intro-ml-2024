@@ -11,7 +11,8 @@ from typing import Callable
 import numpy as np
 from scipy.io.wavfile import write
 
-from src.audio.wav import load_wav_with_window
+from src.audio.audio_data import AudioData
+from src.audio.wav import load_wav_with_window, AudioDataIterator, FlattenWavIterator
 from src.constants import WavIteratorType
 
 AMPLITUDE: float = 0.5
@@ -100,6 +101,14 @@ def test_wav_iter_count_overlapping() -> None:
 
             assert iterations == expected_iterations
 
+    for fps, duration, np_dtype, window_seconds, expected_iterations in OVERLAPPING_CASES:
+        with artificial_wav(fps, duration, np_dtype):
+            iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.OVERLAPPING)
+            iterator = AudioDataIterator(iterator)
+            iterations = sum(1 for _ in iterator)
+
+            assert iterations == expected_iterations
+
 
 PLAIN_CASES: list[tuple[int, float, str, float, int]] = [
     (44100, 1.0, "uint8", 0.2, 5),
@@ -125,3 +134,37 @@ def test_wav_iter_count_plain() -> None:
             iterations = sum(1 for _ in iterator)
 
             assert iterations == expected_iterations
+
+    for fps, duration, np_dtype, window_seconds, expected_iterations in PLAIN_CASES:
+        with artificial_wav(fps, duration, np_dtype):
+            iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.PLAIN)
+            iterator = AudioDataIterator(iterator)
+            iterations = sum(1 for _ in iterator)
+
+            assert iterations == expected_iterations
+
+
+def test_audio_data_returns_same() -> None:
+    """
+    Test if the AudioData object returns the same audio signal as the raw audio data
+    """
+
+    for fps, duration, np_dtype, window_seconds, _ in PLAIN_CASES:
+        with artificial_wav(fps, duration, np_dtype):
+            iterator = load_wav_with_window(FILE, window_seconds, 0, WavIteratorType.PLAIN)
+            iterator1 = AudioDataIterator(iterator)
+
+            for _, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
+                assert np.array_equal(
+                    AudioData(audio_data1, int(iterator.get_frame_rate())).audio_signal,
+                    audio_data2.audio_signal)
+
+    for fps, duration, np_dtype, window_seconds, _ in PLAIN_CASES:
+        with artificial_wav(fps, duration, np_dtype):
+            iterator = FlattenWavIterator(FILE, window_seconds, WavIteratorType.PLAIN)
+            iterator1 = AudioDataIterator(iterator)
+
+            for _, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
+                assert np.array_equal(AudioData(audio_data1,
+                                    int(iterator.get_first_iter().get_frame_rate())).audio_signal,
+                                      audio_data2.audio_signal)

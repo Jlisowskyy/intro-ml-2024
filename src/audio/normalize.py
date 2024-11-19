@@ -10,7 +10,7 @@ import numpy as np
 from src.constants import NormalizationType
 
 
-def mean_variance_normalization(signal: np.array) -> np.array:
+def mean_variance_normalization(signal: np.ndarray) -> np.ndarray:
     """
     Apply mean and variance normalization to the signal.
     Adjusts the signal to have a mean of 0 and a standard deviation of 1.
@@ -24,22 +24,6 @@ def mean_variance_normalization(signal: np.array) -> np.array:
     std = np.maximum(std, 1e-8)
     normalized_signal = (signal - mean) / std
     return normalized_signal
-
-
-def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
-    """
-    Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
-
-    Source: https://en.wikipedia.org/wiki/Cepstral_mean_and_variance_normalization
-
-    :param signal: Input audio signal (numpy array)
-    :param fs: Sampling rate
-    :return: CMVN normalized audio signal (numpy array)
-    """
-
-    raise NotImplementedError("CMVN normalization is not implemented yet")
-
-
 
 def pcen_normalization(signal: np.ndarray,
                        fs: float,
@@ -93,7 +77,5 @@ def normalize(signal: np.ndarray,
         return mean_variance_normalization(signal)
     if normalization_type == NormalizationType.PCEN:
         return pcen_normalization(signal, fs, *args)
-    if normalization_type == NormalizationType.CMVN:
-        return cmvn_normalization(signal, fs)
 
     raise ValueError("Unsupported normalization type")

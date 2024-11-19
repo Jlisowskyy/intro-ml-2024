@@ -34,3 +34,4 @@ watchfiles
 wave
 websockets
 moviepy
+colorama

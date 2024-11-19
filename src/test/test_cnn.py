@@ -7,20 +7,26 @@ Tests for CNN model
 from torchsummary import summary
 
 from src.cnn.cnn import BasicCNN
+from src.cnn.loadset import DAPSDataset
+from src.constants import DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, SPECTROGRAM_WIDTH, \
+    SPECTROGRAM_HEIGHT
+
+PNG_NUM_COLORS = 3
 
 
-def display_summary() -> None:
+def manual_test_dataset() -> None:
     """
-    Display summary of the CNN model
+    Manual test for the DAPSDataset
     """
+    d = DAPSDataset(DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH,
+                    'cuda')
+    print(d[0])
 
-    cnn = BasicCNN()
-    summary(cnn.cuda(), (3, 300, 400))
 
-
-def manual_test() -> None:
+def manual_test_cnn() -> None:
     """
     Manual test for the CNN model
     """
 
-    display_summary()
+    cnn = BasicCNN().to('cuda')
+    summary(cnn, (PNG_NUM_COLORS, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT))

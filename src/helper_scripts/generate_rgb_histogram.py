@@ -4,8 +4,6 @@ Author: Jakub Pietrzak, 2024
 Modul for generating rgb histgram of spectrogram 
 """
 
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
@@ -49,7 +47,3 @@ def main(args: list[str]) -> None:
 
     spectrogram_path = args[0]
     generate_rgb_histogram(spectrogram_path)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

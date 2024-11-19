@@ -8,26 +8,12 @@ methods to be compatible with scikit-learn pipelines.
 
 from src.audio.audio_data import AudioData
 from src.audio.denoise import denoise
-from src.constants import DenoiseType
 
 
 class AudioCleaner:
     """
     A class used to clean audio data as part of a machine learning pipeline.
     """
-
-    denoise_type = DenoiseType.BASIC
-    def __init__(self, denoise_type: DenoiseType = DenoiseType.BASIC) -> None:
-        """
-        Initializes the AudioCleaner.
-
-        Parameters:
-        denoise_type (DenoiseType): Type of denoising to perform (from DenoiseType enum).
-
-        Returns:
-        None
-        """
-        self.denoise_type = denoise_type
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None):
@@ -57,7 +43,7 @@ class AudioCleaner:
         for audio_data in x_data:
             audio_data.audio_signal = denoise(
                 audio_data.audio_signal,
-                audio_data.sample_rate,
-                self.denoise_type)
+                audio_data.sample_rate
+            )
 
         return x_data
