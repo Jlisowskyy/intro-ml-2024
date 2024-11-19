@@ -80,14 +80,14 @@ class BasicCNN(BaseCNN):
     Simplified CNN with two layers
     """
 
-    def __init__(self) -> None:
+    def __init__(self, class_count=2):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.fc1 = nn.Linear(111744, 128)
         self.fc2 = nn.Linear(128, 84)
-        self.fc3 = nn.Linear(84, 2)
+        self.fc3 = nn.Linear(84, class_count)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """

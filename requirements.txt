@@ -22,6 +22,7 @@ scipy
 sniffio
 soundfile
 starlette
+tabulate
 torch
 torchaudio
 torchsummary

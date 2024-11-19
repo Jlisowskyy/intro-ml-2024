@@ -54,7 +54,7 @@ class DAPSDataset(Dataset):
     def __len__(self) -> int:
         return len(self.annotations)
 
-    def __getitem__(self, index: int) -> tuple[Tensor, int]:
+    def __getitem__(self, index: int) -> tuple[Tensor, any]:
         """
         Retrieve item from the dataset, random access
 

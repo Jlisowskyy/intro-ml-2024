@@ -3,8 +3,11 @@ Author: Jakub Lisowski, Tomasz Mycielski, 2024
 
 Simple class providing a simple validation method
 """
-from torch import Tensor
+from collections.abc import Iterable, Sequence
 
+import pandas as pd
+from tabulate import tabulate
+from torch import Tensor
 
 class Validator:
     """
@@ -15,54 +18,56 @@ class Validator:
     - calculating the accuracy, F1 score, macro F1 score
     """
 
-    _results: list[list[int]]
+    _results: pd.DataFrame
 
-    def __init__(self) -> None:
+    def __init__(self, classes: Iterable[any]=None) -> None:
         """
         Method initializing the validation
         """
+        if not classes:
+            classes = [0, 1]
 
-        self._results = [[0, 0], [0, 0]]
+        self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
-    def get_results(self) -> list[list[int]]:
-        """
-        Method returning the results
-        """
 
-        return self._results
-
-    def validate(self, predictions: Tensor, target: Tensor) -> None:
+    def validate(self, predictions: Tensor, target: Tensor,
+                 mapping: Sequence[int]=None) -> None:
         """
         Method saving the results of the validation
         """
-
-        for response, answer in zip(predictions, target):
-            self._results[response.argmax(0).item()][answer.item()] += 1
+        if not mapping:
+            for response, answer in zip(predictions, target):
+                self._results.loc[answer.item(), response.argmax(0).item()] += 1
+        else:
+            for response, answer in zip(predictions, target):
+                self._results[mapping[response.argmax(0).item()]][mapping[answer.item()]] += 1
 
     def get_results_str(self) -> str:
         """
         Method returning the results as a string
         """
 
-        f1 = 2 * self._results[1][1] / (
-                2 * self._results[1][1] + self._results[0][1] + self._results[1][0])
+        # F1 is only relvant when there's a nega
+        f1 = 'N/A'
+        if (len(self._results.columns) == 2 and
+            (self._results.columns == [0, 1]).all()):
+            f1 = 2 * self._results[1][1] / (
+                    2 * self._results[1][1] + self._results[0][1] + self._results[1][0])
 
         # macro F1 score which assumes that both classes are positive
-        macro_f1 = (self._results[1][1] / (
-                2 * self._results[1][1] + self._results[0][1] + self._results[1][0]) +
-                    self._results[0][0] / (
-                            2 * self._results[0][0] + self._results[0][1] + self._results[1][0]))
+        macro_f1 = 0
+        for i in self._results:
+            numerator = 2 * self._results[i][i]
+            # fn + fp + 2tp of a class is the sum of its row + sum of its column
+            denominator = self._results.sum(axis=0)[i] + self._results.sum(axis=1)[i]
+            macro_f1 += numerator/denominator
+        macro_f1 /= len(self._results)
         accuracy = (self._results[1][1] + self._results[0][0]) / (
                 sum(self._results[0]) + sum(self._results[1]))
-
-        return f'''
-┏━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃      ┃ Pred. Pos. ┃ Pred. Neg. ┃
-┣━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ Pos. ┃ {self._results[1][1]:>10} ┃ {self._results[0][1]:>10} ┃
-┣━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ Neg. ┃ {self._results[1][0]:>10} ┃ {self._results[0][0]:>10} ┃
-┗━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+        table = tabulate(self._results,
+                         ['Pred. ' + str(i) for i in self._results.columns],
+                         tablefmt='heavy_grid')
+        return f'''{table}
 
 Accuracy: {accuracy}
 F1 score: {f1}
@@ -76,10 +81,7 @@ Macro F1: {macro_f1}
 
         print(self.get_results_str())
 
-    def __add__(self, b : 'Validator') -> 'Validator':
+    def __add__(self, b: 'Validator') -> 'Validator':
         out = Validator()
-        out._results[0][0] = self._results[0][0] + b.get_results()[0][0]
-        out._results[0][1] = self._results[0][1] + b.get_results()[0][1]
-        out._results[1][0] = self._results[1][0] + b.get_results()[1][0]
-        out._results[1][1] = self._results[1][1] + b.get_results()[1][1]
+        out._results = self._results + b._results
         return out

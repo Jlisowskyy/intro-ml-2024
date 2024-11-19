@@ -14,11 +14,12 @@ from tqdm import tqdm  # for the progress bar
 
 from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import DAPSDataset
-from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
+
+from src.cnn.validator import Validator
 
 
 def train_single_epoch(
@@ -99,6 +100,7 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
+        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()

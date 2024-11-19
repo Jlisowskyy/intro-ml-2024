@@ -114,6 +114,21 @@ SPEAKER_CLASSES = {
     'f10':0
 }
 
+# CLASSES = [
+#     'yes',
+#     'no',
+#     'up',
+#     'down',
+#     'left',
+#     'right',
+#     'on',
+#     'off',
+#     'stop',
+#     'go',
+#     'unknown',
+#     'silence'
+# ]
+
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_PATH: str = './datasets/daps'
 DATABASE_OUT_NAME: str = 'daps_split_spectro'
