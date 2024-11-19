@@ -14,7 +14,7 @@ from sklearn.pipeline import Pipeline
 
 # pylint: disable=line-too-long
 from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_mel_spectrogram, save_spectrogram
+from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
@@ -46,5 +46,5 @@ def example_test_run():
 
     save_spectrogram(model_input[0], SPECTROGRAM_CLEANED_PATH)
 
-    spectrogram_not_cleaned = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+    spectrogram_not_cleaned = gen_spectrogram(audio_data, True)
     save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)

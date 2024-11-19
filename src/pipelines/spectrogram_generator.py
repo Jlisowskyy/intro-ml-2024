@@ -8,7 +8,7 @@ for generating mel-frequency spectrograms from audio data.
 import numpy as np
 
 from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_mel_spectrogram
+from src.audio.spectrogram import gen_spectrogram
 
 
 class SpectrogramGenerator:
@@ -52,6 +52,6 @@ class SpectrogramGenerator:
         """
         spectrogram_data = []
         for audio_data in audio_data_list:
-            spectrogram = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+            spectrogram = gen_spectrogram(audio_data, True)
             spectrogram_data.append(spectrogram)
         return spectrogram_data
