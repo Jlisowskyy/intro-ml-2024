@@ -29,8 +29,7 @@ def get_random_file_path(dir_path: str, file_type: str) -> str:
         subdirectories = [d for d in os.listdir(dir_path)
                           if os.path.isdir(os.path.join(dir_path, d))]
         if not subdirectories:
-            raise FileNotFoundError(f"No {file_type} files found in the
-                                    directory or its subdirectories.")
+            raise FileNotFoundError(f"No {file_type} files found in the directory.")
         dir_path = os.path.join(dir_path, random.choice(subdirectories))
 
 def process(file_path: str = "", directory: str = "", number_of_samples: int = 1):
