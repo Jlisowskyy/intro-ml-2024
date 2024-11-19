@@ -15,7 +15,7 @@ from PIL import Image
 
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_spectrogram, save_spectrogram
-from src.helper_scripts.spectrogram_script import get_random_audio_path
+from src.helper_scripts.spectrogram_from_npy import get_random_file_path
 
 
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
@@ -94,7 +94,7 @@ def process_path_and_generate_rgb_histogram(path: str, number: int = 1) -> None:
 
     if os.path.isdir(path):
         for _ in range(number):
-            file_path = get_random_audio_path(path)
+            file_path = get_random_file_path(path, ".wav")
             spectrogram_path=create_spectrogram_from_audio_file(file_path)
             generate_rgb_histogram(spectrogram_path)
 
