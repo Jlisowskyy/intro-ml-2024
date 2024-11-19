@@ -12,18 +12,20 @@ from PIL import Image
 from librosa import feature
 from matplotlib import pyplot as plt
 
-from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT, \
-    SPECTROGRA_DPI,SPECTROGRAM_N_FFT, SPECTROGRAM_HOP_LENGTH, SPECTROGRAM_N_MELS)
+from src.audio.audio_data import AudioData
+from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
+                           SPECTROGRA_DPI, SPECTROGRAM_N_FFT,
+                           SPECTROGRAM_HOP_LENGTH,
+                           SPECTROGRAM_N_MELS)
 
 
-def gen_spectrogram(audio_data: np.ndarray, sample_rate: int,
+def gen_spectrogram(audio_data: AudioData,
                     show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
                     height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
     """
-    MISSING DOCSTRING
+    # TODO: MISSING DOCSTRING
     Args:
         audio_data:
-        sample_rate:
         show_axis:
         width:
         height:
@@ -32,12 +34,12 @@ def gen_spectrogram(audio_data: np.ndarray, sample_rate: int,
 
     """
     dpi = SPECTROGRA_DPI
-    s = librosa.stft(audio_data, n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH)
+    s = librosa.stft(audio_data.audio_signal, n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH)
     s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-    img = librosa.display.specshow(s_db, sr=sample_rate, x_axis='time', y_axis='log', ax=ax)
+    img = librosa.display.specshow(s_db, sr=audio_data.sample_rate, x_axis='time', y_axis='log', ax=ax)
     if show_axis:
         plt.colorbar(img, format='%+2.0f dB')
         plt.title('Spectrogram')
@@ -59,14 +61,13 @@ def gen_spectrogram(audio_data: np.ndarray, sample_rate: int,
     return image_array
 
 
-def gen_mel_spectrogram(audio_data: np.ndarray, sample_rate: int,
+def gen_mel_spectrogram(audio_data: AudioData,
                         show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
                         height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
     """
-    MISSING DOCSTRING
+    # TODO: MISSING DOCSTRING
     Args:
         audio_data:
-        sample_rate:
         show_axis:
         width:
         height:
@@ -75,14 +76,14 @@ def gen_mel_spectrogram(audio_data: np.ndarray, sample_rate: int,
 
     """
     dpi = SPECTROGRA_DPI
-    s = feature.melspectrogram(y=audio_data, sr=sample_rate,
+    s = feature.melspectrogram(y=audio_data.audio_signal, sr=audio_data.sample_rate,
                                n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH,
                                n_mels=SPECTROGRAM_N_MELS, fmax=DENOISE_FREQ_HIGH_CUT)
     s_db = librosa.power_to_db(s, ref=np.max)
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-    img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
+    img = librosa.display.specshow(s_db, sr=audio_data.sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
                                    x_axis='time', y_axis='mel', ax=ax)
     if show_axis:
         plt.colorbar(img, format='%+2.0f dB')

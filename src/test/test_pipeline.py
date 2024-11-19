@@ -17,6 +17,8 @@ from src.audio.audio_data import AudioData
 from src.constants import SPEAKER_CLASSES
 
 AUDIO_DIRECTORY_PATH = "generated_files"
+
+
 def gen_random_audio_data():
     """
     Generates random wav files for testing purposes.
@@ -26,6 +28,7 @@ def gen_random_audio_data():
     for i in range(10):
         audio_data = np.random.randn(18000)
         write(os.path.join(AUDIO_DIRECTORY_PATH, f"random_{i}.wav"), 18000, audio_data)
+
 
 def example_test_run():
     """
@@ -45,6 +48,7 @@ def example_test_run():
     prediction = training_pipeline.predict([x_train[1]])
 
     print(prediction)
+
 
 def get_data(audio_directory_path):
     """
@@ -76,4 +80,4 @@ def get_data(audio_directory_path):
             x_train.append(audio_data)
             y_train.append(speaker_class)
 
-    return (x_train, y_train)
+    return x_train, y_train

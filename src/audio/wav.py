@@ -27,7 +27,7 @@ class WavIteratorBase(ABC):
     # class fields
     # ------------------------------
 
-    #pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes
     _file_path: str
     _window_size_frames: int
 
@@ -102,7 +102,6 @@ class WavIteratorBase(ABC):
         return self._audio_data[
                index * self._window_size_frames:(index + 1) * self._window_size_frames,
                self._channel_index]
-
 
     def get_data_type(self) -> type:
         """
@@ -476,7 +475,6 @@ class AudioDataIterator:
             yield AudioData(chunk, self._sample_rate)
 
 
-
 def load_wav(file_path: str, channel_index: int = 0,
              iterator_type: WavIteratorType = WavIteratorType.PLAIN) -> WavIteratorBase:
     """
@@ -536,7 +534,7 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
 
     for index, chunk in enumerate(it):
         output_file = os.path.join(destination_dir,
-            f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
+                                   f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
 
         try:
             with wave.open(output_file, 'wb') as wav_file:

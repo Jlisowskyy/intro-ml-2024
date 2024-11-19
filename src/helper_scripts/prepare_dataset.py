@@ -52,9 +52,9 @@ def main() -> None:
                     if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
-                    audio_data = denoise.denoise(audio_data.audio_signal, sr)
-                    audio_data = normalize.normalize(audio_data, sr, NORMALIZATION_TYPE)
-                    spectrogram = gen_mel_spectrogram(audio_data, int(sr),
+                    audio_data = denoise.denoise(audio_data)
+                    audio_data = normalize.normalize(audio_data, NORMALIZATION_TYPE)
+                    spectrogram = gen_mel_spectrogram(audio_data,
                                                       width=SPECTROGRAM_WIDTH,
                                                       height=SPECTROGRAM_HEIGHT)
 

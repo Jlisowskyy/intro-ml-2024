@@ -24,6 +24,7 @@ def create_spectrogram(directory, denoise=False):
     """
     Function that creates spectrograms from audio files
     Args:
+        denoise:  (bool): If True, denoise the audio files before creating spectrograms
         directory (str): Path to the directory with audio files.
     """
     output_directory = os.path.join(directory, HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX)

@@ -36,8 +36,9 @@ def get_random_audio_path(dir_path: str) -> str:
             raise FileNotFoundError("No `.wav` files found in the directory or its subdirectories.")
         dir_path = os.path.join(dir_path, random.choice(subdirectories))
 
-def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1, output_path:
-            str = None, show: bool = False,
+
+def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,
+            output_path: str = None, show: bool = False,
             mel: bool = False, clean_data: bool = False, show_axis: bool = False):
     # pylint: disable=too-many-locals
     """
@@ -72,15 +73,13 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
             audio_data = transformation_pipeline.transform([audio_data])[0]
 
         if mel:
-            spectrogram = gen_mel_spectrogram(audio_data.audio_signal,
-                                            audio_data.sample_rate, show_axis)
+            spectrogram = gen_mel_spectrogram(audio_data, show_axis)
         else:
-            spectrogram = gen_spectrogram(audio_data.audio_signal,
-                                          audio_data.sample_rate, show_axis)
+            spectrogram = gen_spectrogram(audio_data, show_axis)
 
         if output_path:
-            splited_path=output_path.split(".")
-            save_spectrogram(spectrogram, splited_path[0]+str(i)+"."+splited_path[1])
+            splited_path = output_path.split(".")
+            save_spectrogram(spectrogram, splited_path[0] + str(i) + "." + splited_path[1])
 
         if show:
             plt.imshow(spectrogram)

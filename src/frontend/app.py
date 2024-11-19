@@ -11,8 +11,10 @@ from fastapi.responses import HTMLResponse
 from src.frontend.app_state import AppState
 from src.frontend.models import ModelResponse
 from src.cnn.model_api import classify_file
+
 app = FastAPI()
 app_state = AppState()
+
 
 @app.get("/")
 async def root():

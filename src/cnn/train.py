@@ -29,7 +29,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False
-        ) -> None:
+) -> None:
     """
     Method training `model` a single iteration with the data provided
 
@@ -49,6 +49,9 @@ def train_single_epoch(
 
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
+
+    calculate_accuracy:
+        # TODO: add description
     """
 
     validator = Validator()
@@ -70,12 +73,13 @@ def train_single_epoch(
     if calculate_accuracy:
         validator.display_results()
 
+
 def validate(
         model: nn.Module,
         data_loader: DataLoader,
         loss_fn: nn.Module,
         device: str = 'cpu'
-        ) -> float:
+) -> float:
     """
     Function for evaluating `model` against an independent dataset during training
 
@@ -106,6 +110,7 @@ def validate(
     model.train()
     return valid_loss
 
+
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
           device: str, epochs: int, val_data: DataLoader | None = None) -> None:
     """
@@ -116,7 +121,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     model: :class:`torch.nn.Module`
         Model to train
     
-    data_loader: :class:`torch.utils.data.DataLoader`
+    train_data: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
@@ -130,10 +135,13 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
     epochs: :class:`int`
         set amount of epochs to train the model
+
+    val_data: :class:`torch.utils.data.DataLoader`
+        # TODO: add description
     """
     min_valid_loss = float('inf')
     for i in range(epochs):
-        print(f"Epoch {i+1}")
+        print(f"Epoch {i + 1}")
         train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1)
 
         if val_data is None:
@@ -144,7 +152,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         if valid_loss < min_valid_loss:
             min_valid_loss = valid_loss
             # backup for longer training sessions
-            torch.save(model.state_dict(), f'cnn_e{i+1}_backup.pth')
+            torch.save(model.state_dict(), f'cnn_e{i + 1}_backup.pth')
     print("Finished training")
 
 

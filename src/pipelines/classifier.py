@@ -7,6 +7,7 @@ for fitting a model and making predictions based on audio data.
 
 import numpy as np
 
+
 class Classifier:
     """
     A simple classifier for predicting labels from audio data.

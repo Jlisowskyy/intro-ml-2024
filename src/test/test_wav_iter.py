@@ -123,6 +123,7 @@ PLAIN_CASES: list[tuple[int, float, str, float, int]] = [
     (44100, 0, "uint8", 0.2, 0),
 ]
 
+
 def test_wav_iter_count_plain() -> None:
     """
     Test the number of iterations over the artificial WAV file
@@ -166,5 +167,5 @@ def test_audio_data_returns_same() -> None:
 
             for _, (audio_data1, audio_data2) in enumerate(zip(iterator, iterator1)):
                 assert np.array_equal(AudioData(audio_data1,
-                                    int(iterator.get_first_iter().get_frame_rate())).audio_signal,
+                                                int(iterator.get_first_iter().get_frame_rate())).audio_signal,
                                       audio_data2.audio_signal)

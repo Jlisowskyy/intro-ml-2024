@@ -19,10 +19,10 @@ from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
-
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
 SPECTROGRAM_CLEANED_PATH = str(Path.resolve(Path(f'{__file__}/../test_tmp/cleaned_spectrogram.png')))
 SPECTROGRAM_PATH = str(Path.resolve(Path(f'{__file__}/../test_tmp/spectrogram.png')))
+
 
 def example_test_run():
     """
@@ -46,5 +46,5 @@ def example_test_run():
 
     save_spectrogram(model_input[0], SPECTROGRAM_CLEANED_PATH)
 
-    spectrogram_not_cleaned = gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+    spectrogram_not_cleaned = gen_mel_spectrogram(audio_data)
     save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)
