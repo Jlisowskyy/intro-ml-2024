@@ -124,7 +124,7 @@ TRAINING_MOMENTUM: float = 0.9
 
 SPECTROGRAM_WIDTH: int = 300
 SPECTROGRAM_HEIGHT: int = 400
-SPECTROGRA_DPI: int = 10
+SPECTROGRAM_DPI: int = 100
 SPECTROGRAM_N_FFT: int = 4096
 SPECTROGRAM_HOP_LENGTH: int = 512
 SPECTROGRAM_N_MELS: int = 5120
@@ -195,7 +195,7 @@ MODEL_WINDOW_LENGTH: int = 3
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
-MAJORITY_THRESHOLD: float = 0.7
+CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """
 How many chunks need to be classified as 1 to classify the whole file as 1
 """

@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 
 from src.audio.audio_data import AudioData
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
-                           SPECTROGRA_DPI, SPECTROGRAM_N_FFT,
+                           SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
                            SPECTROGRAM_HOP_LENGTH,
                            SPECTROGRAM_N_MELS)
 
@@ -23,17 +23,16 @@ def gen_spectrogram(audio_data: AudioData,
                     show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
                     height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
     """
-    # TODO: MISSING DOCSTRING
+    Generates a normal spectrogram from audio data.
     Args:
-        audio_data:
-        show_axis:
-        width:
-        height:
-
+        audio_data: AudioData object containing the audio signal and sample rate.
+        show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
+        width (int, optional): Width of the output image in pixels. Defaults to 400.
+        height (int, optional): Height of the output image in pixels.
     Returns:
-
+        np.ndarray: Image array of the spectrogram.
     """
-    dpi = SPECTROGRA_DPI
+    dpi = SPECTROGRAM_DPI
     s = librosa.stft(audio_data.audio_signal, n_fft=SPECTROGRAM_N_FFT,
                      hop_length=SPECTROGRAM_HOP_LENGTH)
     s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
@@ -67,17 +66,16 @@ def gen_mel_spectrogram(audio_data: AudioData,
                         show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
                         height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
     """
-    # TODO: MISSING DOCSTRING
+    Generates a mel-frequency spectrogram from audio data.
     Args:
-        audio_data:
-        show_axis:
-        width:
-        height:
-
+        audio_data: AudioData object containing the audio signal and sample rate.
+        show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
+        width (int, optional): Width of the output image in pixels. Defaults to 400.
+        height (int, optional): Height of the output image in pixels. Defaults to 300.
     Returns:
-
+        np.ndarray: Image array of the mel-frequency spectrogram.
     """
-    dpi = SPECTROGRA_DPI
+    dpi = SPECTROGRAM_DPI
     s = feature.melspectrogram(y=audio_data.audio_signal, sr=audio_data.sample_rate,
                                n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH,
                                n_mels=SPECTROGRAM_N_MELS, fmax=DENOISE_FREQ_HIGH_CUT)
