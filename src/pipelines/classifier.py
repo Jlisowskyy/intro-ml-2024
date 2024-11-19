@@ -5,7 +5,6 @@ This module contains the Classifier class, which provides functionality
 for fitting a model and making predictions based on audio data.
 """
 
-import numpy as np
 import torch
 
 from src.cnn.cnn import BasicCNN

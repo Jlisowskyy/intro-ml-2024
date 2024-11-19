@@ -8,7 +8,6 @@ through a series of transformations and passes it to a CNN model for prediction.
 """
 
 from sklearn.pipeline import Pipeline
-import torch
 
 from src.audio.audio_data import AudioData
 from src.cnn.cnn import BasicCNN
@@ -31,7 +30,7 @@ def classify(audio_data: list[AudioData], model: BasicCNN) -> list[int]:
         int: user's class.
     """
 
-    transformation_pipeline = Pipeline(steps=[
+    pipeline = Pipeline(steps=[
         ('AudioCleaner', AudioCleaner()),
         ('AudioNormalizer', AudioNormalizer()),
         ('SpectrogramGenerator', SpectrogramGenerator()),
@@ -39,8 +38,4 @@ def classify(audio_data: list[AudioData], model: BasicCNN) -> list[int]:
         ('Classifier', Classifier(model))
     ])
 
-    # Transformed data
-    transformation_pipeline.fit([audio_data])
-    predictions = transformation_pipeline.predict([audio_data])
-
-    return predictions
+    return pipeline.predict(audio_data)
