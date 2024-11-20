@@ -88,7 +88,6 @@ def run_pytest() -> None:
 
 SCRIPTS: dict[str, Callable[..., None]] = {
     "data_analysis": data_analysis.main,
-    "from_wav_to_histogram": from_wav_to_histogram.main,
     "generate_rgb_histogram": generate_rgb_histogram.main,
     "regenerate_csv": regenerate_csv.main,
     "spectrogram_script": spectrogram_script.main,

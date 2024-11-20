@@ -13,7 +13,6 @@ from librosa import feature
 from matplotlib import pyplot as plt
 from src.audio.audio_data import AudioData
 
-from src.audio.audio_data import AudioData
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
                            SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
                            SPECTROGRAM_HOP_LENGTH,
@@ -40,7 +39,7 @@ def gen_spectrogram(audio:AudioData, mel:bool=False,
                                        fmax=DENOISE_FREQ_HIGH_CUT)
         s_db = librosa.power_to_db(s, ref=np.max)
     else:
-        s = librosa.stft(audio.audio_signal, n_fft=SPECTROGRAM_N_FFT, 
+        s = librosa.stft(audio.audio_signal, n_fft=SPECTROGRAM_N_FFT,
                          hop_length=SPECTROGRAM_HOP_LENGTH)
         s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
