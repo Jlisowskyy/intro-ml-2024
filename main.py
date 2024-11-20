@@ -31,7 +31,6 @@ from colorama import Fore, Style, init
 
 from src.cnn import train
 from src.helper_scripts import data_analysis
-from src.helper_scripts import from_wav_to_histogram
 from src.helper_scripts import generate_rgb_histogram
 from src.helper_scripts import prepare_dataset
 from src.helper_scripts import regenerate_csv

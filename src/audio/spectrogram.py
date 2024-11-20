@@ -32,14 +32,16 @@ def gen_spectrogram(audio:AudioData, mel:bool=False,
     Returns:
         np.ndarray: Image array of the spectrogram.
     """
-    dpi = 100
+    dpi = SPECTROGRAM_DPI
     if mel:
         s=feature.melspectrogram(y=audio.audio_signal, sr=audio.sample_rate,
-                                       n_fft=4096, hop_length=512, n_mels=512,
+                                       n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH,
+                                       n_mels=SPECTROGRAM_N_MELS,
                                        fmax=DENOISE_FREQ_HIGH_CUT)
         s_db = librosa.power_to_db(s, ref=np.max)
     else:
-        s = librosa.stft(audio.audio_signal, n_fft=4096, hop_length=512)
+        s = librosa.stft(audio.audio_signal, n_fft=SPECTROGRAM_N_FFT, 
+                         hop_length=SPECTROGRAM_HOP_LENGTH)
         s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)

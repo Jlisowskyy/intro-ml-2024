@@ -19,12 +19,9 @@ from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.helper_scripts.spectrogram_from_npy import get_random_file_path
 
-
-WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
-
 from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS
 
-
+WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
 
 def generate_rgb_histogram(spectrogram_path: str) -> None:
     """
