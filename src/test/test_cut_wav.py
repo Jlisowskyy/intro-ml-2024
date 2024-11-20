@@ -12,6 +12,7 @@ from src.constants import WavIteratorType
 TEST_DATA_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/cut_test_data.wav')))
 TEST_OUT_DIR = str(Path.resolve(Path(f'{__file__}/../test_tmp')))
 
+
 def manual_cut_test() -> None:
     """
     Manual test for cutting the wav file

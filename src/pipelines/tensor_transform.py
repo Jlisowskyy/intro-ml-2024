@@ -7,10 +7,12 @@ Module for transforming spectrogram data into tensors suitable for PyTorch model
 import numpy as np
 import torch
 
+
 class TensorTransform:
     """
     A class used to fit and transform spectrogram data into PyTorch tensors.
     """
+
     def __init__(self):
         """
         Initializes the TensorTransform object.

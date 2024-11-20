@@ -17,8 +17,9 @@ from src.helper_scripts.spectrogram_from_npy import get_random_file_path
 
 
 
-def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1, output_path:
-            str = None, show: bool = False,
+
+def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,
+            output_path: str = None, show: bool = False,
             mel: bool = False, clean_data: bool = False, show_axis: bool = False):
     # pylint: disable=too-many-locals
     """
@@ -58,8 +59,8 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
         spectrogram = gen_spectrogram(audio_data, mel, show_axis)
 
         if output_path:
-            splited_path=output_path.split(".")
-            save_spectrogram(spectrogram, splited_path[0]+str(i)+"."+splited_path[1])
+            splited_path = output_path.split(".")
+            save_spectrogram(spectrogram, splited_path[0] + str(i) + "." + splited_path[1])
 
         if show:
             plt.imshow(spectrogram)
@@ -95,9 +96,3 @@ def main(argv: list[str]) -> None:
     args = parser.parse_args(argv)
     process(args.file_path, args.directory, args.number, args.output, args.show, args.mel,
             args.clean, args.show_axis)
-
-
-if __name__ == "__main__":
-    import sys
-
-    main(sys.argv[1:])
