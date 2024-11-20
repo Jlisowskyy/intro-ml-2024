@@ -8,7 +8,7 @@ from pathlib import Path
 import soundfile as sf
 import numpy as np
 from src.audio.audio_data import AudioData
-from src.pipelines.load_model import get_classifier
+from src.cnn.cnn import BasicCNN
 
 # pylint: disable=line-too-long
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
@@ -22,6 +22,6 @@ def example_test_run():
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)
     audio_data = AudioData(np.array(audio_data_wav), sample_rate)
 
-    classifier = get_classifier(MODEL_PATH)
+    classifier = BasicCNN.load_model(MODEL_PATH)
 
-    print(classifier([audio_data]))
+    print(classifier.classify(audio_data))
