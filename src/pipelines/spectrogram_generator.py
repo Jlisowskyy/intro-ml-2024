@@ -12,8 +12,11 @@ from PIL import Image
 from librosa import feature
 from matplotlib import pyplot as plt
 
-from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT
 from src.audio.audio_data import AudioData
+from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
+                           SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
+                           SPECTROGRAM_HOP_LENGTH,
+                           SPECTROGRAM_N_MELS)
 
 
 class SpectrogramGenerator:
@@ -44,27 +47,28 @@ class SpectrogramGenerator:
         plt.savefig(file_path, bbox_inches='tight', pad_inches=0)
 
     @staticmethod
-    def gen_spectrogram(audio_data: np.array, sample_rate: int,
+    def gen_spectrogram(audio_data: AudioData,
                     show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
-                    height: int = SPECTROGRAM_HEIGHT) -> np.array:
+                    height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
         """
         Generates a normal spectrogram from audio data.
         Args:
-            audio_data (np.array): Input audio signal as a NumPy array.
-            sample_rate (int): Sample rate of the audio signal.
+            audio_data: AudioData object containing the audio signal and sample rate.
             show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
             width (int, optional): Width of the output image in pixels. Defaults to 400.
             height (int, optional): Height of the output image in pixels.
         Returns:
-            np.array: NumPy array representing the spectrogram image.
+            np.ndarray: Image array of the spectrogram.
         """
-        dpi = 100
-        s = librosa.stft(audio_data, n_fft=4096, hop_length=512)
+        dpi = SPECTROGRAM_DPI
+        s = librosa.stft(audio_data.audio_signal, n_fft=SPECTROGRAM_N_FFT,
+                        hop_length=SPECTROGRAM_HOP_LENGTH)
         s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
         fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-        img = librosa.display.specshow(s_db, sr=sample_rate, x_axis='time', y_axis='log', ax=ax)
+        img = librosa.display.specshow(s_db, sr=audio_data.sample_rate,
+                                    x_axis='time', y_axis='log', ax=ax)
         if show_axis:
             plt.colorbar(img, format='%+2.0f dB')
             plt.title('Spectrogram')
@@ -85,33 +89,31 @@ class SpectrogramGenerator:
 
         return image_array
 
+
     @staticmethod
-    def gen_mel_spectrogram(audio_data: np.array, sample_rate: int,
-                        show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
-                        height: int = SPECTROGRAM_HEIGHT) -> np.array:
+    def gen_mel_spectrogram(audio_data: AudioData,
+                            show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
+                            height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
         """
         Generates a mel-frequency spectrogram from audio data.
-
         Args:
-            audio_data (np.array): Input audio signal as a NumPy array.
-            sample_rate (int): Sample rate of the audio signal.
+            audio_data: AudioData object containing the audio signal and sample rate.
             show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
             width (int, optional): Width of the output image in pixels. Defaults to 400.
             height (int, optional): Height of the output image in pixels. Defaults to 300.
-
         Returns:
-            np.array: NumPy array representing the spectrogram image.
+            np.ndarray: Image array of the mel-frequency spectrogram.
         """
-        dpi = 100
-        s = feature.melspectrogram(y=audio_data, sr=sample_rate,
-                                        n_fft=4096, hop_length=512, n_mels=512,
-                                        fmax=DENOISE_FREQ_HIGH_CUT)
+        dpi = SPECTROGRAM_DPI
+        s = feature.melspectrogram(y=audio_data.audio_signal, sr=audio_data.sample_rate,
+                                n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH,
+                                n_mels=SPECTROGRAM_N_MELS, fmax=DENOISE_FREQ_HIGH_CUT)
         s_db = librosa.power_to_db(s, ref=np.max)
 
         fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-        img = librosa.display.specshow(s_db, sr=sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
-                                        x_axis='time', y_axis='mel', ax=ax)
+        img = librosa.display.specshow(s_db, sr=audio_data.sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
+                                    x_axis='time', y_axis='mel', ax=ax)
         if show_axis:
             plt.colorbar(img, format='%+2.0f dB')
             plt.title('Mel-Frequency Spectrogram')
@@ -160,6 +162,6 @@ class SpectrogramGenerator:
         """
         spectrogram_data = []
         for audio_data in audio_data_list:
-            spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data.audio_signal, audio_data.sample_rate)
+            spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data)
             spectrogram_data.append(spectrogram)
         return spectrogram_data

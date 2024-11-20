@@ -54,7 +54,7 @@ class DAPSDataset(Dataset):
     def __len__(self) -> int:
         return len(self.annotations)
 
-    def __getitem__(self, index: int) -> tuple[Tensor, int]:
+    def __getitem__(self, index: int) -> tuple[Tensor, any]:
         """
         Retrieve item from the dataset, random access
 
@@ -73,8 +73,4 @@ class DAPSDataset(Dataset):
         tens = torch.from_numpy(spectrogram).type(torch.float32)
         tens = torch.rot90(tens, dims=(0, 2))
         class_id = self.annotations['classID'][index]
-        return (tens, class_id)
-
-if __name__ == '__main__':
-    d = DAPSDataset('annotations.csv', './datasets/daps_split_spectro/', 'cuda')
-    print(d[0])
+        return tens, class_id

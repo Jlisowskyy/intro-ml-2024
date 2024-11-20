@@ -10,10 +10,12 @@ import os
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Generator
+from typing import Iterator, Union
 
 import numpy as np
 
-from src.constants import WavIteratorType
+from src.audio.audio_data import AudioData
+from src.constants import WavIteratorType, WINDOW_SIZE_FRAMES_DIVISOR
 
 
 class WavIteratorBase(ABC):
@@ -25,7 +27,7 @@ class WavIteratorBase(ABC):
     # class fields
     # ------------------------------
 
-    #pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes
     _file_path: str
     _window_size_frames: int
 
@@ -64,7 +66,7 @@ class WavIteratorBase(ABC):
             self._sample_width = wav_file.getsampwidth()
             self._num_channels = wav_file.getnchannels()
 
-            self._window_size_frames = self._frame_rate // 10
+            self._window_size_frames = self._frame_rate // WINDOW_SIZE_FRAMES_DIVISOR
 
             if self._num_channels <= self._channel_index:
                 raise ValueError(f"Channel index out of range: {self._channel_index}")
@@ -100,7 +102,6 @@ class WavIteratorBase(ABC):
         return self._audio_data[
                index * self._window_size_frames:(index + 1) * self._window_size_frames,
                self._channel_index]
-
 
     def get_data_type(self) -> type:
         """
@@ -241,7 +242,7 @@ class WavIteratorBase(ABC):
 
         return self
 
-    def __next__(self) -> np.array:
+    def __next__(self) -> np.ndarray:
         """
         Return the next window of samples
 
@@ -429,6 +430,51 @@ class FlattenWavIterator:
             yield flat_chunk
 
 
+class AudioDataIterator:
+    """
+    A wrapper class that converts WAV iterator output into AudioData objects.
+    Works with both WavIteratorBase and FlattenWavIterator instances.
+    """
+
+    _wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']
+    _sample_rate: int
+
+    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']):
+        """
+        Initialize the AudioData iterator.
+
+        :param wav_iterator: WavIteratorBase or FlattenWavIterator instance
+        """
+        self._wav_iterator = wav_iterator
+
+        if hasattr(wav_iterator, 'get_first_iter'):
+            self._sample_rate = int(wav_iterator.get_first_iter().get_frame_rate())
+        else:
+            self._sample_rate = int(wav_iterator.get_frame_rate())
+
+    def __iter__(self) -> Iterator[AudioData]:
+        """
+        :return: Iterator over AudioData objects
+        """
+        if hasattr(self._wav_iterator, 'iterate'):
+            return self._iter_flatten()
+        return self._iter_base()
+
+    def _iter_base(self) -> Generator[AudioData, None, None]:
+        """
+        Iterator for WavIteratorBase instances.
+        """
+        for chunk in self._wav_iterator:
+            yield AudioData(chunk, self._sample_rate)
+
+    def _iter_flatten(self) -> Generator[AudioData, None, None]:
+        """
+        Iterator for FlattenWavIterator instances.
+        """
+        for chunk in self._wav_iterator.iterate():
+            yield AudioData(chunk, self._sample_rate)
+
+
 def load_wav(file_path: str, channel_index: int = 0,
              iterator_type: WavIteratorType = WavIteratorType.PLAIN) -> WavIteratorBase:
     """
@@ -487,7 +533,8 @@ def cut_file_to_plain_chunk_files(file_path: str, destination_dir: str,
     counter = 0
 
     for index, chunk in enumerate(it):
-        output_file = os.path.join(destination_dir,
+        output_file = os.path.join(
+            destination_dir,
             f"{os.path.splitext(os.path.basename(file_path))[0]}_{index:0>3}.wav")
 
         try:

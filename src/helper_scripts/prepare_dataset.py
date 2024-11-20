@@ -10,13 +10,11 @@ from os import walk, path, makedirs
 import numpy as np
 from tqdm import tqdm
 
-import src.constants
 from src.audio import detect_speech
-from src.audio.audio_data import AudioData
-from src.audio.wav import FlattenWavIterator
+from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
     DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
-    DATABASE_ANNOTATIONS_PATH
+    DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
@@ -32,7 +30,7 @@ def main() -> None:
 
         for root, _, files in walk(DATABASE_PATH):
             folder = root.rsplit('/')[-1]
-            new_root = root.replace('daps', DATABASE_OUT_NAME)
+            new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in tqdm(files, colour='magenta'):
                 # Omit annoying hidden mac files
@@ -45,22 +43,20 @@ def main() -> None:
                 it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                         DATABASE_CUT_ITERATOR)
                 sr = it.get_first_iter().get_frame_rate()
+                it = AudioDataIterator(it)
 
                 sub_file_counter: int = 0
                 for audio_data in it:
-                    audio_data = AudioData.to_float(audio_data)
-
                     # Omit not full chunks to avoid filling the dataset with silence
-                    if len(audio_data) < MODEL_WINDOW_LENGTH * sr:
+                    if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
                         continue
 
-                    if not detect_speech.is_speech(audio_data, int(sr)):
+                    if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
-                    audio_data = AudioCleaner.denoise(audio_data, sr)
-                    audio_data = AudioNormalizer.normalize(audio_data, sr,
-                                                     src.constants.NormalizationType.MEAN_VARIANCE)
-                    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data, int(sr),
+                    audio_data = AudioCleaner.denoise(audio_data)
+                    audio_data = AudioNormalizer.normalize(audio_data, NORMALIZATION_TYPE)
+                    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data,
                                                       width=SPECTROGRAM_WIDTH,
                                                       height=SPECTROGRAM_HEIGHT)
 
@@ -71,7 +67,3 @@ def main() -> None:
                     f.write(
                         f'{speaker},{folder},{file},{sub_file_counter},{data_class_id}\n')  # pylint: disable=line-too-long
                     sub_file_counter += 1
-
-
-if __name__ == "__main__":
-    main()

@@ -9,7 +9,9 @@ audio signals for further analysis or modeling.
 import librosa
 import numpy as np
 from src.audio.audio_data import AudioData
-from src.constants import NormalizationType
+from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT,
+                           NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA,
+                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
 
 class AudioNormalizer:
     """
@@ -30,51 +32,36 @@ class AudioNormalizer:
         self.normalization_type = normalization_type
 
     @staticmethod
-    def mean_variance_normalization(signal: np.array) -> np.array:
+    def mean_variance_normalization(audio_data: AudioData) -> AudioData:
         """
         Apply mean and variance normalization to the signal.
         Adjusts the signal to have a mean of 0 and a standard deviation of 1.
 
-        :param signal: Input audio signal (numpy array)
-        :return: Normalized audio signal
+        :param audio_data: Audio data to be normalized
+        :return: Audio data with normalized signal
         """
 
-        mean = np.mean(signal)
-        std = np.std(signal)
-        std = np.maximum(std, 1e-8)
-        normalized_signal = (signal - mean) / std
-        return normalized_signal
+        mean = np.mean(audio_data.audio_signal)
+        std = np.std(audio_data.audio_signal)
+        std = np.maximum(std, EPSILON)
+        normalized_signal = (audio_data.audio_signal - mean) / std
+        audio_data.audio_signal = normalized_signal
+        return audio_data
 
     @staticmethod
-    def cmvn_normalization(signal: np.ndarray, fs: float) -> np.ndarray:
-        """
-        Apply Cepstral Mean and Variance Normalization (CMVN) to the signal.
-
-        Source: https://en.wikipedia.org/wiki/Cepstral_mean_and_variance_normalization
-
-        :param signal: Input audio signal (numpy array)
-        :param fs: Sampling rate
-        :return: CMVN normalized audio signal (numpy array)
-        """
-
-        raise NotImplementedError("CMVN normalization is not implemented yet")
-
-    @staticmethod
-    def pcen_normalization(signal: np.ndarray,
-                        fs: float,
-                        time_constant: float = 0.06,
-                        alpha: float = 0.98,
-                        delta: float = 2,
-                        r: float = 0.5,
-                        eps: float = 1e-6) -> np.ndarray:
+    def pcen_normalization(audio_data: AudioData,
+                       time_constant: float = NORMALIZATION_PCEN_TIME_CONSTANT,
+                       alpha: float = NORMALIZATION_PCEN_ALPHA,
+                       delta: float = NORMALIZATION_PCEN_DELTA,
+                       r: float = NORMALIZATION_PCEN_R,
+                       eps: float = EPSILON) -> AudioData:
         # pylint: disable=line-too-long
         """
         Apply Per-Channel Energy Normalization (PCEN) to the signal.
 
         Source: https://bioacoustics.stackexchange.com/questions/846/should-we-normalize-audio-before-training-a-ml-model
 
-        :param signal: Input audio signal (numpy array)
-        :param fs: Sampling rate
+        :param audio_data: Audio data to be normalized
         :param time_constant: Time constant for the PCEN filter
         :param alpha: Gain factor for the PCEN filter
         :param delta: Bias for the PCEN filter
@@ -83,37 +70,34 @@ class AudioNormalizer:
         :return: PCEN normalized audio signal (numpy array)
         """
 
-        s = np.abs(librosa.stft(signal)) ** 2
-        m = librosa.pcen(s, sr=fs, hop_length=512,
+        s = np.abs(librosa.stft(audio_data.audio_signal)) ** 2
+        m = librosa.pcen(s, sr=audio_data.sample_rate, hop_length=NORMALIZATION_PCEN_HOP_LENGTH,
                         gain=alpha, bias=delta,
                         eps=eps, power=r,
                         time_constant=time_constant)
         normalized_signal = librosa.istft(m)
-        return normalized_signal
+        audio_data.audio_signal = normalized_signal
+        return audio_data
 
     @staticmethod
-    def normalize(signal: np.ndarray,
-              fs: float,
+    def normalize(audio_data: AudioData,
               normalization_type: NormalizationType,
-              *args) -> np.ndarray:
+              *args) -> AudioData:
         """
         General normalize function that chooses between currently implemented normalization methods.
 
-        :param signal: Input audio signal (numpy array)
-        :param fs: Sampling rate
+        :param audio_data: Audio data to be normalized
         :param normalization_type: Enum for normalization type (mean-variance, PCEN, or CMVN)
         :param args: Additional arguments to pass to the normalization functions
         :return: Normalized audio signal (numpy array)
         """
 
-        assert signal.dtype in (np.float32, np.float64)
+        assert audio_data.audio_signal.dtype in (np.float32, np.float64)
 
         if normalization_type == NormalizationType.MEAN_VARIANCE:
-            return AudioNormalizer.mean_variance_normalization(signal)
+            return AudioNormalizer.mean_variance_normalization(audio_data)
         if normalization_type == NormalizationType.PCEN:
-            return AudioNormalizer.pcen_normalization(signal, fs, *args)
-        if normalization_type == NormalizationType.CMVN:
-            return AudioNormalizer.cmvn_normalization(signal, fs)
+            return AudioNormalizer.pcen_normalization(audio_data, *args)
 
         raise ValueError("Unsupported normalization type")
 
@@ -143,8 +127,7 @@ class AudioNormalizer:
         list[AudioData]: A list of normalized AudioData instances.
         """
         for audio_data in x_data:
-            audio_data.audio_signal = AudioNormalizer.normalize(
-                audio_data.audio_signal,
-                audio_data.sample_rate,
+            audio_data = AudioNormalizer.normalize(
+                audio_data,
                 self.normalization_type)
         return x_data

@@ -9,6 +9,7 @@ import torch
 
 from src.cnn.cnn import BasicCNN
 
+
 class Classifier:
     """
     A simple classifier for predicting labels from audio data.
