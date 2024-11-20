@@ -12,12 +12,10 @@ from tqdm import tqdm
 
 from src.audio import detect_speech
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
-from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
-    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
+from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
+    DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipelines.base_preprocessing_pipeline import process_audio
 
 
 def main() -> None:
@@ -54,11 +52,7 @@ def main() -> None:
                     if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
-                    audio_data = AudioCleaner.denoise(audio_data)
-                    audio_data = AudioNormalizer.normalize(audio_data, NORMALIZATION_TYPE)
-                    spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data,
-                                                      width=SPECTROGRAM_WIDTH,
-                                                      height=SPECTROGRAM_HEIGHT)
+                    spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
                     if not path.exists(path.join(new_root, file)):  # TODO: add [:-4]
                         makedirs(path.join(new_root, file))

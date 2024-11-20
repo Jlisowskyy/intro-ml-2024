@@ -9,10 +9,8 @@ import torch.nn.functional as tnnf
 from torch import nn
 
 from src.audio.audio_data import AudioData
-from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.constants import NORMALIZATION_TYPE
+from src.pipelines.base_preprocessing_pipeline import process_audio
 
 
 # Disable pylint warning about the class not implementing abstract methods since
@@ -34,11 +32,7 @@ class BaseCNN(nn.Module):
             int: user's class.
         """
 
-        audio_data = AudioCleaner.denoise(audio_data)
-        audio_data = AudioNormalizer.normalize(audio_data, NORMALIZATION_TYPE)
-        spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data,
-                                          width=SPECTROGRAM_WIDTH,
-                                          height=SPECTROGRAM_HEIGHT)
+        spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
         tens = torch.from_numpy(spectrogram).type(torch.float32)
         tens = torch.rot90(tens, dims=(0, 2))
         tens = tens[None, :, :, :]
