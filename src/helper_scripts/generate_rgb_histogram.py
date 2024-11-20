@@ -13,6 +13,8 @@ import soundfile as sf
 import matplotlib.pyplot as plt
 from PIL import Image
 
+from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS
+
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.helper_scripts.spectrogram_script import get_random_audio_path
@@ -43,9 +45,12 @@ def generate_rgb_histogram(spectrogram_path: str) -> None:
     b_channel = image_array[:, :, 2].flatten()
 
     plt.figure(figsize=(10, 5))
-    plt.hist(r_channel, bins=256, color='red', alpha=0.5, label='Red Channel')
-    plt.hist(g_channel, bins=256, color='green', alpha=0.5, label='Green Channel')
-    plt.hist(b_channel, bins=256, color='blue', alpha=0.5, label='Blue Channel')
+    plt.hist(r_channel, bins=HELPER_SCRIPTS_HISTOGRAM_N_BINS, color='red',
+             alpha=HELPER_SCRIPTS_HISTOGRAM_ALPHA, label='Red Channel')
+    plt.hist(g_channel, bins=HELPER_SCRIPTS_HISTOGRAM_N_BINS, color='green',
+             alpha=HELPER_SCRIPTS_HISTOGRAM_ALPHA, label='Green Channel')
+    plt.hist(b_channel, bins=HELPER_SCRIPTS_HISTOGRAM_N_BINS, color='blue',
+             alpha=HELPER_SCRIPTS_HISTOGRAM_ALPHA, label='Blue Channel')
 
     plt.title('RGB Histogram')
     plt.xlabel('Pixel Intensity')

@@ -4,9 +4,9 @@ Author: Jakub Pietrzak, 2024
 Modul for generating spectrograms and showing/saving it
 """
 
+import argparse
 import os
 import random
-import argparse
 
 import matplotlib.pyplot as plt
 import soundfile as sf
@@ -15,6 +15,7 @@ from sklearn.pipeline import Pipeline
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.pipelines.audio_cleaner import AudioCleaner
+
 
 def get_random_audio_path(dir_path: str) -> str:
     """
@@ -35,8 +36,9 @@ def get_random_audio_path(dir_path: str) -> str:
             raise FileNotFoundError("No `.wav` files found in the directory or its subdirectories.")
         dir_path = os.path.join(dir_path, random.choice(subdirectories))
 
-def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1, output_path:
-            str = None, show: bool = False,
+
+def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,
+            output_path: str = None, show: bool = False,
             mel: bool = False, clean_data: bool = False, show_axis: bool = False):
     # pylint: disable=too-many-locals
     """
@@ -76,8 +78,8 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
         spectrogram = gen_spectrogram(audio_data, mel, show_axis)
 
         if output_path:
-            splited_path=output_path.split(".")
-            save_spectrogram(spectrogram, splited_path[0]+str(i)+"."+splited_path[1])
+            splited_path = output_path.split(".")
+            save_spectrogram(spectrogram, splited_path[0] + str(i) + "." + splited_path[1])
 
         if show:
             plt.imshow(spectrogram)
@@ -113,9 +115,3 @@ def main(argv: list[str]) -> None:
     args = parser.parse_args(argv)
     process(args.file_path, args.directory, args.number, args.output, args.show, args.mel,
             args.clean, args.show_axis)
-
-
-if __name__ == "__main__":
-    import sys
-
-    main(sys.argv[1:])
