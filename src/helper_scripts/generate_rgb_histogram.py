@@ -4,30 +4,27 @@ Author: Jakub Pietrzak, 2024
 Modul for generating rgb histgram of spectrogram 
 """
 
-<<<<<<< HEAD
+
 import os
-import sys
+
 import argparse
 import shutil
-=======
-import matplotlib.pyplot as plt
->>>>>>> origin/dev
 import numpy as np
 import soundfile as sf
 import matplotlib.pyplot as plt
 from PIL import Image
 
-<<<<<<< HEAD
+
 from src.audio.audio_data import AudioData
 from src.audio.spectrogram import gen_spectrogram, save_spectrogram
 from src.helper_scripts.spectrogram_from_npy import get_random_file_path
 
 
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
-=======
+
 from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS
 
->>>>>>> origin/dev
+
 
 def generate_rgb_histogram(spectrogram_path: str) -> None:
     """
