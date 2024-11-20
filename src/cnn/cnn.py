@@ -4,13 +4,16 @@ Author: Tomasz Mycielski, 2024
 Implementation of the CNN
 """
 
+from sklearn.pipeline import Pipeline
 import torch
 import torch.nn.functional as tnnf
 from torch import nn
 
 from src.audio.audio_data import AudioData
-from src.constants import NORMALIZATION_TYPE
-from src.pipelines.base_preprocessing_pipeline import process_audio
+from src.pipelines.audio_cleaner import AudioCleaner
+from src.pipelines.audio_normalizer import AudioNormalizer
+from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipelines.tensor_transform import TensorTransform
 
 
 # Disable pylint warning about the class not implementing abstract methods since
@@ -21,31 +24,28 @@ class BaseCNN(nn.Module):
     Base class defining the CNN model functionality.
     """
 
-    def classify(self, audio_data: AudioData) -> int:
+    def classify(self, audio_data: list[AudioData]) -> list[int]:
         """
         Classify audio data using the provided CNN model.
 
         Args:
-            audio_data (AudioData): The audio data to classify.
+            data (list[AudioData]): The audio data to classify.
 
         Returns:
             int: user's class.
         """
 
-        spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
-        tens = torch.from_numpy(spectrogram).type(torch.float32)
-        tens = torch.rot90(tens, dims=(0, 2))
-        tens = tens[None, :, :, :]
+        from src.pipelines.classifier import Classifier 
 
-        if torch.cuda.is_available():
-            device = 'cuda'
-        else:
-            device = 'cpu'
-        tens.to(device)
+        pipeline = Pipeline(steps=[
+            ('AudioCleaner', AudioCleaner()),
+            ('AudioNormalizer', AudioNormalizer()),
+            ('SpectrogramGenerator', SpectrogramGenerator()),
+            ('TensorTransform', TensorTransform()),
+            ('Classifier', Classifier(self))
+        ])
 
-        with torch.no_grad():
-            prediction = self(tens)
-        return prediction[0].argmax(0).item()
+        return pipeline.predict(audio_data)
 
     @classmethod
     def load_model(cls, model_file_path: str) -> 'BaseCNN':
