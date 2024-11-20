@@ -13,21 +13,24 @@ from librosa import feature
 from matplotlib import pyplot as plt
 from src.audio.audio_data import AudioData
 
-from src.constants import SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT
+from src.audio.audio_data import AudioData
+from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
+                           SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
+                           SPECTROGRAM_HOP_LENGTH,
+                           SPECTROGRAM_N_MELS)
 
 def gen_spectrogram(audio:AudioData, mel:bool=False,
                     show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
-                    height: int = SPECTROGRAM_HEIGHT) -> np.array:
+                    height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
     """
     Generates a normal spectrogram from audio data.
     Args:
-        audio_data (np.array): Input audio signal as a NumPy array.
-        sample_rate (int): Sample rate of the audio signal.
+        audio_data: AudioData object containing the audio signal and sample rate.
         show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
         width (int, optional): Width of the output image in pixels. Defaults to 400.
         height (int, optional): Height of the output image in pixels.
     Returns:
-        np.array: NumPy array representing the spectrogram image.
+        np.ndarray: Image array of the spectrogram.
     """
     dpi = 100
     if mel:

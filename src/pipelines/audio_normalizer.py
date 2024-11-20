@@ -56,7 +56,6 @@ class AudioNormalizer:
         """
         for audio_data in x_data:
             audio_data.audio_signal = normalize(
-                audio_data.audio_signal,
-                audio_data.sample_rate,
+                audio_data,
                 self.normalization_type)
         return x_data

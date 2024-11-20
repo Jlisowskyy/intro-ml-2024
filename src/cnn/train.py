@@ -18,7 +18,8 @@ from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
-from src.validation.simple_validation import SimpleValidation
+
+from src.cnn.validator import Validator
 
 
 def train_single_epoch(
@@ -28,7 +29,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False
-        ) -> None:
+) -> None:
     """
     Method training `model` a single iteration with the data provided
 
@@ -48,9 +49,12 @@ def train_single_epoch(
 
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
+
+    calculate_accuracy:
+        # TODO: add description
     """
 
-    validator = SimpleValidation()
+    validator = Validator()
     train_loss = 0.0
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
@@ -69,12 +73,13 @@ def train_single_epoch(
     if calculate_accuracy:
         validator.display_results()
 
+
 def validate(
         model: nn.Module,
         data_loader: DataLoader,
         loss_fn: nn.Module,
         device: str = 'cpu'
-        ) -> float:
+) -> float:
     """
     Function for evaluating `model` against an independent dataset during training
 
@@ -99,10 +104,12 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
+        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
     return valid_loss
+
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
           device: str, epochs: int, val_data: DataLoader | None = None) -> None:
@@ -114,7 +121,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     model: :class:`torch.nn.Module`
         Model to train
     
-    data_loader: :class:`torch.utils.data.DataLoader`
+    train_data: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
@@ -128,10 +135,13 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
     epochs: :class:`int`
         set amount of epochs to train the model
+
+    val_data: :class:`torch.utils.data.DataLoader`
+        # TODO: add description
     """
     min_valid_loss = float('inf')
     for i in range(epochs):
-        print(f"Epoch {i+1}")
+        print(f"Epoch {i + 1}")
         train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1)
 
         if val_data is None:
@@ -142,11 +152,11 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         if valid_loss < min_valid_loss:
             min_valid_loss = valid_loss
             # backup for longer training sessions
-            torch.save(model.state_dict(), f'cnn_e{i+1}_backup.pth')
+            torch.save(model.state_dict(), f'cnn_e{i + 1}_backup.pth')
     print("Finished training")
 
 
-def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> SimpleValidation:
+def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -163,7 +173,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Simp
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = SimpleValidation()
+    validator = Validator()
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):
@@ -176,44 +186,47 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Simp
     return validator
 
 
-if __name__ == '__main__':
+def main() -> None:
+    """
+    Main function for training the CNN model
+    """
+
     if torch.cuda.is_available():
-        DEVICE = 'cuda'
+        device = 'cuda'
     else:
-        DEVICE = 'cpu'
-    print(f'Using {DEVICE}')
+        device = 'cpu'
+    print(f'Using {device}')
 
     # preparing datasets
     dataset = DAPSDataset(
         DATABASE_ANNOTATIONS_PATH,
         DATABASE_OUT_PATH,
-        DEVICE
+        device
     )
 
     seed = randint(0, 1 << 64)
     print(f'split seed: {seed}')
-    GENERATOR = torch.Generator().manual_seed(seed)
+    generator = torch.Generator().manual_seed(seed)
     train_dataset, validation_dataset, test_dataset = (
         torch.utils.data.random_split(dataset,
-            [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
-            TRAINING_TEST_SET_SIZE], generator=GENERATOR))
+                                      [TRAINING_TRAIN_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
+                                       TRAINING_TEST_SET_SIZE], generator=generator))
 
     train_dataloader = DataLoader(train_dataset, batch_size=TRAINING_TRAIN_BATCH_SIZE)
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
     test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
     # training
-    for index, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-
-        cnn = BasicCNN().to(DEVICE)
+    for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+        cnn = BasicCNN().to(device)
         print(cnn)
 
         loss_function = nn.CrossEntropyLoss()
         optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, DEVICE, TRAINING_EPOCHS,
+        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
               validate_dataloader)
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, DEVICE)
+        test(cnn, test_dataloader, device)

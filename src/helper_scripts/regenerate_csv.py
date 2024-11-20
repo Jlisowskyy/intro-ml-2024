@@ -27,7 +27,3 @@ def main() -> None:
             class_id = SPEAKER_CLASSES[speaker]
             for i in range(len(samples)):
                 f.write(f'{speaker},{location},{file},{i},{class_id}\n')
-
-
-if __name__ == "__main__":
-    main()
