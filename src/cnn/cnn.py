@@ -11,7 +11,7 @@ from torch import nn
 from src.audio.audio_data import AudioData
 from src.audio.denoise import denoise
 from src.audio.normalize import normalize
-from src.audio.spectrogram import gen_mel_spectrogram
+from src.audio.spectrogram import gen_spectrogram
 from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
 
 
@@ -36,7 +36,7 @@ class BaseCNN(nn.Module):
 
         audio_data = denoise(audio_data)
         audio_data = normalize(audio_data, NORMALIZATION_TYPE)
-        spectrogram = gen_mel_spectrogram(audio_data,
+        spectrogram = gen_spectrogram(audio_data, mel= True,
                                           width=SPECTROGRAM_WIDTH,
                                           height=SPECTROGRAM_HEIGHT)
         tens = torch.from_numpy(spectrogram).type(torch.float32)

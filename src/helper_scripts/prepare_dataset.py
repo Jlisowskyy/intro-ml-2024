@@ -11,7 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 from src.audio import normalize, denoise, detect_speech
-from src.audio.spectrogram import gen_mel_spectrogram
+from src.audio.spectrogram import gen_spectrogram
 from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
     DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
@@ -54,7 +54,7 @@ def main() -> None:
 
                     audio_data = denoise.denoise(audio_data)
                     audio_data = normalize.normalize(audio_data, NORMALIZATION_TYPE)
-                    spectrogram = gen_mel_spectrogram(audio_data,
+                    spectrogram = gen_spectrogram(audio_data,True,
                                                       width=SPECTROGRAM_WIDTH,
                                                       height=SPECTROGRAM_HEIGHT)
 
