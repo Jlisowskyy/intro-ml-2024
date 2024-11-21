@@ -28,22 +28,20 @@ The project task is to develop CNN model for intercom device detecting authorise
 ├── examples
 ├── reports
 └── src
-    ├── audio
     ├── cnn
     ├── frontend
-    ├── helper_scripts
-    ├── pipelines
+    ├── scripts
+    ├── pipeline
     └── test
 ```
 
 - `examples`: Contains example code using jupyter notebooks.
 - `reports`: Contains reports and documentation created for project milestones etc.
 - `src`: Contains the source code for the project.
-    - `audio`: Contains the code for the audio processing part of the project.
-    - `cnn`: Contains code for the CNN model.
+  - `cnn`: Contains code for the CNN model.
   - `frontend`: Contains the code for the frontend of the project.
-    - `helper_scripts`: Collection of standalone scripts used in the project.
-    - `pipelines`: Contains the code for the data processing pipelines.
+  - `scripts`: Collection of standalone scripts used in the project.
+  - `pipelines`: Contains the code for the data processing pipelines. Including the code for the audio processing part of the project.
   - `test`: Contains the code for testing the project.
 
 ## Usage:
