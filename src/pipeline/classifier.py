@@ -6,9 +6,7 @@ for fitting a model and making predictions based on audio data.
 """
 
 import torch
-
-from src.cnn.cnn import BasicCNN
-
+from torch import nn
 
 class Classifier:
     """
@@ -18,7 +16,7 @@ class Classifier:
     to predict labels for new data inputs.
     """
 
-    def __init__(self, model: BasicCNN) -> None:
+    def __init__(self, model: nn.Module) -> None:
         """
         Initializes the Classifier instance.
         """
