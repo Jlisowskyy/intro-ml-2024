@@ -34,7 +34,6 @@ class AudioCleaner:
         self.denoiser_model = pretrained.dns64()
         self.denoiser_model.eval()
         self.denoiser_model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
-        return
 
     def denoise(self, audio_data: AudioData) -> AudioData:
         """
