@@ -1,3 +1,20 @@
+# Project-specific
+# audio data folder
+datasets/*
+!datasets/.gitkeep
+
+# torch models
+*.pth
+
+# annotation files
+*.csv
+
+uploaded_files/
+generated_files/
+test.wav
+
+# Created by the program dynamically
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
