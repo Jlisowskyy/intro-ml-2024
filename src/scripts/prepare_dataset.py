@@ -10,12 +10,12 @@ from os import walk, path, makedirs
 import numpy as np
 from tqdm import tqdm
 
-from src.audio import normalize, denoise, detect_speech
-from src.audio.spectrogram import gen_spectrogram
-from src.audio.wav import FlattenWavIterator, AudioDataIterator
-from src.constants import MODEL_WINDOW_LENGTH, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH, \
-    DATABASE_PATH, DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
+from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
+    DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
+from src.pipeline import detect_speech
+from src.pipeline.base_preprocessing_pipeline import process_audio
+from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
 
 def main() -> None:
@@ -52,11 +52,7 @@ def main() -> None:
                     if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
-                    audio_data = denoise.denoise(audio_data)
-                    audio_data = normalize.normalize(audio_data, NORMALIZATION_TYPE)
-                    spectrogram = gen_spectrogram(audio_data,True,
-                                                      width=SPECTROGRAM_WIDTH,
-                                                      height=SPECTROGRAM_HEIGHT)
+                    spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
                     if not path.exists(path.join(new_root, file)):  # TODO: add [:-4]
                         makedirs(path.join(new_root, file))

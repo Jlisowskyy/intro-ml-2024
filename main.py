@@ -30,20 +30,20 @@ import uvicorn
 from colorama import Fore, Style, init
 
 from src.cnn import train
-from src.helper_scripts import data_analysis
-from src.helper_scripts import generate_rgb_histogram
-from src.helper_scripts import prepare_dataset
-from src.helper_scripts import regenerate_csv
-from src.helper_scripts import spectrogram_script
-from src.helper_scripts import validate_dataset
+from src.scripts import data_analysis
+from src.scripts import generate_rgb_histogram
+from src.scripts import prepare_dataset
+from src.scripts import regenerate_csv
+from src.scripts import spectrogram_script
+from src.scripts import validate_dataset
 from src.test import test_cnn
 from src.test import test_cut_wav
 from src.test import test_denoise
 from src.test import test_detect_speech
 from src.test import test_normalize
-from src.test import test_pipeline
 from src.test import test_transformation_pipeline
 from src.test import test_wav
+from src.test import test_classify
 
 # Initialize colorama
 init()
@@ -101,9 +101,9 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test_cnn,
     "dataset": test_cnn.manual_test_dataset,
-    "pipeline": test_pipeline.example_test_run,
     "speech_detection": test_detect_speech.example_test_run,
     "transformation_pipeline": test_transformation_pipeline.example_test_run,
+    "test_classify": test_classify.example_test_run
 }
 
 

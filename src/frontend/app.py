@@ -8,9 +8,9 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
 
+from src.cnn.model_api import classify_file
 from src.frontend.app_state import AppState
 from src.frontend.models import ModelResponse
-from src.cnn.model_api import classify_file
 
 app = FastAPI()
 app_state = AppState()

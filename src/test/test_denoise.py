@@ -10,8 +10,8 @@ import numpy as np
 from scipy.io.wavfile import write, read
 from scipy.signal import spectrogram
 
-from src.audio.audio_data import AudioData
-from src.audio.denoise import denoise
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 
 
 def generate_sine_wave(frequency: int,
@@ -68,7 +68,7 @@ def test_denoise_basic_low_freq_filtering() -> None:
 
     sine_wave = generate_sine_wave(low_freq, duration, sample_rate)
     sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = denoise(sine_wave)
+    filtered_wave = AudioCleaner.denoise(sine_wave)
 
     assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
         "Low frequencies were not properly reduced"
@@ -85,7 +85,7 @@ def test_denoise_basic_high_freq_filtering() -> None:
 
     sine_wave = generate_sine_wave(high_freq, duration, sample_rate)
     sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = denoise(sine_wave)
+    filtered_wave = AudioCleaner.denoise(sine_wave)
 
     assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
         "High frequencies were not properly reduced"
@@ -103,7 +103,7 @@ def manual_test_denoise_basic_passband_freq() -> None:
 
     sine_wave = generate_sine_wave(passband_freq, duration, sample_rate)
     sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = denoise(sine_wave)
+    filtered_wave = AudioCleaner.denoise(sine_wave)
 
     # Before
     freqs, times, sxx = spectrogram(sine_wave.audio_signal, fs=sample_rate, nperseg=256)
@@ -146,7 +146,7 @@ def manual_test_denoise_basic_mixed_freq() -> None:
                   generate_sine_wave(high_freq, duration, sample_rate))
 
     mixed_wave = AudioData(mixed_wave, sample_rate)
-    filtered_wave = denoise(mixed_wave)
+    filtered_wave = AudioCleaner.denoise(mixed_wave)
 
     # Manual check of the spectrogram
     freqs, times, sxx = spectrogram(filtered_wave.audio_signal, fs=sample_rate, nperseg=256)

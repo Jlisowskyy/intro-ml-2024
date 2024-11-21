@@ -4,54 +4,46 @@ Author: Tomasz Mycielski, 2024
 Implementation of the CNN
 """
 
+from abc import ABC
+
 import torch
 import torch.nn.functional as tnnf
+from sklearn.pipeline import Pipeline
 from torch import nn
 
-from src.audio.audio_data import AudioData
-from src.audio.denoise import denoise
-from src.audio.normalize import normalize
-from src.audio.spectrogram import gen_spectrogram
-from src.constants import NORMALIZATION_TYPE, SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
+from src.pipeline.audio_normalizer import AudioNormalizer
+from src.pipeline.classifier import Classifier
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.tensor_transform import TensorTransform
 
 
-# Disable pylint warning about the class not implementing abstract methods since
-# it's just wrong in this case
-# pylint: disable=W0223
-class BaseCNN(nn.Module):
+class BaseCNN(nn.Module, ABC):
     """
     Base class defining the CNN model functionality.
     """
 
-    def classify(self, audio_data: AudioData) -> int:
+    def classify(self, audio_data: list[AudioData]) -> list[int]:
         """
         Classify audio data using the provided CNN model.
 
         Args:
-            audio_data (AudioData): The audio data to classify.
+            data (list[AudioData]): The audio data to classify.
 
         Returns:
             int: user's class.
         """
 
-        audio_data = denoise(audio_data)
-        audio_data = normalize(audio_data, NORMALIZATION_TYPE)
-        spectrogram = gen_spectrogram(audio_data, mel= True,
-                                          width=SPECTROGRAM_WIDTH,
-                                          height=SPECTROGRAM_HEIGHT)
-        tens = torch.from_numpy(spectrogram).type(torch.float32)
-        tens = torch.rot90(tens, dims=(0, 2))
-        tens = tens[None, :, :, :]
+        pipeline = Pipeline(steps=[
+            ('AudioCleaner', AudioCleaner()),
+            ('AudioNormalizer', AudioNormalizer()),
+            ('SpectrogramGenerator', SpectrogramGenerator()),
+            ('TensorTransform', TensorTransform()),
+            ('Classifier', Classifier(self))
+        ])
 
-        if torch.cuda.is_available():
-            device = 'cuda'
-        else:
-            device = 'cpu'
-        tens.to(device)
-
-        with torch.no_grad():
-            prediction = self(tens)
-        return prediction[0].argmax(0).item()
+        return pipeline.predict(audio_data)
 
     @classmethod
     def load_model(cls, model_file_path: str) -> 'BaseCNN':
@@ -81,7 +73,7 @@ class BasicCNN(BaseCNN):
     Simplified CNN with two layers
     """
 
-    def __init__(self, class_count=2):
+    def __init__(self, class_count=2) -> None:
         super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)

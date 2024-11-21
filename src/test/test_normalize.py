@@ -12,8 +12,8 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import spectrogram
 
-from src.audio.audio_data import AudioData
-from src.audio.normalize import mean_variance_normalization, pcen_normalization
+from src.pipeline.audio_data import AudioData
+from src.pipeline.audio_normalizer import AudioNormalizer
 
 # Define paths
 TEST_DATA_PATH = (
@@ -72,7 +72,7 @@ def manual_test_mean_variance_normalization() -> None:
     """
     audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
     audio_data = AudioData(audio_data, sample_rate)
-    normalized_wave = mean_variance_normalization(audio_data)
+    normalized_wave = AudioNormalizer.mean_variance_normalization(audio_data)
 
     mean = np.mean(normalized_wave.audio_signal)
     std = np.std(normalized_wave.audio_signal)
@@ -94,7 +94,7 @@ def manual_test_pcen_normalization() -> None:
     """
     audio_data, sample_rate = load_audio_file(TEST_DATA_PATH)
     audio_data = AudioData(audio_data, sample_rate)
-    normalized_wave = pcen_normalization(audio_data)
+    normalized_wave = AudioNormalizer.pcen_normalization(audio_data)
 
     plot_spectrograms(
         audio_data.audio_signal,

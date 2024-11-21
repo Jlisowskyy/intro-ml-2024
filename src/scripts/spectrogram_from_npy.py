@@ -4,9 +4,9 @@ Author: Jakub Pietrzak, 2024
 Script for generating spectrograms form npy files and showing them
 """
 
+import argparse
 import os
 import random
-import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,7 @@ def get_random_file_path(dir_path: str, file_type: str) -> str:
     """
     Gets a random audio file path from a directory.
     Args:
-        dir_path (str): path to direstory with audio files
+        dir_path (str): path to directory with audio files
         file_type (str): type of file to search for example '.npy'
 
     Returns:
@@ -25,14 +25,14 @@ def get_random_file_path(dir_path: str, file_type: str) -> str:
     while True:
         files = [f for f in os.listdir(dir_path) if f.endswith(file_type)]
         if files:
-            return os.path.join(dir_path, random.choice(files))
+            return str(os.path.join(dir_path, random.choice(files)))
         subdirectories = [d for d in os.listdir(dir_path)
                           if os.path.isdir(os.path.join(dir_path, d))]
         if not subdirectories:
             raise FileNotFoundError(f"No {file_type} files found in the directory.")
-        dir_path = os.path.join(dir_path, random.choice(subdirectories))
+        dir_path = str(os.path.join(dir_path, random.choice(subdirectories)))
 
-def process(file_path: str = "", directory: str = "", number_of_samples: int = 1):
+def process(file_path: str = "", directory: str = "", number_of_samples: int = 1) -> None:
     """
     Process function that processes the audio file, generates a spectrogram, and optionally
     cleans the data.
@@ -87,9 +87,3 @@ def main(argv: list[str]) -> None:
         raise ValueError("The number of samples must be at least 1.")
 
     process(args.file_path, args.directory, args.number)
-
-
-if __name__ == "__main__":
-    import sys
-
-    main(sys.argv[1:])

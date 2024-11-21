@@ -17,7 +17,7 @@ class AudioData:
     sample_rate (int): The sample rate of the audio signal in Hertz.
     """
 
-    def __init__(self, audio_signal: np.ndarray, sample_rate: int):
+    def __init__(self, audio_signal: np.ndarray, sample_rate: int) -> None:
         """
         Initializes the AudioData object with an audio signal and its sample rate.
         Converts the audio signal to a float32 array if not already in float format.

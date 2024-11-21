@@ -9,13 +9,11 @@ import argparse
 import matplotlib.pyplot as plt
 import soundfile as sf
 from sklearn.pipeline import Pipeline
+from src.pipeline.audio_data import AudioData
 
-from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_spectrogram, save_spectrogram
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.helper_scripts.spectrogram_from_npy import get_random_file_path
-
-
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.scripts.spectrogram_from_npy import get_random_file_path
 
 
 def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,
@@ -36,8 +34,8 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
         clean_data (bool): Flag to clean and normalize the audio data.
         show_axis (bool): Flag to show axis on the spectrogram plot.
     """
-    if  not isinstance(number_of_samples, int) or number_of_samples < 1:
-        number_of_samples=1
+    if not isinstance(number_of_samples, int) or number_of_samples < 1:
+        number_of_samples = 1
 
     for i in range(number_of_samples):
         new_sound_path = sound_path
@@ -55,12 +53,12 @@ def process(sound_path: str = "", directory: str = "", number_of_samples: int = 
             transformation_pipeline.fit([audio_data])
             audio_data = transformation_pipeline.transform([audio_data])[0]
 
+        spectrogram = SpectrogramGenerator.gen_spectrogram(audio_data, mel, show_axis)
 
-        spectrogram = gen_spectrogram(audio_data, mel, show_axis)
-
+        # pylint: disable=line-too-long
         if output_path:
-            splited_path = output_path.split(".")
-            save_spectrogram(spectrogram, splited_path[0] + str(i) + "." + splited_path[1])
+            split_path=output_path.split(".")
+            SpectrogramGenerator.save_spectrogram(spectrogram, split_path[0]+str(i)+"."+split_path[1])
 
         if show:
             plt.imshow(spectrogram)

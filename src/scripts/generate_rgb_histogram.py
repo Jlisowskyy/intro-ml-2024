@@ -5,21 +5,19 @@ Modul for generating rgb histgram of spectrogram
 """
 
 
-import os
-
 import argparse
+import os
 import shutil
+
+import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
-import matplotlib.pyplot as plt
 from PIL import Image
-
-
-from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_spectrogram, save_spectrogram
-from src.helper_scripts.spectrogram_from_npy import get_random_file_path
+from src.pipeline.audio_data import AudioData
 
 from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.scripts.spectrogram_from_npy import get_random_file_path
 
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
 
@@ -73,10 +71,10 @@ def create_spectrogram_from_audio_file(audio_file: str) -> str:
     """
     data, samplerate = sf.read(audio_file)
     audio_data = AudioData(data, samplerate)
-    spectrogram = gen_spectrogram(audio_data, mel=True)
+    spectrogram = SpectrogramGenerator.gen_spectrogram(audio_data, mel=True)
     output_filename = f"{os.path.splitext(os.path.basename(audio_file))[0]}.png"
     output_path = os.path.join(WORKING_DIR, output_filename)
-    save_spectrogram(spectrogram, output_path)
+    SpectrogramGenerator.save_spectrogram(spectrogram, output_path)
     return output_path
 
 

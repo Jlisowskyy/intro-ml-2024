@@ -12,12 +12,11 @@ import numpy as np
 import soundfile as sf
 from sklearn.pipeline import Pipeline
 
+from src.pipeline.audio_cleaner import AudioCleaner
 # pylint: disable=line-too-long
-from src.audio.audio_data import AudioData
-from src.audio.spectrogram import gen_spectrogram, save_spectrogram
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.audio_data import AudioData
+from src.pipeline.audio_normalizer import AudioNormalizer
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
 
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
 SPECTROGRAM_CLEANED_PATH = str(Path.resolve(Path(f'{__file__}/../test_tmp/cleaned_spectrogram.png')))
@@ -44,7 +43,7 @@ def example_test_run():
     transformation_pipeline.fit([audio_data])
     model_input = transformation_pipeline.transform([audio_data])
 
-    save_spectrogram(model_input[0], SPECTROGRAM_CLEANED_PATH)
+    SpectrogramGenerator.save_spectrogram(model_input[0], SPECTROGRAM_CLEANED_PATH)
 
-    spectrogram_not_cleaned = gen_spectrogram(audio_data, True)
-    save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)
+    spectrogram_not_cleaned = SpectrogramGenerator.gen_spectrogram(audio_data, mel=True)
+    SpectrogramGenerator.save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)
