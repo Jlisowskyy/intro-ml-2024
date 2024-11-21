@@ -16,7 +16,7 @@ from PIL import Image
 
 
 from src.audio.audio_data import AudioData
-from src.helper_scripts.spectrogram_from_npy import get_random_file_path
+from src.scripts.spectrogram_from_npy import get_random_file_path
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 
 from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS

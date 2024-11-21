@@ -13,7 +13,7 @@ from sklearn.pipeline import Pipeline
 from src.audio.audio_data import AudioData
 from src.constants import HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX, \
     HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR
-from src.helper_scripts.generate_rgb_histogram import generate_rgb_histogram
+from src.scripts.generate_rgb_histogram import generate_rgb_histogram
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_normalizer import AudioNormalizer
 from src.pipeline.spectrogram_generator import SpectrogramGenerator

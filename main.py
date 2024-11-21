@@ -30,12 +30,12 @@ import uvicorn
 from colorama import Fore, Style, init
 
 from src.cnn import train
-from src.helper_scripts import data_analysis
-from src.helper_scripts import generate_rgb_histogram
-from src.helper_scripts import prepare_dataset
-from src.helper_scripts import regenerate_csv
-from src.helper_scripts import spectrogram_script
-from src.helper_scripts import validate_dataset
+from src.scripts import data_analysis
+from src.scripts import generate_rgb_histogram
+from src.scripts import prepare_dataset
+from src.scripts import regenerate_csv
+from src.scripts import spectrogram_script
+from src.scripts import validate_dataset
 from src.test import test_cnn
 from src.test import test_cut_wav
 from src.test import test_denoise
