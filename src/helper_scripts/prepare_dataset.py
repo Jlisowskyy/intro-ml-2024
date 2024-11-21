@@ -15,7 +15,7 @@ from src.audio.wav import FlattenWavIterator, AudioDataIterator
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
-from src.pipelines.base_preprocessing_pipeline import process_audio
+from src.pipeline.base_preprocessing_pipeline import process_audio
 
 
 def main() -> None:

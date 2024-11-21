@@ -12,8 +12,8 @@ from sklearn.pipeline import Pipeline
 
 from src.audio.audio_data import AudioData
 from src.helper_scripts.spectrogram_from_npy import get_random_file_path
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
 
 
 def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,

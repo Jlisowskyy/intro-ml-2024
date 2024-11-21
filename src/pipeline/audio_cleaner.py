@@ -10,7 +10,7 @@ basic denoising for human speech frequencies.
 
 from scipy.signal import butter, sosfilt
 
-from src.audio.audio_data import AudioData
+from src.pipeline.audio_data import AudioData
 from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DENOISE_NYQUIST_COEFFICIENT
 
 

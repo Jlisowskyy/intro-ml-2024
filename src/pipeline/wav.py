@@ -14,7 +14,7 @@ from typing import Iterator, Union
 
 import numpy as np
 
-from src.audio.audio_data import AudioData
+from src.pipeline.audio_data import AudioData
 from src.constants import WavIteratorType, WINDOW_SIZE_FRAMES_DIVISOR
 
 

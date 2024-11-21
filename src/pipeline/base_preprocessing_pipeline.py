@@ -7,11 +7,11 @@ normalization, and generating a mel spectrogram.
 from sklearn.pipeline import Pipeline
 import numpy as np
 
-from src.audio.audio_data import AudioData
+from src.pipeline.audio_data import AudioData
 from src.constants import NORMALIZATION_TYPE, NormalizationType
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_normalizer import AudioNormalizer
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
 
 
 def process_audio(audio_data: AudioData,

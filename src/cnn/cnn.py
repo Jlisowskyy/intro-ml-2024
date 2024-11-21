@@ -11,11 +11,11 @@ from torch import nn
 from abc import ABC
 
 from src.audio.audio_data import AudioData
-from src.pipelines.audio_cleaner import AudioCleaner
-from src.pipelines.audio_normalizer import AudioNormalizer
-from src.pipelines.spectrogram_generator import SpectrogramGenerator
-from src.pipelines.tensor_transform import TensorTransform
-from src.pipelines.classifier import Classifier
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_normalizer import AudioNormalizer
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.tensor_transform import TensorTransform
+from src.pipeline.classifier import Classifier
 
 class BaseCNN(nn.Module, ABC):
     """
