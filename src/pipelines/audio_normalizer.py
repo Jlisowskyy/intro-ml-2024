@@ -8,10 +8,12 @@ audio signals for further analysis or modeling.
 
 import librosa
 import numpy as np
+
 from src.audio.audio_data import AudioData
 from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT,
                            NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA,
                            NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
+
 
 class AudioNormalizer:
     """
@@ -102,7 +104,7 @@ class AudioNormalizer:
         raise ValueError("Unsupported normalization type")
 
     # pylint: disable=unused-argument
-    def fit(self, x_data: list[AudioData], y_data: list[int] = None):
+    def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioNormalizer':
         """
         Fits the normalizer to the audio data (no fitting process required).
 
@@ -126,8 +128,7 @@ class AudioNormalizer:
         Returns:
         list[AudioData]: A list of normalized AudioData instances.
         """
+        transformed_data = []
         for audio_data in x_data:
-            audio_data = AudioNormalizer.normalize(
-                audio_data,
-                self.normalization_type)
-        return x_data
+            transformed_data.append(AudioNormalizer.normalize(audio_data, self.normalization_type))
+        return transformed_data

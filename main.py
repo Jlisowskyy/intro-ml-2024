@@ -31,7 +31,6 @@ from colorama import Fore, Style, init
 
 from src.cnn import train
 from src.helper_scripts import data_analysis
-from src.helper_scripts import from_wav_to_histogram
 from src.helper_scripts import generate_rgb_histogram
 from src.helper_scripts import prepare_dataset
 from src.helper_scripts import regenerate_csv
@@ -89,7 +88,6 @@ def run_pytest() -> None:
 
 SCRIPTS: dict[str, Callable[..., None]] = {
     "data_analysis": data_analysis.main,
-    "from_wav_to_histogram": from_wav_to_histogram.main,
     "generate_rgb_histogram": generate_rgb_histogram.main,
     "regenerate_csv": regenerate_csv.main,
     "spectrogram_script": spectrogram_script.main,

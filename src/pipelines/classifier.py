@@ -18,7 +18,7 @@ class Classifier:
     to predict labels for new data inputs.
     """
 
-    def __init__(self, model: BasicCNN):
+    def __init__(self, model: BasicCNN) -> None:
         """
         Initializes the Classifier instance.
         """
@@ -28,7 +28,7 @@ class Classifier:
         self.model.to(self.device)
 
     # pylint: disable=unused-argument
-    def fit(self, x_data: list[torch.Tensor], y_data: list[int]):
+    def fit(self, x_data: list[torch.Tensor], y_data: list[int]) -> 'Classifier':
         """
         Fit the classifier to the training data.
 

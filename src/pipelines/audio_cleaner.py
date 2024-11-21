@@ -9,8 +9,10 @@ basic denoising for human speech frequencies.
 """
 
 from scipy.signal import butter, sosfilt
+
 from src.audio.audio_data import AudioData
 from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DENOISE_NYQUIST_COEFFICIENT
+
 
 class AudioCleaner:
     """
@@ -73,7 +75,7 @@ class AudioCleaner:
         return audio_data
 
     # pylint: disable=unused-argument
-    def fit(self, x_data: list[AudioData], y_data: list[int] = None):
+    def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioCleaner':
         """
         Fits the transformer to the data.
 
@@ -97,9 +99,9 @@ class AudioCleaner:
         Returns:
         x_data (array-like): Output data - list of cleaned AudioData objects.
         """
-        for audio_data in x_data:
-            audio_data = AudioCleaner.denoise(
-                audio_data
-            )
 
-        return x_data
+        transformed_data = []
+        for audio_data in x_data:
+            transformed_data.append(AudioCleaner.denoise(audio_data))
+
+        return transformed_data

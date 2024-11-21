@@ -5,13 +5,17 @@ normalization, and generating a mel spectrogram.
 """
 
 from sklearn.pipeline import Pipeline
-from src.constants import NORMALIZATION_TYPE
+import numpy as np
+
+from src.audio.audio_data import AudioData
+from src.constants import NORMALIZATION_TYPE, NormalizationType
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
 
-def process_audio(audio_data, normalization_type=NORMALIZATION_TYPE):
+def process_audio(audio_data: AudioData,
+                  normalization_type: NormalizationType = NORMALIZATION_TYPE) -> np.ndarray:
     """
     Process the audio data by denoising, normalizing, and generating a mel spectrogram.
 

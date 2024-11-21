@@ -11,17 +11,16 @@ import soundfile as sf
 from sklearn.pipeline import Pipeline
 
 from src.audio.audio_data import AudioData
+from src.constants import HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX, \
+    HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR
 from src.helper_scripts.generate_rgb_histogram import generate_rgb_histogram
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 
-from src.constants import HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX, \
-                          HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR
-
 
 # pylint: disable=line-too-long
-def create_spectrogram(directory, denoise=False):
+def create_spectrogram(directory: str, denoise: bool = False) -> str:
     """
     Function that creates spectrograms from audio files
     Args:
@@ -44,7 +43,7 @@ def create_spectrogram(directory, denoise=False):
                 ])
                 transformation_pipeline.fit([audio_data])
                 audio_data = transformation_pipeline.transform([audio_data])[0]
-            spectrogram = SpectrogramGenerator.gen_mel_spectrogram(audio_data.audio_signal, samplerate)
+            spectrogram = SpectrogramGenerator.gen_spectrogram(audio_data, mel=True)
             SpectrogramGenerator.save_spectrogram(spectrogram, os.path.join(output_directory, file[:-4] + ".png"))
             print(f"Spectrogram: Done with {file}, {index}")
     print("Done with creating spectrograms")

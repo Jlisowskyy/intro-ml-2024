@@ -8,18 +8,16 @@ from sklearn.pipeline import Pipeline
 import torch
 import torch.nn.functional as tnnf
 from torch import nn
+from abc import ABC
 
 from src.audio.audio_data import AudioData
 from src.pipelines.audio_cleaner import AudioCleaner
 from src.pipelines.audio_normalizer import AudioNormalizer
 from src.pipelines.spectrogram_generator import SpectrogramGenerator
 from src.pipelines.tensor_transform import TensorTransform
+from src.pipelines.classifier import Classifier
 
-
-# Disable pylint warning about the class not implementing abstract methods since
-# it's just wrong in this case
-# pylint: disable=W0223
-class BaseCNN(nn.Module):
+class BaseCNN(nn.Module, ABC):
     """
     Base class defining the CNN model functionality.
     """
@@ -34,8 +32,6 @@ class BaseCNN(nn.Module):
         Returns:
             int: user's class.
         """
-
-        from src.pipelines.classifier import Classifier 
 
         pipeline = Pipeline(steps=[
             ('AudioCleaner', AudioCleaner()),
@@ -75,7 +71,7 @@ class BasicCNN(BaseCNN):
     Simplified CNN with two layers
     """
 
-    def __init__(self, class_count=2):
+    def __init__(self, class_count=2) -> None:
         super().__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
