@@ -1,167 +1,80 @@
 """
 Author: Łukasz Kryczka, 2024
 
-Test cases for the denoise module.
-Currently, tests the basic denoising filter.
+Manual test cases for denoise module using a pretrained DNS64 model.
 """
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.io.wavfile import write, read
-from scipy.signal import spectrogram
+from scipy.io.wavfile import write
 
+from src.pipeline.wav import load_wav, WavIteratorType, AudioDataIterator
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_data import AudioData
 
+TEST_WINDOW_LENGTH_MS = 999999
+TEST_FILE_NAME = "f2_script1_ipad_office1_35000.wav"
+TEST_FILE_PATH = str(
+    Path.resolve(Path(f'{__file__}/../test_data/{TEST_FILE_NAME}')))
+TEST_FILE_OUTPUT_BEFORE_PATH = str(
+    Path.resolve(Path(f'{__file__}/../test_tmp/{TEST_FILE_NAME}_before_denoise.wav')))
+TEST_FILE_OUTPUT_AFTER_PATH = str(
+    Path.resolve(Path(f'{__file__}/../test_tmp/{TEST_FILE_NAME}_after_denoise.wav')))
 
-def generate_sine_wave(frequency: int,
-                       duration: float,
-                       sample_rate: int,
-                       amplitude: float = 1.0) -> np.ndarray:
+
+def test_denoise_manual():
     """
-    Generate a sine wave of a given frequency.
+    Run the manual test for the denoise module.
+    It loads a WAV file, adds noise to the audio signal, denoises it using the
+    AudioCleaner class, and displays the original and denoised spectrograms.
 
-    :param frequency: Frequency of the sine wave in Hz
-    :param duration: Duration of the signal in seconds
-    :param sample_rate: Sample rate (samples per second)
-    :param amplitude: Amplitude of the sine wave
-    :return: Generated sine wave as a numpy array
+    The 'original + noise' and 'denoised' audio signals are saved to WAV files.
     """
+    iterator = load_wav(TEST_FILE_PATH, 0, WavIteratorType.PLAIN)
+    frame_rate = iterator.get_frame_rate()
+    window_size_frames = int(TEST_WINDOW_LENGTH_MS * frame_rate / 1000)
+    iterator.set_window_size(window_size_frames)
 
-    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-    return amplitude * np.sin(2 * np.pi * frequency * t)
+    iterator = AudioDataIterator(iterator)
 
+    for i, audio_data in enumerate(iterator):
+        if i > 0:
+            break
+        # Add some noise to the audio signal
+        noise = np.random.normal(0, 0.02, audio_data.audio_signal.shape)
+        audio_data.audio_signal += noise
 
-def save_wave(file_name: str, data: np.ndarray, sample_rate: int) -> None:
-    """
-    Save a numpy array as a WAV file.
+        audio_cleaner = AudioCleaner()
 
-    :param file_name: File name to save as
-    :param data: Audio data
-    :param sample_rate: Sample rate of the data
-    """
+        # audio_data = audio_normalizer.normalize(audio_data, NormalizationType.MEAN_VARIANCE)
 
-    write(file_name, sample_rate, data)
+        # Deep copy the audio data to avoid modifying the original signal
+        denoised_audio_data = AudioData(np.copy(audio_data.audio_signal), audio_data.sample_rate)
+        denoised_audio_data = audio_cleaner.denoise(denoised_audio_data)
 
+        # Generate spectrograms for the original and denoised audio signals
+        original_spectrogram = SpectrogramGenerator.gen_spectrogram(audio_data, mel=True)
+        denoised_spectrogram = SpectrogramGenerator.gen_spectrogram(denoised_audio_data, mel=True)
 
-def load_wave(file_name: str) -> tuple[int, np.ndarray]:
-    """
-    Load a WAV file and return its sample rate and data.
+        # Display the original and denoised spectrograms
+        plt.figure(figsize=(10, 5))
+        plt.subplot(1, 2, 1)
+        plt.imshow(original_spectrogram, aspect="auto", origin="lower")
+        plt.title("Original Spectrogram")
+        plt.axis("off")
 
-    :param file_name: File name to load
-    :return: Sample rate and audio data as numpy array
-    """
+        plt.subplot(1, 2, 2)
+        plt.imshow(denoised_spectrogram, aspect="auto", origin="lower")
+        plt.title("Denoised Spectrogram")
+        plt.axis("off")
 
-    return read(file_name)
+        plt.tight_layout()
+        plt.show()
 
-
-# Actual test cases
-
-def test_denoise_basic_low_freq_filtering() -> None:
-    """
-    Test that frequencies below 50 Hz are reduced by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    low_freq = 20
-
-    sine_wave = generate_sine_wave(low_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
-        "Low frequencies were not properly reduced"
-
-
-def test_denoise_basic_high_freq_filtering() -> None:
-    """
-    Test that frequencies above 8500 Hz are reduced by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    high_freq = 16500
-
-    sine_wave = generate_sine_wave(high_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
-        "High frequencies were not properly reduced"
-
-
-def manual_test_denoise_basic_passband_freq() -> None:
-    """
-    Test that frequencies within the passband (100 Hz - 8000 Hz)
-    are preserved by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    passband_freq = 2000
-
-    sine_wave = generate_sine_wave(passband_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    # Before
-    freqs, times, sxx = spectrogram(sine_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram before Denoising Passband Frequencies - Manual Check')
-    plt.show()
-
-    # After
-    freqs, times, sxx = spectrogram(filtered_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after Denoising Passband Frequencies - Manual Check')
-    plt.show()
-
-    # NOTE: Investigate
-    # ??? The results are not as expected and surprising
-
-    assert np.allclose(sine_wave.audio_signal, filtered_wave.audio_signal, atol=0.20), \
-        "Passband frequencies were not preserved"
-
-
-def manual_test_denoise_basic_mixed_freq() -> None:
-    """
-    Test that a mixture of frequencies is correctly filtered by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    low_freq = 50
-    passband_freq1 = 500
-    passband_freq2 = 3000
-    high_freq = 12000
-
-    mixed_wave = (generate_sine_wave(low_freq, duration, sample_rate) +
-                  generate_sine_wave(passband_freq1, duration, sample_rate) +
-                  generate_sine_wave(passband_freq2, duration, sample_rate) +
-                  generate_sine_wave(high_freq, duration, sample_rate))
-
-    mixed_wave = AudioData(mixed_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(mixed_wave)
-
-    # Manual check of the spectrogram
-    freqs, times, sxx = spectrogram(filtered_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after Denoising Mixed Frequencies - Manual Check')
-    plt.show()
-
-
-# Running all tests
-def manual_test() -> None:
-    """
-    Run all the tests
-    """
-
-    manual_test_denoise_basic_passband_freq()
-    manual_test_denoise_basic_mixed_freq()
+        # Save the denoised audio signal to a WAV file
+        write(TEST_FILE_OUTPUT_BEFORE_PATH,
+              audio_data.sample_rate, audio_data.audio_signal)
+        write(TEST_FILE_OUTPUT_AFTER_PATH,
+              denoised_audio_data.sample_rate, denoised_audio_data.audio_signal)
