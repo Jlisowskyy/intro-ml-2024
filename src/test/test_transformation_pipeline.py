@@ -12,9 +12,9 @@ import numpy as np
 import soundfile as sf
 from sklearn.pipeline import Pipeline
 
-# pylint: disable=line-too-long
-from src.audio.audio_data import AudioData
 from src.pipeline.audio_cleaner import AudioCleaner
+# pylint: disable=line-too-long
+from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 

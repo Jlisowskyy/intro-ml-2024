@@ -5,21 +5,19 @@ Modul for generating rgb histgram of spectrogram
 """
 
 
-import os
-
 import argparse
+import os
 import shutil
+
+import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
-import matplotlib.pyplot as plt
 from PIL import Image
-
-
-from src.audio.audio_data import AudioData
-from src.scripts.spectrogram_from_npy import get_random_file_path
-from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.audio_data import AudioData
 
 from src.constants import HELPER_SCRIPTS_HISTOGRAM_ALPHA, HELPER_SCRIPTS_HISTOGRAM_N_BINS
+from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.scripts.spectrogram_from_npy import get_random_file_path
 
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))+"/temp_data"
 

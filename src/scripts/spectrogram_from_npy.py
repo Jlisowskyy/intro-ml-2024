@@ -4,9 +4,9 @@ Author: Jakub Pietrzak, 2024
 Script for generating spectrograms form npy files and showing them
 """
 
+import argparse
 import os
 import random
-import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np

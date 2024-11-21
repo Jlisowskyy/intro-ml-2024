@@ -6,8 +6,8 @@ File contains manual tests for cutting the wav file
 
 from pathlib import Path
 
-from src.audio.wav import cut_file_to_plain_chunk_files
 from src.constants import WavIteratorType
+from src.pipeline.wav import cut_file_to_plain_chunk_files
 
 TEST_DATA_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/cut_test_data.wav')))
 TEST_OUT_DIR = str(Path.resolve(Path(f'{__file__}/../test_tmp')))

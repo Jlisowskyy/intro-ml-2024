@@ -10,8 +10,9 @@ import numpy as np
 from scipy.io.wavfile import write, read
 from scipy.signal import spectrogram
 
-from src.audio.audio_data import AudioData
 from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
+
 
 def generate_sine_wave(frequency: int,
                        duration: float,

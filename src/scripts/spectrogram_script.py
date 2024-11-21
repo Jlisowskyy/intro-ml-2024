@@ -9,11 +9,11 @@ import argparse
 import matplotlib.pyplot as plt
 import soundfile as sf
 from sklearn.pipeline import Pipeline
+from src.pipeline.audio_data import AudioData
 
-from src.audio.audio_data import AudioData
-from src.scripts.spectrogram_from_npy import get_random_file_path
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.scripts.spectrogram_from_npy import get_random_file_path
 
 
 def process(sound_path: str = "", directory: str = "", number_of_samples: int = 1,

@@ -11,7 +11,7 @@ import numpy as np
 from scipy.signal import spectrogram
 
 # pylint: disable=import-error
-from src.audio.wav import load_wav_with_window
+from src.pipeline.wav import load_wav_with_window
 
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/test.wav')))
 

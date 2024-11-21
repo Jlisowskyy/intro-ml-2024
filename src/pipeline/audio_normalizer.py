@@ -9,10 +9,10 @@ audio signals for further analysis or modeling.
 import librosa
 import numpy as np
 
-from src.pipeline.audio_data import AudioData
 from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT,
                            NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA,
                            NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
+from src.pipeline.audio_data import AudioData
 
 
 class AudioNormalizer:

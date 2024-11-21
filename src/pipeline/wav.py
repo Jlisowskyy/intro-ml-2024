@@ -14,8 +14,8 @@ from typing import Iterator, Union
 
 import numpy as np
 
-from src.pipeline.audio_data import AudioData
 from src.constants import WavIteratorType, WINDOW_SIZE_FRAMES_DIVISOR
+from src.pipeline.audio_data import AudioData
 
 
 class WavIteratorBase(ABC):
@@ -439,7 +439,7 @@ class AudioDataIterator:
     _wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']
     _sample_rate: int
 
-    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']):
+    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']) -> None:
         """
         Initialize the AudioData iterator.
 

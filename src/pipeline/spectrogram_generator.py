@@ -6,18 +6,17 @@ for generating mel-frequency spectrograms from audio data.
 """
 from io import BytesIO
 
-import numpy as np
 import librosa
+import numpy as np
 from PIL import Image
 from librosa import feature
 from matplotlib import pyplot as plt
 
-from src.pipeline.audio_data import AudioData
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
                            SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
                            SPECTROGRAM_HOP_LENGTH,
                            SPECTROGRAM_N_MELS)
-
+from src.pipeline.audio_data import AudioData
 
 
 class SpectrogramGenerator:

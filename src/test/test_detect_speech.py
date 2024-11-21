@@ -6,8 +6,9 @@ Tests the silence detection feature.
 """
 
 import numpy as np
-from src.audio.audio_data import AudioData
-from src.audio.detect_speech import is_speech
+
+from src.pipeline.audio_data import AudioData
+from src.pipeline.detect_speech import is_speech
 
 
 def generate_silence(duration: float, sample_rate: int) -> np.ndarray:

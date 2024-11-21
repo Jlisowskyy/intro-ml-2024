@@ -11,8 +11,8 @@ from typing import Callable
 import numpy as np
 from scipy.io.wavfile import write
 
-from src.audio.audio_data import AudioData
-from src.audio.wav import load_wav_with_window, AudioDataIterator, FlattenWavIterator
+from src.pipeline.audio_data import AudioData
+from src.pipeline.wav import load_wav_with_window, AudioDataIterator, FlattenWavIterator
 from src.constants import WavIteratorType
 
 AMPLITUDE: float = 0.5

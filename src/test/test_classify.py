@@ -5,10 +5,12 @@ audio, converts it into an `AudioData` object, and uses the `classify_wrapper` f
 the class of the audio.
 """
 from pathlib import Path
-import soundfile as sf
+
 import numpy as np
-from src.audio.audio_data import AudioData
+import soundfile as sf
+
 from src.cnn.cnn import BasicCNN
+from src.pipeline.audio_data import AudioData
 
 # pylint: disable=line-too-long
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))

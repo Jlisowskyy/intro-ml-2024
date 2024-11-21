@@ -6,8 +6,8 @@ Module contains functions to detect speech or silence in the audio signal.
 
 import numpy as np
 
-from src.pipeline.audio_data import AudioData
 from src.constants import DETECT_SILENCE_THRESHOLD, DETECT_SILENCE_TOLERANCE
+from src.pipeline.audio_data import AudioData
 
 
 def is_speech(audio_data: AudioData, silence_tolerance: float = DETECT_SILENCE_TOLERANCE,

@@ -4,12 +4,12 @@ in sequence using scikit-learn's Pipeline. The transformations include denoising
 normalization, and generating a mel spectrogram.
 """
 
-from sklearn.pipeline import Pipeline
 import numpy as np
+from sklearn.pipeline import Pipeline
 
-from src.pipeline.audio_data import AudioData
 from src.constants import NORMALIZATION_TYPE, NormalizationType
 from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 

@@ -12,7 +12,7 @@ import numpy as np
 import soundfile as sf
 from scipy.signal import spectrogram
 
-from src.audio.audio_data import AudioData
+from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
 
 # Define paths

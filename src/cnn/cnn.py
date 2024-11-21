@@ -4,18 +4,20 @@ Author: Tomasz Mycielski, 2024
 Implementation of the CNN
 """
 
-from sklearn.pipeline import Pipeline
-import torch
-import torch.nn.functional as tnnf
-from torch import nn
 from abc import ABC
 
-from src.audio.audio_data import AudioData
+import torch
+import torch.nn.functional as tnnf
+from sklearn.pipeline import Pipeline
+from torch import nn
+
 from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
+from src.pipeline.classifier import Classifier
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 from src.pipeline.tensor_transform import TensorTransform
-from src.pipeline.classifier import Classifier
+
 
 class BaseCNN(nn.Module, ABC):
     """
