@@ -44,6 +44,7 @@ from src.test import test_detect_speech
 from src.test import test_normalize
 from src.test import test_transformation_pipeline
 from src.test import test_wav
+from src.test import test_classify
 
 # Initialize colorama
 init()
@@ -104,6 +105,7 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "dataset": test_cnn.manual_test_dataset,
     "speech_detection": test_detect_speech.example_test_run,
     "transformation_pipeline": test_transformation_pipeline.example_test_run,
+    "test_classify": test_classify.example_test_run
 }
 
 

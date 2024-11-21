@@ -60,7 +60,7 @@ class Classifier:
                 tens = tens.to(self.device)
 
                 prediction = self.model(tens)
-                predicted_label = prediction.argmax(1).item()
+                predicted_label = prediction.argmax(0).item()
                 predictions.append(predicted_label)
 
         return predictions

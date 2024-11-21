@@ -24,4 +24,4 @@ def example_test_run():
 
     classifier = BasicCNN.load_model(MODEL_PATH)
 
-    print(classifier.classify(audio_data))
+    print(classifier.classify([audio_data]))
