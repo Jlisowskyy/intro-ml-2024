@@ -14,7 +14,6 @@ from torch import nn
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
-from src.pipeline.classifier import Classifier
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 from src.pipeline.tensor_transform import TensorTransform
 
@@ -34,6 +33,8 @@ class BaseCNN(nn.Module, ABC):
         Returns:
             int: user's class.
         """
+
+        from src.pipeline.classifier import Classifier
 
         pipeline = Pipeline(steps=[
             ('AudioCleaner', AudioCleaner()),

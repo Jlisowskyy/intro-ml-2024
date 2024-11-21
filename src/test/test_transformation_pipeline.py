@@ -47,4 +47,3 @@ def example_test_run():
 
     spectrogram_not_cleaned = SpectrogramGenerator.gen_spectrogram(audio_data, mel=True)
     SpectrogramGenerator.save_spectrogram(spectrogram_not_cleaned, SPECTROGRAM_PATH)
-
