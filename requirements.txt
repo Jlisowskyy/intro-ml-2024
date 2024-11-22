@@ -1,12 +1,15 @@
 annotated-types
 anyio
 click
+colorama
+denoiser
 fastapi
 fastapi[standard]
 h11
 httptools
 librosa
 matplotlib
+moviepy
 numpy
 pandas
 pillow
@@ -33,5 +36,3 @@ uvloop
 watchfiles
 wave
 websockets
-moviepy
-colorama

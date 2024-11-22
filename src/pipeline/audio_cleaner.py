@@ -8,9 +8,11 @@ functionality for denoising WAV data using simple filters. Currently, supports
 basic denoising for human speech frequencies.
 """
 
-from scipy.signal import butter, sosfilt
+from denoiser import pretrained
+import torch
+import torchaudio
+import numpy as np
 
-from src.constants import DENOISE_FREQ_HIGH_CUT, DENOISE_FREQ_LOW_CUT, DENOISE_NYQUIST_COEFFICIENT
 from src.pipeline.audio_data import AudioData
 
 
@@ -18,6 +20,7 @@ class AudioCleaner:
     """
     A class used to clean audio data as part of a machine learning pipeline.
     """
+
     def __init__(self) -> None:
         """
         Initializes the AudioCleaner.
@@ -28,49 +31,55 @@ class AudioCleaner:
         Returns:
         None
         """
-        return
+        self.denoiser_model = pretrained.dns64()
+        self.denoiser_model.eval()
+        self.denoiser_model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
-    @staticmethod
-    def denoise(audio_data: AudioData,
-                lowcut: float = DENOISE_FREQ_LOW_CUT,
-                highcut: float = DENOISE_FREQ_HIGH_CUT) -> AudioData:
+    def denoise(self, audio_data: AudioData) -> AudioData:
         """
-        Denoise the given audio chunk using the specified denoise type.
+        Denoise the given audio data using the pretrained DNS64 model.
+        More info on the model: https://pypi.org/project/denoiser/
 
-        :param audio_data: Audio data to be denoised
-        :param lowcut: Lower bound of the frequency range (Hz)
-        :param highcut: Upper bound of the frequency range (Hz)
-
-        :return: Denoised chunk of audio data
+        :param audio_data: Audio data to be denoised.
+        :return: Denoised chunk of audio data.
         """
+        with torch.no_grad():
+            # Denoiser requires mono .wav files with 16 kHz sample rate
 
-        # assert audio_data.audio_signal.dtype in (np.float32, np.float64)
+            # Ensure the signal is scaled to [-1, 1]
+            audio_signal = audio_data.audio_signal
+            if audio_signal.dtype != np.float32:
+                audio_signal = AudioData.to_float(audio_signal)
 
-        return AudioCleaner.butter_bandpass(audio_data, lowcut, highcut)
+            # Resample to 16 kHz if needed
+            if audio_data.sample_rate != 16000:
+                resampled_signal = torchaudio.transforms.Resample(
+                    orig_freq=audio_data.sample_rate, new_freq=16000
+                )(torch.tensor(audio_signal, dtype=torch.float32))
+            else:
+                resampled_signal = torch.tensor(audio_signal, dtype=torch.float32)
 
-    @staticmethod
-    def butter_bandpass(audio_data: AudioData, lowcut: float, highcut: float,
-                        order: int = 6) -> AudioData:
-        """
-        Create a bandpass filter to allow frequencies within a specified range and block others.
+            # Add batch and channel dimensions
+            if resampled_signal.ndim == 1:  # Mono audio
+                resampled_signal = resampled_signal.unsqueeze(0)  # Add batch dimension
+            elif resampled_signal.ndim == 2 and resampled_signal.shape[0] > 2:  # Stereo audio
+                resampled_signal = resampled_signal.T.unsqueeze(0)  # Correct channel order
 
-        :param audio_data: Audio data to be filtered
-        :param lowcut: Lower bound of the frequency range (Hz)
-        :param highcut: Upper bound of the frequency range (Hz)
-        :param order: Order of the filter
-        :return: Filtered audio data
-        """
+            device = next(self.denoiser_model.parameters()).device
+            resampled_signal = resampled_signal.to(device)
 
-        nyquist = DENOISE_NYQUIST_COEFFICIENT * audio_data.sample_rate
-        low = lowcut / nyquist
-        high = highcut / nyquist
-        if low <= 0 or high >= 1:
-            raise ValueError(
-                f"Invalid critical frequencies: low={low}, high={high}. Ensure 0 < low < high < 1.")
+            denoised_signal = self.denoiser_model(resampled_signal)[0]
 
-        sos = butter(order, [low, high], analog=False, btype='band', output='sos')
-        filtered_signal = sosfilt(sos, audio_data.audio_signal)
-        audio_data.audio_signal = filtered_signal
+            # Remove batch and channel dimensions
+            denoised_signal = denoised_signal.squeeze(0).cpu().numpy()
+
+            # Resample back to original sample rate if needed
+            if audio_data.sample_rate != 16000:
+                denoised_signal = torchaudio.transforms.Resample(
+                    orig_freq=16000, new_freq=audio_data.sample_rate
+                )(torch.tensor(denoised_signal, dtype=torch.float32)).numpy()
+
+            audio_data.audio_signal = denoised_signal
 
         return audio_data
 
@@ -102,6 +111,6 @@ class AudioCleaner:
 
         transformed_data = []
         for audio_data in x_data:
-            transformed_data.append(AudioCleaner.denoise(audio_data))
+            transformed_data.append(self.denoise(audio_data))
 
         return transformed_data

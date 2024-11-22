@@ -45,16 +45,6 @@ Small constant to avoid division by zero
 # DENOISE constants
 # ------------------------------
 
-DENOISE_NYQUIST_COEFFICIENT: float = 0.5
-"""
-Nyquist coefficient is 0.5, as it is a half of the sampling rate
-"""
-
-DENOISE_FREQ_LOW_CUT: float = 50.0
-"""
-Lowcut is chosen to be 50 Hz : Male voice frequency range
-"""
-
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
@@ -127,7 +117,7 @@ SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
 SPECTROGRAM_N_FFT: int = 4096
 SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 5120
+SPECTROGRAM_N_MELS: int = 512
 
 # ------------------------------
 # WAV ITERATOR constants
