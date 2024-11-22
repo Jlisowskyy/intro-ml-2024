@@ -1,5 +1,5 @@
 """
-Author: Michał Kwiatkowski, Łukasz Kryczka
+Author: Michał Kwiatkowski, Łukasz Kryczka, Jakub Lisowski
 
 This module contains the AudioCleaner class, which is used to clean audio data
 as part of a machine learning pipeline. It implements the fit and transform
@@ -8,11 +8,13 @@ functionality for denoising WAV data using simple filters. Currently, supports
 basic denoising for human speech frequencies.
 """
 
-from denoiser import pretrained
+import numpy as np
 import torch
 import torchaudio
-import numpy as np
+from denoiser import pretrained
 
+from src.constants import DETECT_SILENCE_THRESHOLD_DB, DETECT_SILENCE_WINDOW_MAX_MS, \
+    SILENCE_CUT_WINDOW_MS
 from src.pipeline.audio_data import AudioData
 
 
@@ -82,6 +84,30 @@ class AudioCleaner:
             audio_data.audio_signal = denoised_signal
 
         return audio_data
+
+    @staticmethod
+    def is_speech(audio_data: AudioData, silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> bool:
+        duration = len(audio_data.audio_signal) / audio_data.sample_rate
+        assert (duration * 1000) < DETECT_SILENCE_WINDOW_MAX_MS
+
+        rms = np.sqrt(np.mean(np.square(audio_data.audio_signal)))
+        rms_db = 20 * np.log10(rms + 1e-9)
+
+        return rms_db > silence_threshold
+
+    @staticmethod
+    def remove_silence(audio_data: AudioData,
+                       silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> AudioData:
+        window = (SILENCE_CUT_WINDOW_MS * audio_data.sample_rate) // 1000
+
+        output = np.array([])
+        for i in range(0, len(audio_data.audio_signal), window):
+            chunk = AudioData(audio_data.audio_signal[i:i + window], audio_data.sample_rate)
+
+            if AudioCleaner.is_speech(chunk, silence_threshold):
+                output = np.concatenate((output, chunk))
+
+        return AudioData(output, audio_data.sample_rate)
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioCleaner':
