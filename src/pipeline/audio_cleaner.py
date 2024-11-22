@@ -87,6 +87,16 @@ class AudioCleaner:
 
     @staticmethod
     def is_speech(audio_data: AudioData, silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> bool:
+        """
+        Determines if an audio segment contains speech based on RMS energy threshold.
+
+        Parameters:
+            audio_data (AudioData): Audio segment to analyze.
+            silence_threshold (float): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            bool: True if segment contains speech, False if classified as silence.
+        """
         duration = len(audio_data.audio_signal) / audio_data.sample_rate
         assert (duration * 1000) < DETECT_SILENCE_WINDOW_MAX_MS
 
@@ -96,18 +106,49 @@ class AudioCleaner:
         return rms_db > silence_threshold
 
     @staticmethod
-    def remove_silence(audio_data: AudioData,
-                       silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> AudioData:
-        window = (SILENCE_CUT_WINDOW_MS * audio_data.sample_rate) // 1000
+    def remove_silence_raw(audio_data: np.ndarray, frame_rate: int,
+                           silence_threshold: int = DETECT_SILENCE_THRESHOLD_DB) -> np.ndarray:
+        """
+        Removes silent segments from raw audio data by analyzing fixed-size windows.
+
+        Parameters:
+            audio_data (np.ndarray): Raw audio signal data.
+            frame_rate (int): Audio sample rate in Hz.
+            silence_threshold (int): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            np.ndarray: Audio data with silent segments removed.
+        """
+        window = (SILENCE_CUT_WINDOW_MS * frame_rate) // 1000
 
         output = np.array([])
-        for i in range(0, len(audio_data.audio_signal), window):
-            chunk = AudioData(audio_data.audio_signal[i:i + window], audio_data.sample_rate)
+        for i in range(0, len(audio_data), window):
+            chunk = AudioData(audio_data[i:i + window], frame_rate)
 
             if AudioCleaner.is_speech(chunk, silence_threshold):
                 output = np.concatenate((output, chunk))
 
-        return AudioData(output, audio_data.sample_rate)
+        return output
+
+    @staticmethod
+    def remove_silence(audio_data: AudioData,
+                       silence_threshold: int = DETECT_SILENCE_THRESHOLD_DB) -> AudioData:
+        """
+        Removes silent segments from an AudioData object.
+
+        Parameters:
+            audio_data (AudioData): Audio data to process.
+            silence_threshold (float): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            AudioData: New AudioData object with silent segments removed.
+        """
+        return AudioData(
+            AudioCleaner.remove_silence_raw(audio_data.audio_signal, audio_data.sample_rate,
+                                            silence_threshold),
+            audio_data.sample_rate
+        )
+
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioCleaner':

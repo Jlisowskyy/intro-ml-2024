@@ -5,6 +5,7 @@ Helper script for generating a dataset and a relevant annotations file
 while splitting the files into smaller ones
 """
 import re
+from collections.abc import Callable
 from os import walk, path, makedirs
 
 import numpy as np
@@ -13,7 +14,8 @@ from tqdm import tqdm
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
-from src.pipeline import detect_speech
+from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
@@ -40,6 +42,11 @@ def main() -> None:
                 data_class_id = SPEAKER_CLASSES[speaker]
                 it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                         DATABASE_CUT_ITERATOR)
+
+                transform_func: Callable[[AudioData], np.ndarray] = lambda \
+                    x: AudioCleaner.remove_silence_raw(x.audio_signal, x.sample_rate)
+                it.transform(transform_func)
+
                 sr = it.get_first_iter().get_frame_rate()
                 it = AudioDataIterator(it)
 

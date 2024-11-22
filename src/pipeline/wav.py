@@ -10,7 +10,7 @@ import os
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Generator
-from typing import Iterator, Union
+from typing import Iterator, Union, Callable
 
 import numpy as np
 
@@ -35,7 +35,6 @@ class WavIteratorBase(ABC):
     _channel_index: int
 
     _frame_rate: int
-    _num_frames: int
     _sample_width: int
     _num_channels: int
 
@@ -62,7 +61,7 @@ class WavIteratorBase(ABC):
 
         with wave.open(file_path, 'rb') as wav_file:
             self._frame_rate = wav_file.getframerate()
-            self._num_frames = wav_file.getnframes()
+            num_frames = wav_file.getnframes()
             self._sample_width = wav_file.getsampwidth()
             self._num_channels = wav_file.getnchannels()
 
@@ -71,7 +70,7 @@ class WavIteratorBase(ABC):
             if self._num_channels <= self._channel_index:
                 raise ValueError(f"Channel index out of range: {self._channel_index}")
 
-            frames = wav_file.readframes(self._num_frames)
+            frames = wav_file.readframes(num_frames)
             dtype = self.get_data_type()
 
             self._audio_data = np.frombuffer(frames, dtype=dtype).reshape(-1, self._num_channels)
@@ -139,15 +138,6 @@ class WavIteratorBase(ABC):
 
         return self._frame_rate
 
-    def get_num_frames(self) -> int:
-        """
-        Return the number of frames
-
-        :return: Number of frames
-        """
-
-        return self._num_frames
-
     def get_sample_width(self) -> int:
         """
         Return the sample width
@@ -173,9 +163,19 @@ class WavIteratorBase(ABC):
 
         return self._audio_data
 
-        # ------------------------------
-        # Simple setters
-        # ------------------------------
+    def transform(self, transform_func: Callable[[AudioData], np.ndarray]) -> None:
+        """
+        Transform the audio data using the provided function
+
+        :param transform_func: Function to apply to the audio data
+        """
+
+        self._audio_data = transform_func(AudioData(self._audio_data, self._frame_rate))
+        self._invalidate()
+
+    # ------------------------------
+    # Simple setters
+    # ------------------------------
 
     def set_window_size(self, window_size: int) -> None:
         """
@@ -293,8 +293,8 @@ class OverlappingWavIterator(WavIteratorBase):
         start_point = start_point_offset * self._window_index
         end_point = start_point + self._window_size_frames
 
-        if end_point > self._num_frames:
-            end_point = self._num_frames
+        if end_point > len(self._audio_data):
+            end_point = len(self._audio_data)
             start_point = max(0, end_point - self._window_size_frames)
 
         if end_point <= self._prev_last_sample:
@@ -400,6 +400,16 @@ class FlattenWavIterator:
         """
 
         return self._iters[0]
+
+    def transform(self, transform_func: Callable[[AudioData], np.ndarray]) -> None:
+        """
+        Transform the audio data using the provided function
+
+        :param transform_func: Function to apply to the audio data
+        """
+
+        for it in self._iters:
+            it.transform(transform_func)
 
     # ------------------------------
     # Iterator Protocol
