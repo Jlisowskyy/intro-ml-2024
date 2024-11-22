@@ -24,7 +24,7 @@ TEST_FILE_OUTPUT_AFTER_PATH = str(
     Path.resolve(Path(f'{__file__}/../test_tmp/{TEST_FILE_NAME}_after_denoise.wav')))
 
 
-def test_denoise_manual():
+def denoise_test_manual():
     """
     Run the manual test for the denoise module.
     It loads a WAV file, adds noise to the audio signal, denoises it using the
