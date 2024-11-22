@@ -101,7 +101,7 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test_cnn,
     "dataset": test_cnn.manual_test_dataset,
-    # "speech_detection": test_detect_speech.example_test_run,
+    "silence_removal": test_detect_speech.silence_removal_test,
     "transformation_pipeline": test_transformation_pipeline.example_test_run,
     "test_classify": test_classify.example_test_run
 }

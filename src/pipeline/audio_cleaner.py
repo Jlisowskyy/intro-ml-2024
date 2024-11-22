@@ -110,25 +110,27 @@ class AudioCleaner:
                            silence_threshold: int = DETECT_SILENCE_THRESHOLD_DB) -> np.ndarray:
         """
         Removes silent segments from raw audio data by analyzing fixed-size windows.
+        Expects and returns audio data in shape (N, 1).
 
         Parameters:
-            audio_data (np.ndarray): Raw audio signal data.
+            audio_data (np.ndarray): Raw audio signal data in shape (N, 1).
             frame_rate (int): Audio sample rate in Hz.
             silence_threshold (int): RMS energy threshold in dB to classify as speech.
 
         Returns:
-            np.ndarray: Audio data with silent segments removed.
+            np.ndarray: Audio data with silent segments removed, maintaining shape (N, 1).
+
+        Raises:
+            ValueError: If the input audio is not in shape (N, 1).
         """
-        window = (SILENCE_CUT_WINDOW_MS * frame_rate) // 1000
+        
+        if len(audio_data.shape) != 2 or audio_data.shape[1] != 1:
+            raise ValueError(f"Input audio must be in shape (N, 1). Got shape: {audio_data.shape}")
 
-        output = np.array([])
-        for i in range(0, len(audio_data), window):
-            chunk = AudioData(audio_data[i:i + window], frame_rate)
-
-            if AudioCleaner.is_speech(chunk, silence_threshold):
-                output = np.concatenate((output, chunk))
-
-        return output
+        audio_1d = audio_data.flatten()
+        audio = AudioData(audio_1d, frame_rate)
+        processed_audio = AudioCleaner.remove_silence(audio, silence_threshold)
+        return processed_audio.audio_signal.reshape(-1, 1)
 
     @staticmethod
     def remove_silence(audio_data: AudioData,
@@ -143,11 +145,18 @@ class AudioCleaner:
         Returns:
             AudioData: New AudioData object with silent segments removed.
         """
-        return AudioData(
-            AudioCleaner.remove_silence_raw(audio_data.audio_signal, audio_data.sample_rate,
-                                            silence_threshold),
-            audio_data.sample_rate
-        )
+        window = (SILENCE_CUT_WINDOW_MS * audio_data.sample_rate) // 1000
+
+        output = np.array([], dtype=audio_data.audio_signal.dtype)
+
+        for i in range(0, len(audio_data.audio_signal), window):
+            chunk_data = audio_data.audio_signal[i:i + window]
+            chunk = AudioData(chunk_data, audio_data.sample_rate)
+
+            if AudioCleaner.is_speech(chunk, silence_threshold):
+                output = np.concatenate((output, chunk_data))
+
+        return AudioData(output, audio_data.sample_rate)
 
 
     # pylint: disable=unused-argument
