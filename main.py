@@ -250,7 +250,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             return False
         return True
     # pylint: disable=broad-except
-    except Exception as e:
+    except Exception:
         print_error(f"Error executing command: {traceback.format_exc()}")
         return False
 

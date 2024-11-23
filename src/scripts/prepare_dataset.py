@@ -58,7 +58,7 @@ def main(dry: bool = False) -> None:
                         print(data)
                     else:
                         if not path.exists(new_root):
-                            makedirs(path.join(new_root, file))
+                            makedirs(path.join(new_root))
                         np.save(path.join(new_root, f'{file[:-4]}.npy'), spectrogram)
                         f.write(data + '\n')
                     break # Apologies to future me for the legacy code, it was easier to adapt it
