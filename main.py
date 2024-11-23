@@ -22,6 +22,7 @@ Adding new functionality:
 
 import argparse
 import inspect
+import traceback
 from pathlib import Path
 from typing import Callable
 
@@ -233,7 +234,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             fastapi_main()
         elif command in ('prepare', '-p', '--prepare'):
             print_success("Starting db preparation...")
-            prepare_dataset.main()
+            prepare_dataset.main('dry' in args)
         elif command == 'script' and args:
             print_success(f"Running script '{args[0]}'...")
             run_script(args[0], args[1:])
@@ -250,7 +251,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
         return True
     # pylint: disable=broad-except
     except Exception as e:
-        print_error(f"Error executing command: {str(e)}")
+        print_error(f"Error executing command: {traceback.format_exc()}")
         return False
 
 
@@ -269,12 +270,9 @@ def parse_arguments() -> None:
     main_group.add_argument('-r', '--run', action='store_true', help='Start running')
     main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
 
-    parser.add_argument('command', nargs='?',
-                        help='Command to execute (train/validate/run/prepare/script/test)')
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
-
     if args.train:
         handle_command('train')
     elif args.validate:
@@ -282,7 +280,7 @@ def parse_arguments() -> None:
     elif args.run:
         handle_command('run')
     elif args.prepare:
-        handle_command('prepare')
+        handle_command('prepare', args.args) # TODO: Add subflags
     elif args.command:
         if not handle_command(args.command, args.args):
             display_help()
