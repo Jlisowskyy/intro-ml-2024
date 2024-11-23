@@ -115,7 +115,7 @@ class MultiLabelDataset(Dataset):
         self.annotations = pd.read_csv(annotations_file)
         self.root = root
         self.device = device
-        self.classes = annotations_file['classID'].unique()
+        self.classes = self.annotations['classID'].unique()
         self.le = LabelEncoder()
         self.le.fit(self.classes)
 
@@ -132,10 +132,10 @@ class MultiLabelDataset(Dataset):
             access location
         """
         spectrogram_path = join(
-            self.root,
             self.annotations['folder'][index],
             self.annotations['file_name'][index][:-4] + '.npy'
         )
+        print(spectrogram_path)
         spectrogram = np.load(spectrogram_path)
         tens = torch.from_numpy(spectrogram).type(torch.float32)
         # NOTE rot90 can stay, but I can drop it and we'll have all future models account for it

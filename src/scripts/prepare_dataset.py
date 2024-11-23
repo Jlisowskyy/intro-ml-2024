@@ -24,7 +24,7 @@ def main(dry: bool = False) -> None:
     # TODO: add NUL support for the windows users
     db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
     with open(db_path, 'w', encoding='UTF-8') as f:
-        f.write('folder,classID,file_name\n')
+        f.write('folder,file_name,classID\n')
 
         for root, _, files in walk(DATABASE_PATH):
             folder = root.rsplit('/')[-1]
@@ -52,7 +52,7 @@ def main(dry: bool = False) -> None:
                     spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
                     class_id = folder if folder in CLASSES else 'unknown'
-                    data = f'{new_root},{folder},{file},{class_id}'
+                    data = f'{new_root},{file},{class_id}'
 
                     if dry:
                         print(data)
