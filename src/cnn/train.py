@@ -172,7 +172,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Vali
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = Validator()
+    validator = Validator(classes=[0,1,2])
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):

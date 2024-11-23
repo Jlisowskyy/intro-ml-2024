@@ -24,7 +24,8 @@ class BaseCNN(nn.Module, ABC):
     Base class defining the CNN model functionality.
     """
 
-    def classify(self, audio_data: list[AudioData]) -> list[int]:
+    def classify(self, audio_data: list[AudioData],
+                 pipeline: Pipeline = None) -> list[int]:
         """
         Classify audio data using the provided CNN model.
 
@@ -35,13 +36,14 @@ class BaseCNN(nn.Module, ABC):
             int: user's class.
         """
 
-        pipeline = Pipeline(steps=[
-            ('AudioCleaner', AudioCleaner()),
-            ('AudioNormalizer', AudioNormalizer()),
-            ('SpectrogramGenerator', SpectrogramGenerator()),
-            ('TensorTransform', TensorTransform()),
-            ('Classifier', Classifier(self))
-        ])
+        if pipeline is None:
+            pipeline = Pipeline(steps=[
+                ('AudioCleaner', AudioCleaner()),
+                ('AudioNormalizer', AudioNormalizer()),
+                ('SpectrogramGenerator', SpectrogramGenerator()),
+                ('TensorTransform', TensorTransform()),
+                ('Classifier', Classifier(self))
+            ])
 
         return pipeline.predict(audio_data)
 
