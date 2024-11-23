@@ -97,7 +97,7 @@ SCRIPTS: dict[str, Callable[..., None]] = {
 TEST_CASES: dict[str, Callable[[], None]] = {
     "wav": test_wav.manual_test,
     "pytest": run_pytest,
-    "denoise": test_denoise.test_denoise_manual,
+    "denoise": test_denoise.denoise_test_manual,
     "normalize": test_normalize.manual_test,
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test_cnn,
