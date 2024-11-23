@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
 from src.cnn.cnn import BasicCNN
-from src.cnn.loadset import DAPSDataset
+from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
@@ -197,7 +197,7 @@ def main() -> None:
     print(f'Using {device}')
 
     # preparing datasets
-    dataset = DAPSDataset(
+    dataset = MultiLabelDataset(
         DATABASE_ANNOTATIONS_PATH,
         DATABASE_OUT_PATH,
         device
