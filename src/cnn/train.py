@@ -220,7 +220,7 @@ def main() -> None:
 
     # training
     for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-        cnn = BasicCNN().to(device)
+        cnn = BasicCNN(len(dataset.get_labels())).to(device)
         print(cnn)
 
         loss_function = nn.CrossEntropyLoss()
