@@ -31,11 +31,11 @@ class Validator:
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
     def validate(self, predictions: Tensor, target: Tensor,
-                 le: LabelEncoder = None) -> None:
+                 le: LabelEncoder | None = None) -> None:
         """
         Method saving the results of the validation
         """
-        if not le:
+        if le is None:
             for response, answer in zip(predictions, target):
                 self._results.loc[answer.item(), response.argmax(0).item()] += 1
         else:

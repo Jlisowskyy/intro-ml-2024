@@ -270,6 +270,8 @@ def parse_arguments() -> None:
     main_group.add_argument('-r', '--run', action='store_true', help='Start running')
     main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
 
+    parser.add_argument('command', nargs='?',
+                        help='Command to execute (train/validate/run/prepare/script/test)')
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()

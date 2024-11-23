@@ -46,7 +46,9 @@ def main(dry: bool = False) -> None:
                 for audio_data in it:
                     # Pad not full files
                     if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
-                        ... # TODO
+                        ... # TODO most files don't have this problem
+
+                    print(audio_data.audio_signal)
 
                     spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
