@@ -24,7 +24,7 @@ def main(dry: bool = False) -> None:
     # TODO: add NUL support for the windows users
     db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
     with open(db_path, 'w', encoding='UTF-8') as f:
-        f.write('folder,class,file_name\n')
+        f.write('folder,classID,file_name\n')
 
         for root, _, files in walk(DATABASE_PATH):
             folder = root.rsplit('/')[-1]

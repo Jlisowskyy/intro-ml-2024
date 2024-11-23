@@ -25,7 +25,7 @@ class BaseCNN(nn.Module, ABC):
     """
 
     def classify(self, audio_data: list[AudioData],
-                 pipeline: Pipeline = None) -> list[int]:
+                 pipeline: Pipeline | None = None) -> list[int]:
         """
         Classify audio data using the provided CNN model.
 
