@@ -26,7 +26,6 @@ class DAPSDataset(Dataset):
     root: str
     transformation: nn.Module
     device: str
-    le: LabelEncoder # I really wish that LabelEncoder noted that it was deterministic
 
     # ------------------------------
     # Class implementation
@@ -85,6 +84,17 @@ class MultiLabelDataset(Dataset):
     # ------------------------------
     # Class fields
     # ------------------------------
+
+    annotations: pd.DataFrame
+    root: str
+    transformation: nn.Module
+    device: str
+    le: LabelEncoder # I really wish that LabelEncoder noted that it was deterministic
+
+    # ------------------------------
+    # Class implementation
+    # ------------------------------
+
     def __init__(
             self,
             annotations_file: str,
