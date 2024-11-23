@@ -275,19 +275,22 @@ def parse_arguments() -> None:
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
+    cmd = None
     if args.train:
-        handle_command('train')
+        cmd = 'train'
     elif args.validate:
-        handle_command('validate')
+        cmd = 'validate'
     elif args.run:
-        handle_command('run')
+        cmd = 'run'
     elif args.prepare:
-        handle_command('prepare', args.args) # TODO: Add subflags
+        cmd = 'prepare'
     elif args.command:
         if not handle_command(args.command, args.args):
             display_help()
     else:
         interactive_mode()
+    if cmd is not None:
+        handle_command(cmd, args.args) # TODO: Add subflags
 
 
 def interactive_mode() -> None:
