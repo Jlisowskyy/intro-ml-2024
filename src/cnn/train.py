@@ -27,7 +27,8 @@ def train_single_epoch(
         loss_fn: nn.Module,
         optim: Optimizer,
         device: str,
-        calculate_accuracy: bool = False
+        calculate_accuracy: bool = False,
+        labels: list[object] | None = None
 ) -> None:
     """
     Method training `model` a single iteration with the data provided
@@ -53,7 +54,7 @@ def train_single_epoch(
         # TODO: add description
     """
 
-    validator = Validator()
+    validator = Validator(labels)
     train_loss = 0.0
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
@@ -61,7 +62,7 @@ def train_single_epoch(
         predictions = model(input_data)
         loss = loss_fn(predictions, target)
         if calculate_accuracy:
-            validator.validate(predictions, target)
+            validator.validate(predictions, target) # TODO: decouple this
         # back propagate error and update weights
         optim.zero_grad()
         loss.backward()
@@ -111,7 +112,8 @@ def validate(
 
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
-          device: str, epochs: int, val_data: DataLoader | None = None) -> None:
+          device: str, epochs: int, val_data: DataLoader | None = None,
+          labels: list[object] | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -141,7 +143,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     min_valid_loss = float('inf')
     for i in range(epochs):
         print(f"Epoch {i + 1}")
-        train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1)
+        train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1, labels)
 
         if val_data is None:
             continue
@@ -155,7 +157,8 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     print("Finished training")
 
 
-def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Validator:
+def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
+         labels: list[object] | None = None) -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -172,7 +175,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Vali
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = Validator(classes=[0,1,2])
+    validator = Validator(labels)
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):
@@ -228,4 +231,4 @@ def main() -> None:
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device)
+        test(cnn, test_dataloader, device, dataset.get_labels())
