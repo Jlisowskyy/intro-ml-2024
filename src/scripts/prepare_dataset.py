@@ -21,7 +21,6 @@ def main(dry: bool = False) -> None:
     Script entry point
     """
 
-    print(dry)
     # TODO: add NUL support for the windows users
     db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
     with open(db_path, 'w', encoding='UTF-8') as f:
@@ -46,9 +45,9 @@ def main(dry: bool = False) -> None:
                 for audio_data in it:
                     # Pad not full files
                     if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
-                        ... # TODO most files don't have this problem
-
-                    print(audio_data.audio_signal)
+                        audio_data.audio_signal = np.pad(audio_data.audio_signal,
+                               (0,MODEL_WINDOW_LENGTH * sr - len(audio_data.audio_signal)),
+                               constant_values=(0,0))
 
                     spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
