@@ -155,34 +155,34 @@ SPEAKER_CLASSES = {
     'f10': 0
 }
 
-# CLASSES = [
-#     'yes',
-#     'no',
-#     'up',
-#     'down',
-#     'left',
-#     'right',
-#     'on',
-#     'off',
-#     'stop',
-#     'go',
-#     'unknown',
-#     'silence'
-# ]
+CLASSES = [
+    'yes',
+    'no',
+    'up',
+    'down',
+    'left',
+    'right',
+    'on',
+    'off',
+    'stop',
+    'go',
+    'unknown',
+    'silence'
+]
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
-DATABASE_PATH: str = './datasets/daps'
-DATABASE_NAME: str = 'daps'
-DATABASE_OUT_NAME: str = 'daps_split_spectro'
+DATABASE_NAME: str = 'kaggle'
+DATABASE_OUT_NAME: str = 'kaggle_spectro'
+DATABASE_PATH: str = f'./datasets/{DATABASE_NAME}'
 DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
-DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
-DATABASE_VALID_WAV_SR: int = 44100
+DATABASE_ANNOTATIONS_PATH: str = './annotations_kaggle.csv'
+DATABASE_VALID_WAV_SR: int = 16000
 
 # ------------------------------
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 3
+MODEL_WINDOW_LENGTH: int = 1
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
