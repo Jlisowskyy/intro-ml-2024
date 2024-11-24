@@ -85,6 +85,29 @@ class AudioCleaner:
 
         return audio_data
 
+    def denoise_raw(self, audio_data: np.ndarray, frame_rate: int) -> np.ndarray:
+        """
+        Denoises raw audio data using the pretrained DNS64 model.
+        Expects and returns audio data in shape (N, 1).
+
+        Parameters:
+            audio_data (np.ndarray): Raw audio signal data in shape (N, 1).
+            frame_rate (int): Audio sample rate in Hz.
+
+        Returns:
+            np.ndarray: Denoised audio data, maintaining shape (N, 1).
+
+        Raises:
+            ValueError: If the input audio is not in shape (N, 1).
+        """
+        if len(audio_data.shape) != 2 or audio_data.shape[1] != 1:
+            raise ValueError(f"Input audio must be in shape (N, 1). Got shape: {audio_data.shape}")
+
+        audio_1d = audio_data.flatten()
+        audio = AudioData(audio_1d, frame_rate)
+        processed_audio = self.denoise(audio)
+        return processed_audio.audio_signal.reshape(-1, 1)
+
     @staticmethod
     def is_speech(audio_data: AudioData, silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> bool:
         """
@@ -123,7 +146,7 @@ class AudioCleaner:
         Raises:
             ValueError: If the input audio is not in shape (N, 1).
         """
-        
+
         if len(audio_data.shape) != 2 or audio_data.shape[1] != 1:
             raise ValueError(f"Input audio must be in shape (N, 1). Got shape: {audio_data.shape}")
 
