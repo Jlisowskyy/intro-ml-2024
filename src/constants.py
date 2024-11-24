@@ -54,8 +54,9 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # DETECT SPEECH constants
 # ------------------------------
 
-DETECT_SILENCE_TOLERANCE: float = 0.5
-DETECT_SILENCE_THRESHOLD: float = 0.015
+DETECT_SILENCE_WINDOW_MAX_MS : int = 50
+DETECT_SILENCE_THRESHOLD_DB: int = -40
+SILENCE_CUT_WINDOW_MS: int = 25
 
 # ------------------------------
 # NORMALIZE constants

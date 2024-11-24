@@ -13,7 +13,6 @@ from tqdm import tqdm
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
-from src.pipeline import detect_speech
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
@@ -47,9 +46,6 @@ def main() -> None:
                 for audio_data in it:
                     # Omit not full chunks to avoid filling the dataset with silence
                     if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
-                        continue
-
-                    if not detect_speech.is_speech(audio_data.audio_signal):
                         continue
 
                     spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)

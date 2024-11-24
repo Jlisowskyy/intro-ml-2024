@@ -10,7 +10,7 @@ import os
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Generator
-from typing import Iterator, Union
+from collections.abc import Iterator, Callable
 
 import numpy as np
 
@@ -35,7 +35,6 @@ class WavIteratorBase(ABC):
     _channel_index: int
 
     _frame_rate: int
-    _num_frames: int
     _sample_width: int
     _num_channels: int
 
@@ -62,7 +61,7 @@ class WavIteratorBase(ABC):
 
         with wave.open(file_path, 'rb') as wav_file:
             self._frame_rate = wav_file.getframerate()
-            self._num_frames = wav_file.getnframes()
+            num_frames = wav_file.getnframes()
             self._sample_width = wav_file.getsampwidth()
             self._num_channels = wav_file.getnchannels()
 
@@ -71,7 +70,7 @@ class WavIteratorBase(ABC):
             if self._num_channels <= self._channel_index:
                 raise ValueError(f"Channel index out of range: {self._channel_index}")
 
-            frames = wav_file.readframes(self._num_frames)
+            frames = wav_file.readframes(num_frames)
             dtype = self.get_data_type()
 
             self._audio_data = np.frombuffer(frames, dtype=dtype).reshape(-1, self._num_channels)
@@ -139,15 +138,6 @@ class WavIteratorBase(ABC):
 
         return self._frame_rate
 
-    def get_num_frames(self) -> int:
-        """
-        Return the number of frames
-
-        :return: Number of frames
-        """
-
-        return self._num_frames
-
     def get_sample_width(self) -> int:
         """
         Return the sample width
@@ -173,9 +163,31 @@ class WavIteratorBase(ABC):
 
         return self._audio_data
 
-        # ------------------------------
-        # Simple setters
-        # ------------------------------
+    def transform(self, transform_func: Callable[[AudioData], np.ndarray],
+                  new_channels: int | None = None) -> None:
+        """
+        Transform the audio data using the provided function
+
+        :param transform_func: Function to apply to the audio data
+        :param new_channels: Number of channels in the transformed data
+        """
+
+        self._audio_data = transform_func(AudioData(self._audio_data, self._frame_rate))
+        self._num_channels = new_channels if new_channels is not None else self._num_channels
+        self._invalidate()
+
+    def get_num_frames(self) -> int:
+        """
+        Return the number of frames in the audio data
+
+        :return: Number of frames
+        """
+
+        return len(self._audio_data)
+
+    # ------------------------------
+    # Simple setters
+    # ------------------------------
 
     def set_window_size(self, window_size: int) -> None:
         """
@@ -293,8 +305,8 @@ class OverlappingWavIterator(WavIteratorBase):
         start_point = start_point_offset * self._window_index
         end_point = start_point + self._window_size_frames
 
-        if end_point > self._num_frames:
-            end_point = self._num_frames
+        if end_point > len(self._audio_data):
+            end_point = len(self._audio_data)
             start_point = max(0, end_point - self._window_size_frames)
 
         if end_point <= self._prev_last_sample:
@@ -355,17 +367,15 @@ class PlainWavIterator(WavIteratorBase):
 
 class FlattenWavIterator:
     """
-    Iterator wrapper over multiple WAV file iterators
-
-    This iterator wraps multiple WAV file iterators and returns the mean of the samples
+    Iterator wrapper that uses a base iterator and transforms its output to flatten
+    multiple channels of a WAV file into a single channel by averaging them.
     """
 
     # ------------------------------
     # Class fields
     # ------------------------------
 
-    _file_path: str
-    _iters: list[WavIteratorBase]
+    _base_iterator: WavIteratorBase
 
     # ------------------------------
     # Class creation
@@ -373,20 +383,27 @@ class FlattenWavIterator:
 
     def __init__(self, file_path: str, window_length_seconds: float,
                  iterator_type: WavIteratorType) -> None:
-        iters = [load_wav(file_path, 0, iterator_type)]
-        num_channels = iters[0].get_num_channels()
+        """
+        Initialize the iterator by setting up the base iterator and flatten transform.
 
-        for i in range(1, num_channels):
-            iters.append(load_wav(file_path, i, iterator_type))
+        :param file_path: Path to the WAV file
+        :param window_length_seconds: Length of each window in seconds
+        :param iterator_type: Type of iterator to use (affects window overlap behavior)
+        """
 
-        for it in iters:
-            it.set_window_size(int(it.get_frame_rate() * window_length_seconds))
+        self._base_iterator = load_wav(file_path, 0, iterator_type)
 
-        self._file_path = file_path
-        self._iters = iters
+        window_size = int(self._base_iterator.get_frame_rate() * window_length_seconds)
+        self._base_iterator.set_window_size(window_size)
 
-        if len(self._iters) < 1:
-            raise ValueError("No channels found in the file!")
+        def flatten_channels(audio_data: AudioData) -> np.ndarray:
+            data = audio_data.audio_signal
+
+            stacked_data = data.reshape(-1, self._base_iterator.get_num_channels())
+            mono_data = np.mean(stacked_data, axis=1).astype(data.dtype)
+            return mono_data.reshape(-1, 1)
+
+        self._base_iterator.transform(flatten_channels, new_channels=1)
 
     # ------------------------------
     # Class interaction
@@ -394,40 +411,40 @@ class FlattenWavIterator:
 
     def get_first_iter(self) -> WavIteratorBase:
         """
-        Get the first iterator
+        Get the base iterator.
 
-        :return: First iterator
+        :return: Base iterator
         """
+        return self._base_iterator
 
-        return self._iters[0]
+    def transform(self, transform_func: Callable[[AudioData], np.ndarray]) -> None:
+        """
+        Transform the audio data using the provided function.
+
+        :param transform_func: Function to apply to the audio data
+        """
+        self._base_iterator.transform(transform_func)
 
     # ------------------------------
     # Iterator Protocol
     # ------------------------------
 
-    def __iter__(self) -> any:
+    def __iter__(self) -> WavIteratorBase:
         """
-        Return the iterator object itself.
+        Return the iterator object.
 
         :return: self
         """
+        return iter(self._base_iterator)
 
-        return self.iterate()
-
-    def iterate(self) -> Generator[np.ndarray, None, None]:
+    def __next__(self) -> np.ndarray:
         """
-        Return the next window of samples
+        Get the next window of samples.
 
-        :return: Array of samples
+        :return: Next window of flattened samples
+        :raises StopIteration: When there are no more windows
         """
-
-        for chunks in zip(*self._iters):
-            stacked_array = np.stack(chunks, axis=0)
-            meaned_array = np.mean(stacked_array, axis=0)
-
-            dtype = stacked_array.dtype
-            flat_chunk = meaned_array.flatten().astype(dtype)
-            yield flat_chunk
+        return next(self._base_iterator)
 
 
 class AudioDataIterator:
@@ -436,10 +453,10 @@ class AudioDataIterator:
     Works with both WavIteratorBase and FlattenWavIterator instances.
     """
 
-    _wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']
+    _wav_iterator: WavIteratorBase | 'FlattenWavIterator'
     _sample_rate: int
 
-    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']) -> None:
+    def __init__(self, wav_iterator: WavIteratorBase | 'FlattenWavIterator') -> None:
         """
         Initialize the AudioData iterator.
 

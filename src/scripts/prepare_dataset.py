@@ -12,6 +12,7 @@ from tqdm import tqdm
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
+
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
@@ -38,6 +39,7 @@ def main(dry: bool = False) -> None:
                     continue
                 it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                         DATABASE_CUT_ITERATOR)
+
                 sr = it.get_first_iter().get_frame_rate()
                 it = AudioDataIterator(it)
 
