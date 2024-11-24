@@ -6,7 +6,7 @@ Test the WAV iterator by generating an artificial WAV file and iterating over it
 
 import os
 from contextlib import contextmanager
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 from scipy.io.wavfile import write

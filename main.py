@@ -24,7 +24,7 @@ import argparse
 import inspect
 import traceback
 from pathlib import Path
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 import uvicorn

@@ -10,7 +10,7 @@ import os
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Generator
-from typing import Iterator, Union, Callable
+from collections.abc import Iterator, Callable
 
 import numpy as np
 
@@ -453,10 +453,10 @@ class AudioDataIterator:
     Works with both WavIteratorBase and FlattenWavIterator instances.
     """
 
-    _wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']
+    _wav_iterator: WavIteratorBase | 'FlattenWavIterator'
     _sample_rate: int
 
-    def __init__(self, wav_iterator: Union[WavIteratorBase, 'FlattenWavIterator']) -> None:
+    def __init__(self, wav_iterator: WavIteratorBase | 'FlattenWavIterator') -> None:
         """
         Initialize the AudioData iterator.
 
