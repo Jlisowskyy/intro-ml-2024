@@ -22,6 +22,7 @@ Adding new functionality:
 
 import argparse
 import inspect
+import traceback
 from pathlib import Path
 from typing import Callable
 
@@ -233,7 +234,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             fastapi_main()
         elif command in ('prepare', '-p', '--prepare'):
             print_success("Starting db preparation...")
-            prepare_dataset.main()
+            prepare_dataset.main('dry' in args)
         elif command == 'script' and args:
             print_success(f"Running script '{args[0]}'...")
             run_script(args[0], args[1:])
@@ -249,8 +250,8 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             return False
         return True
     # pylint: disable=broad-except
-    except Exception as e:
-        print_error(f"Error executing command: {str(e)}")
+    except Exception:
+        print_error(f"Error executing command: {traceback.format_exc()}")
         return False
 
 
@@ -274,20 +275,22 @@ def parse_arguments() -> None:
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
-
+    cmd = None
     if args.train:
-        handle_command('train')
+        cmd = 'train'
     elif args.validate:
-        handle_command('validate')
+        cmd = 'validate'
     elif args.run:
-        handle_command('run')
+        cmd = 'run'
     elif args.prepare:
-        handle_command('prepare')
+        cmd = 'prepare'
     elif args.command:
         if not handle_command(args.command, args.args):
             display_help()
     else:
         interactive_mode()
+    if cmd is not None:
+        handle_command(cmd, args.args) # TODO: Add subflags
 
 
 def interactive_mode() -> None:
