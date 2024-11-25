@@ -54,7 +54,7 @@ class AudioCleaner:
                 audio_signal = AudioData.to_float(audio_signal)
 
             # Resample to 16 kHz if needed
-            if audio_data.sample_rate != 16000:
+            if audio_data.sample_rate != 16000: # FIXME random constant
                 resampled_signal = torchaudio.transforms.Resample(
                     orig_freq=audio_data.sample_rate, new_freq=16000
                 )(torch.tensor(audio_signal, dtype=torch.float32))

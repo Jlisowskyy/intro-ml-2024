@@ -453,10 +453,10 @@ class AudioDataIterator:
     Works with both WavIteratorBase and FlattenWavIterator instances.
     """
 
-    _wav_iterator: WavIteratorBase | 'FlattenWavIterator'
+    _wav_iterator: WavIteratorBase | FlattenWavIterator
     _sample_rate: int
 
-    def __init__(self, wav_iterator: WavIteratorBase | 'FlattenWavIterator') -> None:
+    def __init__(self, wav_iterator: WavIteratorBase | FlattenWavIterator) -> None:
         """
         Initialize the AudioData iterator.
 
