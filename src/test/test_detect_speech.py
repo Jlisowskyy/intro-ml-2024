@@ -16,8 +16,9 @@ TEST_FILES = DEFAULT_TEST_FILES
 def silence_removal_test() -> None:
     """
     Run the manual test for the silence removal module.
-    Displays spectrograms before and after silence removal and saves processed files.
+    Displays spectrogram before and after silence removal and saves processed files.
     """
+
     def transform_func(x: np.ndarray, sr: int) -> np.ndarray:
         cleaner = AudioCleaner()
         denoised = cleaner.denoise_raw(x, sr)
