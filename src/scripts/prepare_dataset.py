@@ -24,9 +24,6 @@ from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME, NUM_THREADS_DB_PREPARE, \
     NUM_PROCESSES_DB_PREPARE, GENERATE_WITH_AUGMENTATION
 from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
-                            AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
-                            AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL,
-                            AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
                             AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
                             AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                             AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
@@ -203,12 +200,12 @@ class DatabaseGenerator:
 
         audio_datas=[audio_data]
         if GENERATE_WITH_AUGMENTATION:
-            
+
             audio_datas.append(change_pitch(audio_data, AUDIO_AUGMENTATION_DEFAULT_SEMITONES))
             audio_datas.append(add_reverb(audio_data, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT))
-            audio_datas.append(add_echo(audio_data, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY, 
+            audio_datas.append(add_echo(audio_data, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                                   AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY))
-            
+
         for audio_data_to_save, index in audio_datas:
             spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
 
