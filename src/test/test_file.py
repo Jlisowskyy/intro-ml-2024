@@ -1,4 +1,6 @@
 """
+Author: Łukasz Kryczka
+
 Module to store information about a test file.
 Used to automate the testing process.
 """
@@ -20,8 +22,8 @@ class TestFile:
         Obtained by appending the transformation name to the original file name.
         """
         extension = self.file_name.split('.')[-1]
-        self.file_name = self.file_name.replace(f".{extension}", '')
-        return f"{self.file_name}_{transformation_name}.{extension}"
+        tmp_file_name = self.file_name.replace(f".{extension}", '')
+        return f"{tmp_file_name}_{transformation_name}.{extension}"
 
     def get_transformed_file_path_out(self, transformation_name: str) -> str:
         """

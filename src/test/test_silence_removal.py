@@ -1,5 +1,5 @@
 """
-Author: Jakub Lisowski
+Author: Jakub Lisowski, Łukasz Kryczka
 
 File tests quality of silence removal
 """
