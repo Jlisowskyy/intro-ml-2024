@@ -246,7 +246,7 @@ DEFAULT_SAVE_AUDIO = True
 
 NUM_THREADS_DB_PREPARE: int = 2
 NUM_PROCESSES_DB_PREPARE: int = 8
-  
+
 # ------------------------------
 # NOISE constants
 # ------------------------------
