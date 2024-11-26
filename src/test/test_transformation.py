@@ -80,12 +80,15 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
 
         if save_spectrograms:
             SpectrogramGenerator.save_spectrogram(original_spectrogram,
-                                                  test_file.file_path_out.replace(".wav", ".png"))
+                                                  test_file.get_transformed_file_path_out(
+                                                        transformation_name).replace(
+                                                        ".wav", "_original.png"))
             SpectrogramGenerator.save_spectrogram(processed_spectrogram,
                                                   test_file.get_transformed_file_path_out(
                                                       transformation_name).replace(
-                                                      ".wav", ".png"))
+                                                      ".wav", "_transformed.png"))
 
         if save_audio:
-            write(test_file.get_transformed_file_path_out(transformation_name),
+            write(test_file.get_transformed_file_path_out(transformation_name).replace(
+                ".wav", "_transformed.wav"),
                   int(it.get_frame_rate()), processed_audio)
