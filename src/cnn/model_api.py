@@ -4,30 +4,50 @@ Author: Jakub Lisowski, Michał Kwiatkowski, Tomasz Mycielski, Jakub Pietrzak 20
 Module for classifying audio data using a CNN model.
 
 """
+from sklearn.preprocessing import LabelEncoder
 
 from src.cnn.cnn import BasicCNN
-from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType, CLASSIFICATION_CONFIDENCE_THRESHOLD
+from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType, CLASSIFICATION_CONFIDENCE_THRESHOLD, CLASSES
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
+le = LabelEncoder()
+le.fit(CLASSES)
 
-def classify_file(file_path: str, model: BasicCNN) -> bool:
+
+def classify_file(file_path: str, model: BasicCNN) -> str:
     """
     Classify audio data from a file using the provided classifier.
 
     :param file_path: The path to the audio file to classify
     :param model: The classifier object to use
 
-    :return: True if audio belongs 1 claas, False otherwise
+    :return: The predicted class index, or -1 if classification is not confident
     """
 
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
     it = AudioDataIterator(it)
 
-    results = [0, 0]
-    for chunk in it:
-        result = model.classify(chunk)
-        print(f"Classified as: {result}")
-        results[result] += 1
+    results = [0 for _ in range(len(CLASSES))]
+    total_windows = 0
 
-    total = results[0] + results[1]
-    return results[1] / total > CLASSIFICATION_CONFIDENCE_THRESHOLD
+    for audio_data in it:
+        predicted_classes = model.classify([audio_data])
+        predicted_class = predicted_classes[0]
+        if predicted_class < len(CLASSES):
+            results[predicted_class] += 1
+        total_windows += 1
+
+    if total_windows == 0:
+        return "No audio data found in the file"
+
+    max_class_count = max(results)
+    predicted_class = results.index(max_class_count)
+    confidence = max_class_count / total_windows
+
+    predicted_label = le.inverse_transform([predicted_class])[0]
+    print(f"Predicted class: {predicted_label}, confidence: {confidence}")
+
+    if confidence < CLASSIFICATION_CONFIDENCE_THRESHOLD:
+        return "Classification not confident"
+
+    return predicted_label

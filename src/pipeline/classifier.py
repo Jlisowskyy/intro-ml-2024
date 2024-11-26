@@ -8,6 +8,7 @@ for fitting a model and making predictions based on audio data.
 import torch
 from torch import nn
 
+
 class Classifier:
     """
     A simple classifier for predicting labels from audio data.
@@ -58,7 +59,7 @@ class Classifier:
                 tens = tens.to(self.device)
 
                 prediction = self.model(tens)
-                predicted_label = prediction.argmax(0).item()
+                predicted_label = prediction.argmax(-1).item()
                 predictions.append(predicted_label)
 
         return predictions

@@ -11,6 +11,7 @@ import torch.nn.functional as tnnf
 from sklearn.pipeline import Pipeline
 from torch import nn
 
+from src.constants import CLASSES
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
@@ -63,9 +64,10 @@ class BaseCNN(nn.Module, ABC):
         """
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        cnn = cls()
+        cnn = cls(class_count=len(CLASSES))
         cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(device),
                                        weights_only=True))
+        cnn.to(device)
         cnn.eval()
         return cnn
 

@@ -18,7 +18,7 @@ from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR
 
 
 def train_single_epoch(
@@ -104,7 +104,6 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
-        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
@@ -153,7 +152,8 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         if valid_loss < min_valid_loss:
             min_valid_loss = valid_loss
             # backup for longer training sessions
-            torch.save(model.state_dict(), f'cnn_e{i + 1}_backup.pth')
+            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
     print("Finished training")
 
 
@@ -218,6 +218,8 @@ def main() -> None:
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
     test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
+    print(f"Label names: {dataset.get_labels()}")
+
     # training
     for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
         cnn = BasicCNN(len(dataset.get_labels())).to(device)
@@ -230,5 +232,5 @@ def main() -> None:
               validate_dataloader)
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
+        torch.save(cnn.state_dict(), f'{MODELS_DIR}/cnn_{seed}_{now}.pth')
         test(cnn, test_dataloader, device, dataset.get_labels())

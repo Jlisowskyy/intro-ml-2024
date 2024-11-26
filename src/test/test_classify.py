@@ -14,7 +14,7 @@ from src.pipeline.audio_data import AudioData
 
 # pylint: disable=line-too-long
 TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f2_script1_ipad_office1_35000.wav')))
-MODEL_PATH = "/home/michal/studia/sem5/ml/intro-ml-2024/models/model.pth"
+MODEL_PATH = "/home/wookie/Projects/intro-ml-2024/cnn_e9_backup.pth"
 
 def example_test_run():
     """

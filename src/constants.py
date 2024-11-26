@@ -171,8 +171,7 @@ CLASSES = [
     'stop',
     'go',
     'unknown',
-    'silence'
-]
+] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_NAME: str = 'kaggle'
@@ -188,10 +187,10 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 # ------------------------------
 # MODEL constants
 # ------------------------------
+MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
-MODEL_BASE_PATH: str = './models/model.pth'
-MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
+MODEL_BASE_PATH: str = './cnn_e9_backup.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """
