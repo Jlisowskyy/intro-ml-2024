@@ -91,4 +91,4 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
         if save_audio:
             write(test_file.get_transformed_file_path_out(transformation_name).replace(
                 ".wav", "_transformed.wav"),
-                  int(it.get_frame_rate()), processed_audio)
+                  processed_audio_data.sample_rate, processed_audio_data.audio_signal)
