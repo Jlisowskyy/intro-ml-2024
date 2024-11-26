@@ -3,8 +3,6 @@ Author: Jakub Lisowski, Tomasz Mycielski, 2024
 
 Simple class providing a simple validation method
 """
-from collections.abc import Iterable
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
