@@ -12,10 +12,10 @@ objects.
 """
 
 from os import listdir, path
-from random import choice
+from random import Random
 import numpy as np
 import soundfile as sf
-from src.constants import DATABASE_OUT_NOISES, SNR_BOTTOM_BOUND, SNR_UPPER_BOUND
+from src.constants import DATABASE_OUT_NOISES, DEFAULT_SEED, SNR_BOTTOM_BOUND, SNR_UPPER_BOUND
 from src.pipeline.audio_data import AudioData
 
 class NoiseInjector:
@@ -29,7 +29,7 @@ class NoiseInjector:
                                   `DATABASE_OUT_NOISES`.
     """
 
-    def __init__(self, noise_folder_path=DATABASE_OUT_NOISES) -> None:
+    def __init__(self, noise_folder_path = DATABASE_OUT_NOISES, seed: int = DEFAULT_SEED) -> None:
         """
         Initializes the NoiseInjector with the path to the folder containing noise files.
 
@@ -38,9 +38,10 @@ class NoiseInjector:
                                       `DATABASE_OUT_NOISES`.
         """
         self.noise_folder_path = noise_folder_path
+        self._seed = seed
+        self._rng = Random(seed)
 
-    @staticmethod
-    def get_random_audio_file(folder_path: str) -> str:
+    def get_random_audio_file(self, folder_path: str) -> str:
         """
         Get a random audio file from a specified folder.
 
@@ -59,7 +60,7 @@ class NoiseInjector:
         if not audio_files:
             raise ValueError("No audio files found in the specified folder.")
 
-        random_file = choice(audio_files)
+        random_file = self._rng.choice(audio_files)
         return path.join(folder_path, random_file)
 
     # pylint: disable=unused-argument
@@ -96,7 +97,7 @@ class NoiseInjector:
 
         for audio_data in x_data:
             # Load the noise file
-            noise_file_path = NoiseInjector.get_random_audio_file(self.noise_folder_path)
+            noise_file_path = self.get_random_audio_file(self.noise_folder_path)
             noise_audio, noise_sample_rate = sf.read(noise_file_path)
 
             noise_audio = AudioData.to_float(noise_audio)
