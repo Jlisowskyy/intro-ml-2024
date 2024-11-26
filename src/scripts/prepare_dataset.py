@@ -196,6 +196,10 @@ class DatabaseGenerator:
 
         spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
+        if spectrogram is None:
+            print(f"Failed to process file: {file}")
+            return
+
         if not path.exists(new_root):
             with self._file_lock:
                 makedirs(path.join(new_root))
@@ -303,8 +307,11 @@ def main(dry: bool = False) -> None:
     folders = generate_annotations(dry)
     print(f"Generated annotations for {len(folders)} folders")
 
-    if not dry:
-        run_process(folders)
+    # if not dry:
+    #     run_process(folders)
+
+    for d in folders:
+        process_func(d)
 
 
 if __name__ == "__main__":

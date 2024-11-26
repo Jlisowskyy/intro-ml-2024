@@ -11,7 +11,9 @@ import numpy as np
 
 from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT,
                            NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA,
-                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
+                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH,
+                           DETECT_SILENCE_THRESHOLD_DB, DETECT_SILENCE_WINDOW_MAX_MS,
+                           SILENCE_CUT_WINDOW_MS, MODEL_WINDOW_LENGTH)
 from src.pipeline.audio_data import AudioData
 
 
@@ -137,6 +139,82 @@ class AudioNormalizer:
 
         raise ValueError("Unsupported normalization type")
 
+    @staticmethod
+    def is_speech(audio_data: AudioData, silence_threshold=DETECT_SILENCE_THRESHOLD_DB) -> bool:
+        """
+        Determines if an audio segment contains speech based on RMS energy threshold.
+
+        Parameters:
+            audio_data (AudioData): Audio segment to analyze.
+            silence_threshold (float): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            bool: True if segment contains speech, False if classified as silence.
+        """
+        duration = len(audio_data.audio_signal) / audio_data.sample_rate
+        assert (duration * 1000) < DETECT_SILENCE_WINDOW_MAX_MS
+
+        rms = np.sqrt(np.mean(np.square(audio_data.audio_signal)))
+        rms_db = 20 * np.log10(rms + 1e-9)
+
+        return rms_db > silence_threshold
+
+    @staticmethod
+    def remove_silence_raw(audio_data: np.ndarray, frame_rate: int,
+                           silence_threshold: int = DETECT_SILENCE_THRESHOLD_DB) -> np.ndarray:
+        """
+        Removes silent segments from raw audio data by analyzing fixed-size windows.
+        Expects and returns audio data in shape (N, 1).
+
+        Parameters:
+            audio_data (np.ndarray): Raw audio signal data in shape (N, 1).
+            frame_rate (int): Audio sample rate in Hz.
+            silence_threshold (int): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            np.ndarray: Audio data with silent segments removed, maintaining shape (N, 1).
+
+        Raises:
+            ValueError: If the input audio is not in shape (N, 1).
+        """
+
+        if len(audio_data.shape) != 2 or audio_data.shape[1] != 1:
+            raise ValueError(f"Input audio must be in shape (N, 1). Got shape: {audio_data.shape}")
+
+        audio_1d = audio_data.flatten()
+        audio = AudioData(audio_1d, frame_rate)
+        processed_audio = AudioNormalizer.remove_silence(audio, silence_threshold)
+        return processed_audio.audio_signal.reshape(-1, 1)
+
+    @staticmethod
+    def remove_silence(audio_data: AudioData,
+                       silence_threshold: int = DETECT_SILENCE_THRESHOLD_DB) -> AudioData:
+        """
+        Removes silent segments from an AudioData object.
+
+        Parameters:
+            audio_data (AudioData): Audio data to process, with audio_signal as numpy.ndarray.
+            silence_threshold (float): RMS energy threshold in dB to classify as speech.
+
+        Returns:
+            AudioData: New AudioData object with silent segments removed, maintaining input dimensions.
+        """
+        window = (SILENCE_CUT_WINDOW_MS * audio_data.sample_rate) // 1000
+
+        output = np.array([], dtype=audio_data.audio_signal.dtype).reshape(
+            (-1,) + audio_data.audio_signal.shape[1:])
+
+        for i in range(0, len(audio_data.audio_signal), window):
+            chunk_data = audio_data.audio_signal[i:i + window]
+            chunk = AudioData(chunk_data, audio_data.sample_rate)
+
+            if AudioNormalizer.is_speech(chunk, silence_threshold):
+                if len(chunk_data.shape) < len(output.shape):
+                    chunk_data = chunk_data.reshape((-1,) + output.shape[1:])
+                output = np.concatenate((output, chunk_data), axis=0)
+
+        return AudioData(output, audio_data.sample_rate)
+
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioNormalizer':
         """
@@ -164,5 +242,12 @@ class AudioNormalizer:
         """
         transformed_data = []
         for audio_data in x_data:
-            transformed_data.append(AudioNormalizer.normalize(audio_data, self.normalization_type))
+            normalized = AudioNormalizer.normalize(audio_data, self.normalization_type)
+            silence_removed = AudioNormalizer.remove_silence(normalized)
+
+            if len(silence_removed.audio_signal) == 0:
+                continue
+
+            fitted = AudioNormalizer.fit_to_window(silence_removed, MODEL_WINDOW_LENGTH)
+            transformed_data.append(fitted)
         return transformed_data

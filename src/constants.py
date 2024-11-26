@@ -59,7 +59,7 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # ------------------------------
 
 DETECT_SILENCE_WINDOW_MAX_MS: int = 50
-DETECT_SILENCE_THRESHOLD_DB: int = -40
+DETECT_SILENCE_THRESHOLD_DB: int = -60
 SILENCE_CUT_WINDOW_MS: int = 25
 
 # ------------------------------
@@ -186,7 +186,7 @@ DATABASE_VALID_WAV_SR: int = 16000
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 1
+MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
