@@ -76,17 +76,13 @@ class SpectrogramGenerator:
             plt.tight_layout(pad=0)
             plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
-        buf = BytesIO()
-        fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
-        buf.seek(0)
+        with BytesIO() as buf:
+            fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+            buf.seek(0)
+            image = np.array(Image.open(buf).convert('RGB'))
 
-        image = Image.open(buf).convert('RGB')
-        image_array = np.array(image)
-
-        buf.close()
         plt.close(fig)
-
-        return image_array
+        return image
 
     @staticmethod
     def save_spectrogram(spectrogram: np.ndarray, file_path: str) -> None:
@@ -122,7 +118,7 @@ class SpectrogramGenerator:
         Transform audio data into mel-frequency spectrogram's.
 
         Args:
-            audio_data_list (list[AudioData]): A list of AudioData instances 
+            audio_data_list (list[AudioData]): A list of AudioData instances
             to be transformed into spectrogram's.
 
         Returns:

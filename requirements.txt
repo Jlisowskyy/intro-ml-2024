@@ -36,3 +36,4 @@ uvloop
 watchfiles
 wave
 websockets
+aiofiles
