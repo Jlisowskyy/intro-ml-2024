@@ -11,7 +11,8 @@ import numpy as np
 
 from src.constants import (NormalizationType, EPSILON, NORMALIZATION_PCEN_TIME_CONSTANT,
                            NORMALIZATION_PCEN_ALPHA, NORMALIZATION_PCEN_DELTA,
-                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH)
+                           NORMALIZATION_PCEN_R, NORMALIZATION_PCEN_HOP_LENGTH,
+                           MODEL_WINDOW_LENGTH_SECONDS)
 from src.pipeline.audio_data import AudioData
 
 
@@ -164,5 +165,7 @@ class AudioNormalizer:
         """
         transformed_data = []
         for audio_data in x_data:
-            transformed_data.append(AudioNormalizer.normalize(audio_data, self.normalization_type))
+            transformed_data_sample = AudioNormalizer.fit_to_window(audio_data, MODEL_WINDOW_LENGTH_SECONDS)
+            transformed_data_sample = AudioNormalizer.normalize(transformed_data_sample, self.normalization_type)
+            transformed_data.append(transformed_data_sample)
         return transformed_data
