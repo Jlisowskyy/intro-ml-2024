@@ -209,9 +209,14 @@ class DatabaseGenerator:
         for index, audio_data_to_save in enumerate(audio_datas):
             spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
 
+            if spectrogram is None:
+                print(f"Failed to process file: {file}")
+                return
+
             if not path.exists(new_root):
                 with self._file_lock:
                     makedirs(path.join(new_root))
+
 
             np.save(path.join(new_root, f"{file[:-4]}{index}.npy"), spectrogram)
 

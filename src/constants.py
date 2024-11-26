@@ -59,7 +59,7 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # ------------------------------
 
 DETECT_SILENCE_WINDOW_MAX_MS: int = 50
-DETECT_SILENCE_THRESHOLD_DB: int = -40
+DETECT_SILENCE_THRESHOLD_DB: int = -60
 SILENCE_CUT_WINDOW_MS: int = 25
 
 # ------------------------------
@@ -120,9 +120,9 @@ TRAINING_MOMENTUM: float = 0.9
 SPECTROGRAM_WIDTH: int = 300
 SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
-SPECTROGRAM_N_FFT: int = 4096
-SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 256
+SPECTROGRAM_N_FFT: int = 400
+SPECTROGRAM_HOP_LENGTH: int = 160
+SPECTROGRAM_N_MELS: int = 64
 
 # ------------------------------
 # WAV ITERATOR constants
@@ -186,7 +186,7 @@ DATABASE_VALID_WAV_SR: int = 16000
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 1
+MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
@@ -245,7 +245,7 @@ DEFAULT_TEST_FILES = [
         str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[2])
     )
 ]
-DEFAULT_SHOULD_PLOT = True
+DEFAULT_SHOULD_PLOT = False
 DEFAULT_SAVE_SPECTROGRAMS = True
 DEFAULT_SAVE_AUDIO = True
 
