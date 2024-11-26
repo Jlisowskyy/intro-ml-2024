@@ -70,7 +70,7 @@ def test_transformation(transformation_func: Callable[[np.ndarray, int], np.ndar
 
         if save_spectrograms:
             SpectrogramGenerator.save_spectrogram(original_spectrogram,
-                                                  test_file.file_path.replace(".wav", ".png"))
+                                                  test_file.file_path_out.replace(".wav", ".png"))
             SpectrogramGenerator.save_spectrogram(processed_spectrogram,
                                                   test_file.get_transformed_file_path_out(
                                                       transformation_name).replace(
