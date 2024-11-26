@@ -19,6 +19,7 @@ from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR
+from src.model_definitions import model_definitions
 
 
 def train_single_epoch(
@@ -221,16 +222,33 @@ def main() -> None:
     print(f"Label names: {dataset.get_labels()}")
 
     # training
+    best_macro_f1 = 0.0
+    best_model = None
     for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-        cnn = BasicCNN(len(dataset.get_labels())).to(device)
-        print(cnn)
+        for model_definition in model_definitions:
+            print(f"Training {model_definition.model_name} with learning rate {learning_rate}")
+            cnn = model_definition.model.to(device)
+            print(cnn)
 
-        loss_function = nn.CrossEntropyLoss()
-        optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
+            loss_function = nn.CrossEntropyLoss()
+            optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-              validate_dataloader)
+            train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                  validate_dataloader)
 
-        now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        torch.save(cnn.state_dict(), f'{MODELS_DIR}/cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device, dataset.get_labels())
+            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            torch.save(cnn.state_dict(), f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
+            validator = test(cnn, test_dataloader, device, dataset.get_labels())
+            if validator.get_macro_f1() > best_macro_f1:
+                best_macro_f1 = validator.get_macro_f1()
+                best_model = cnn
+
+    print(f"Best model: {best_model}")
+    print(f"Best macro F1: {best_macro_f1}")
+
+    if best_model is None:
+        print("No model was selected as the best (This is a bug)")
+        return
+    now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
+
