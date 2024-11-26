@@ -307,11 +307,8 @@ def main(dry: bool = False) -> None:
     folders = generate_annotations(dry)
     print(f"Generated annotations for {len(folders)} folders")
 
-    # if not dry:
-    #     run_process(folders)
-
-    for d in folders:
-        process_func(d)
+    if not dry:
+        run_process(folders)
 
 
 if __name__ == "__main__":
