@@ -3,13 +3,13 @@ Author: Łukasz Kryczka
 
 Test the fit_to_window function in the AudioNormalizer class.
 """
-import numpy as np
 
 from src.constants import (DEFAULT_TEST_FILES,
                            DEFAULT_SAVE_AUDIO,
                            DEFAULT_SAVE_SPECTROGRAMS,
                            DEFAULT_SHOULD_PLOT)
 from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
 from src.test.test_transformation import test_transformation
 
@@ -21,13 +21,13 @@ def fit_to_window_test() -> None:
     Run the manual test for the silence removal module.
     Displays spectrograms before and after silence removal and saves processed files.
     """
-    def transformation_func(x: np.ndarray, sr: int) -> np.ndarray:
+    def transformation_func(audio_data: AudioData) -> AudioData:
         audio_normalizer = AudioNormalizer()
-        current_window_length_seconds = x.shape[0] / sr
         audio_cleaner = AudioCleaner()
-        x = audio_cleaner.denoise_raw(x, sr)
-        x = audio_cleaner.remove_silence_raw(x, sr)
-        return audio_normalizer.fit_to_window_raw(x, sr, current_window_length_seconds)
+        current_window_length_seconds = audio_data.audio_signal.shape[0] / audio_data.sample_rate
+        audio_data = audio_cleaner.denoise(audio_data)
+        audio_data = audio_cleaner.remove_silence(audio_data)
+        return audio_normalizer.fit_to_window(audio_data, current_window_length_seconds)
 
     test_transformation(transformation_func,
                         "remove_silence_then_fit_to_window",

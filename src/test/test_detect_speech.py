@@ -3,11 +3,11 @@ Author: Jakub Lisowski
 
 File tests quality of silence removal
 """
-import numpy as np
 
 from src.constants import (DEFAULT_TEST_FILES,
                            DEFAULT_SAVE_AUDIO, DEFAULT_SAVE_SPECTROGRAMS, DEFAULT_SHOULD_PLOT)
 from src.pipeline.audio_cleaner import AudioCleaner
+from src.pipeline.audio_data import AudioData
 from src.test.test_transformation import test_transformation
 
 TEST_FILES = DEFAULT_TEST_FILES
@@ -19,11 +19,11 @@ def silence_removal_test() -> None:
     Displays spectrogram before and after silence removal and saves processed files.
     """
 
-    def transform_func(x: np.ndarray, sr: int) -> np.ndarray:
+    def transform_func(audio_data: AudioData) -> AudioData:
         cleaner = AudioCleaner()
-        denoised = cleaner.denoise_raw(x, sr)
-        cleaned = cleaner.remove_silence_raw(denoised, sr)
-        return cleaned
+        audio_data = cleaner.denoise(audio_data)
+        audio_data = cleaner.remove_silence(audio_data)
+        return audio_data
 
     test_transformation(transform_func, "silence_removal", TEST_FILES,
                         save_audio=DEFAULT_SAVE_AUDIO,

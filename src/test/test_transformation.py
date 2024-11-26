@@ -5,7 +5,6 @@ before and after a transformation provided by the user
 """
 from typing import Callable, List
 
-import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io.wavfile import write
 
@@ -16,7 +15,7 @@ from src.pipeline.wav import load_wav
 from src.test.test_file import TestFile
 
 
-def test_transformation(transformation_func: Callable[[np.ndarray, int], np.ndarray],
+def test_transformation(transformation_func: Callable[[AudioData], AudioData],
                         transformation_name: str,
                         test_files: List[TestFile],
                         save_spectrograms=False,
@@ -36,7 +35,6 @@ def test_transformation(transformation_func: Callable[[np.ndarray, int], np.ndar
     """
     for test_file in test_files:
         it_transformed = load_wav(test_file.file_path, 0, WavIteratorType.PLAIN)
-        it_transformed.transform(transformation_func)
         it_transformed.set_window_size(it_transformed.get_num_frames())
 
         it = load_wav(test_file.file_path, 0, WavIteratorType.PLAIN)
@@ -47,6 +45,7 @@ def test_transformation(transformation_func: Callable[[np.ndarray, int], np.ndar
 
         original_audio_data = AudioData(original_audio, int(it.get_frame_rate()))
         processed_audio_data = AudioData(processed_audio, int(it.get_frame_rate()))
+        processed_audio_data = transformation_func(processed_audio_data)
 
         original_spectrogram = SpectrogramGenerator.gen_spectrogram(original_audio_data, mel=True)
         processed_spectrogram = SpectrogramGenerator.gen_spectrogram(processed_audio_data, mel=True)
