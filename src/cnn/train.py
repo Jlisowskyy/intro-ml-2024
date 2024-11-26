@@ -141,7 +141,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         # TODO: add description
     """
     min_valid_loss = float('inf')
-    for i in range(1):
+    for i in range(epochs):
         print(f"Epoch {i + 1}")
         train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1, labels)
 
