@@ -4,10 +4,10 @@ Author: Tomasz Mycielski
 Annotations.csv broke? No Problem!
 Simply run this script on whichever processed dataset you want to generate a relevant script
 """
-import re
+
 from os import walk
 
-from src.constants import SPEAKER_CLASSES, DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH
+from src.constants import DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, CLASSES
 
 
 def main() -> None:
@@ -16,14 +16,10 @@ def main() -> None:
     """
 
     with open(DATABASE_ANNOTATIONS_PATH, 'w', encoding='UTF-8') as f:
-        f.write('speaker,folder,file_name,index,classID\n')
-        for root, _, samples in walk(DATABASE_OUT_PATH):
-            dirs = root.split('/')
-            file = dirs[-1]
-            if not file.endswith('.wav'):
-                continue
-            location = dirs[-2]
-            speaker = re.search(r'[fm]\d\d?', file)[0]
-            class_id = SPEAKER_CLASSES[speaker]
-            for i in range(len(samples)):
-                f.write(f'{speaker},{location},{file},{i},{class_id}\n')
+        f.write('folder,file_name,classID\n')
+        for root, _, files in walk(DATABASE_OUT_PATH):
+            class_id = root.split('/')[-1]
+            if class_id not in CLASSES:
+                class_id = 'unknown'
+            for i in files:
+                f.write(f'{root},{i},{class_id}\n')
