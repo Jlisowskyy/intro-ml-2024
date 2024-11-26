@@ -28,7 +28,7 @@ class Validator:
         Method initializing the validation
         """
         if not classes:
-            classes = CLASSES
+            classes = [0, 1]
 
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
