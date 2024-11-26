@@ -10,8 +10,9 @@ from torch.utils.data import DataLoader
 from src.cnn.cnn import BaseCNN
 from src.cnn.loadset import MultiLabelDataset
 from src.cnn.train import test
-from src.constants import TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE, CLASSES, \
-    TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, MODEL_BASE_PATH
+from src.constants import (TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
+                           TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH,
+                           DATABASE_OUT_PATH, MODEL_BASE_PATH)
 
 
 def main() -> None:
