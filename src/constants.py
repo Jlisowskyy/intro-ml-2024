@@ -46,6 +46,7 @@ Small constant to avoid division by zero
 # ------------------------------
 
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
+DENOISE_FREQ_LOW_CUT: float = 80.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 """

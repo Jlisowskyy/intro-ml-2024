@@ -7,18 +7,21 @@ for generating mel-frequency spectrograms from audio data.
 from io import BytesIO
 
 import librosa
+import matplotlib
 import numpy as np
-from PIL import Image
-from librosa import feature
-from matplotlib import pyplot as plt
 import torch
 import torchaudio
 import torchaudio.transforms
+from PIL import Image
+from matplotlib import pyplot as plt
+
+matplotlib.use('Agg')
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
                            SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
                            SPECTROGRAM_HOP_LENGTH,
-                           SPECTROGRAM_N_MELS)
+                           SPECTROGRAM_N_MELS, DENOISE_FREQ_LOW_CUT)
 from src.pipeline.audio_data import AudioData
 
 
@@ -64,7 +67,8 @@ class SpectrogramGenerator:
                 n_fft=SPECTROGRAM_N_FFT,
                 hop_length=SPECTROGRAM_HOP_LENGTH,
                 n_mels=SPECTROGRAM_N_MELS,
-                f_max=DENOISE_FREQ_HIGH_CUT
+                f_max=DENOISE_FREQ_HIGH_CUT,
+                f_min=DENOISE_FREQ_LOW_CUT
             ).to(device)
 
             spec = mel_transform(waveform)
@@ -83,8 +87,12 @@ class SpectrogramGenerator:
         spec_db = spec_db.cpu().numpy()[0]
 
         dpi = SPECTROGRAM_DPI
-        fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
+        # Create Figure object directly instead of using pyplot
+        fig = plt.Figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+        canvas = FigureCanvasAgg(fig)
+        ax = fig.add_subplot(111)
 
+        cmap = plt.colormaps['magma']
         if mel:
             img = librosa.display.specshow(
                 spec_db,
@@ -92,7 +100,8 @@ class SpectrogramGenerator:
                 fmax=DENOISE_FREQ_HIGH_CUT,
                 x_axis='time',
                 y_axis='mel',
-                ax=ax
+                ax=ax,
+                cmap=cmap
             )
         else:
             img = librosa.display.specshow(
@@ -100,23 +109,25 @@ class SpectrogramGenerator:
                 sr=audio.sample_rate,
                 x_axis='time',
                 y_axis='log',
-                ax=ax
+                ax=ax,
+                cmap=cmap
             )
 
         if show_axis:
-            plt.colorbar(img, format='%+2.0f dB')
-            plt.title('Spectrogram')
+            fig.colorbar(img, ax=ax, format='%+2.0f dB')
+            ax.set_title('Spectrogram')
         else:
-            plt.axis('off')
-            plt.tight_layout(pad=0)
-            plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+            ax.axis('off')
+            fig.tight_layout(pad=0)
+            fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
         with BytesIO() as buf:
-            fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+            canvas.print_png(buf)
             buf.seek(0)
             image = np.array(Image.open(buf).convert('RGB'))
 
-        plt.close(fig)
+        # Clean up
+        fig.clear()
         return image
 
     @staticmethod

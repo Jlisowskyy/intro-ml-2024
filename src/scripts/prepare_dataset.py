@@ -4,6 +4,7 @@ Author: Tomasz Mycielski
 Helper script for generating a dataset and a relevant annotations file
 """
 
+import threading
 from os import walk, path, makedirs
 
 import numpy as np
@@ -12,15 +13,71 @@ from tqdm import tqdm
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
-
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
+
+NUM_THREADS = 32
+
+QUEUE = []
+SHOULD_STOP = False
+LOCK: threading.Lock = threading.Lock()
+SEM: threading.Semaphore = threading.Semaphore(0)
+SEM_REV: threading.Semaphore = threading.Semaphore(NUM_THREADS)
+
+
+def worker():
+    while True:
+        SEM.acquire()
+        with LOCK:
+            if SHOULD_STOP:
+                break
+            if len(QUEUE) == 0:
+                continue
+            file, folder, root, new_root, f, dry = QUEUE.pop()
+        process_file(file, folder, root, new_root, f, dry)
+        SEM_REV.release()
+
+
+def process_file(file: str, folder: str, root: str, new_root: str, f, dry: bool) -> None:
+    it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
+                            DATABASE_CUT_ITERATOR)
+
+    sr = it.get_first_iter().get_frame_rate()
+    it = AudioDataIterator(it)
+
+    for audio_data in it:
+        # Pad not full files
+        if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
+            audio_data.audio_signal = np.pad(audio_data.audio_signal,
+                                             (0, MODEL_WINDOW_LENGTH * sr - len(
+                                                 audio_data.audio_signal)),
+                                             constant_values=(0, 0))
+
+        spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
+
+        class_id = folder if folder in CLASSES else 'unknown'
+        data = f'{new_root},{file},{class_id}'
+
+        if dry:
+            print(data)
+        else:
+            if not path.exists(new_root):
+                makedirs(path.join(new_root))
+            np.save(path.join(new_root, f'{file[:-4]}.npy'), spectrogram)
+            f.write(data + '\n')
+        break  # Apologies to future me for the legacy code, it was easier to adapt it
 
 
 def main(dry: bool = False) -> None:
     """
     Script entry point
     """
+
+    threads = []
+    for _ in range(NUM_THREADS):
+        t = threading.Thread(target=worker)
+        t.start()
+        threads.append(t)
 
     # TODO: add NUL support for the windows users
     db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
@@ -37,30 +94,13 @@ def main(dry: bool = False) -> None:
                     or file.startswith('.')
                     or folder == '_background_noise_'):
                     continue
-                it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
-                                        DATABASE_CUT_ITERATOR)
 
-                sr = it.get_first_iter().get_frame_rate()
-                it = AudioDataIterator(it)
+                SEM_REV.acquire()
+                with LOCK:
+                    QUEUE.append((file, folder, root, new_root, f, dry))
+                SEM.release()
 
-
-                for audio_data in it:
-                    # Pad not full files
-                    if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
-                        audio_data.audio_signal = np.pad(audio_data.audio_signal,
-                               (0,MODEL_WINDOW_LENGTH * sr - len(audio_data.audio_signal)),
-                               constant_values=(0,0))
-
-                    spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
-
-                    class_id = folder if folder in CLASSES else 'unknown'
-                    data = f'{new_root},{file},{class_id}'
-
-                    if dry:
-                        print(data)
-                    else:
-                        if not path.exists(new_root):
-                            makedirs(path.join(new_root))
-                        np.save(path.join(new_root, f'{file[:-4]}.npy'), spectrogram)
-                        f.write(data + '\n')
-                    break # Apologies to future me for the legacy code, it was easier to adapt it
+    global SHOULD_STOP
+    SHOULD_STOP = True
+    for t in threads:
+        t.join()
