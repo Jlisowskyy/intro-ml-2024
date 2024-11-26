@@ -240,6 +240,13 @@ DEFAULT_SAVE_SPECTROGRAMS = True
 DEFAULT_SAVE_AUDIO = True
 
 # ------------------------------
+# THREADING constants
+# ------------------------------
+
+NUM_THREADS_DB_PREPARE: int = 2
+NUM_PROCESSES_DB_PREPARE: int = 8
+
+# ------------------------------
 # NOISE constants
 # ------------------------------
 
