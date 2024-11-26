@@ -203,6 +203,5 @@ class AudioCleaner:
         return transformed_data
 
 
-print(f"Using device: {"cuda" if torch.cuda.is_available() else "cpu"}")
 AudioCleaner.denoiser_model.eval()
 AudioCleaner.denoiser_model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
