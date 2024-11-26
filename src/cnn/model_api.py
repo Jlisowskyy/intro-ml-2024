@@ -22,7 +22,7 @@ def classify_file(file_path: str, model: BasicCNN) -> str:
     :param file_path: The path to the audio file to classify
     :param model: The classifier object to use
 
-    :return: The predicted class index, or -1 if classification is not confident
+    :return: The predicted class label or an error message
     """
 
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)

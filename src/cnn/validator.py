@@ -11,8 +11,6 @@ from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
 
-from src.constants import CLASSES
-
 
 class Validator:
     """
@@ -28,7 +26,7 @@ class Validator:
         Method initializing the validation
         """
         if not classes:
-            classes = CLASSES
+            classes = [0, 1]
 
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
@@ -39,10 +37,10 @@ class Validator:
         """
         if le is None:
             for response, answer in zip(predictions, target):
-                self._results.loc[answer.item(), response.argmax(-1).item()] += 1
+                self._results.loc[answer.item(), response.argmax(0).item()] += 1
         else:
             for response, answer in zip(predictions, target):
-                loc = tuple(le.inverse_transform((answer.item(), response.argmax(-1).item())))
+                loc = tuple(le.inverse_transform((answer.item(), response.argmax(0).item())))
                 self._results.loc[loc] += 1
 
     def get_f1_score(self) -> float | None:
