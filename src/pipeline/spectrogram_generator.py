@@ -11,6 +11,9 @@ import numpy as np
 from PIL import Image
 from librosa import feature
 from matplotlib import pyplot as plt
+import torch
+import torchaudio
+import torchaudio.transforms
 
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
                            SPECTROGRAM_DPI, SPECTROGRAM_N_FFT,
@@ -38,35 +41,67 @@ class SpectrogramGenerator:
                         show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
                         height: int = SPECTROGRAM_HEIGHT) -> np.ndarray:
         """
-        Generates a normal spectrogram from audio data.
+        Generates a spectrogram from audio data using GPU acceleration via torchaudio.
         Args:
             audio_data: AudioData object containing the audio signal and sample rate.
+            mel (bool, optional): If True, generate mel spectrogram. Defaults to False.
             show_axis (bool, optional): If True, display axes on the plot. Defaults to False.
             width (int, optional): Width of the output image in pixels. Defaults to 400.
             height (int, optional): Height of the output image in pixels.
         Returns:
             np.ndarray: Image array of the spectrogram.
         """
-        dpi = SPECTROGRAM_DPI
-        if mel:
-            s = feature.melspectrogram(y=audio.audio_signal, sr=audio.sample_rate,
-                                       n_fft=SPECTROGRAM_N_FFT, hop_length=SPECTROGRAM_HOP_LENGTH,
-                                       n_mels=SPECTROGRAM_N_MELS,
-                                       fmax=DENOISE_FREQ_HIGH_CUT)
-            s_db = librosa.power_to_db(s, ref=np.max)
-        else:
-            s = librosa.stft(audio.audio_signal, n_fft=SPECTROGRAM_N_FFT,
-                             hop_length=SPECTROGRAM_HOP_LENGTH)
-            s_db = librosa.amplitude_to_db(np.abs(s), ref=np.max)
 
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        waveform = torch.tensor(audio.audio_signal).float().to(device)
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)
+
+        if mel:
+            mel_transform = torchaudio.transforms.MelSpectrogram(
+                sample_rate=audio.sample_rate,
+                n_fft=SPECTROGRAM_N_FFT,
+                hop_length=SPECTROGRAM_HOP_LENGTH,
+                n_mels=SPECTROGRAM_N_MELS,
+                f_max=DENOISE_FREQ_HIGH_CUT
+            ).to(device)
+
+            spec = mel_transform(waveform)
+            spec_db = torchaudio.transforms.AmplitudeToDB()(spec)
+        else:
+            spec_transform = torchaudio.transforms.Spectrogram(
+                n_fft=SPECTROGRAM_N_FFT,
+                hop_length=SPECTROGRAM_HOP_LENGTH,
+                power=2.0
+            ).to(device)
+
+            spec = spec_transform(waveform)
+            spec_db = torchaudio.transforms.AmplitudeToDB()(spec)
+
+        # Move back to CPU for plotting
+        spec_db = spec_db.cpu().numpy()[0]
+
+        dpi = SPECTROGRAM_DPI
         fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
 
         if mel:
-            img = librosa.display.specshow(s_db, sr=audio.sample_rate, fmax=DENOISE_FREQ_HIGH_CUT,
-                                           x_axis='time', y_axis='mel', ax=ax)
+            img = librosa.display.specshow(
+                spec_db,
+                sr=audio.sample_rate,
+                fmax=DENOISE_FREQ_HIGH_CUT,
+                x_axis='time',
+                y_axis='mel',
+                ax=ax
+            )
         else:
-            img = librosa.display.specshow(s_db, sr=audio.sample_rate, x_axis='time',
-                                           y_axis='log', ax=ax)
+            img = librosa.display.specshow(
+                spec_db,
+                sr=audio.sample_rate,
+                x_axis='time',
+                y_axis='log',
+                ax=ax
+            )
 
         if show_axis:
             plt.colorbar(img, format='%+2.0f dB')
