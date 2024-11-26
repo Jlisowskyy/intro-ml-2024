@@ -25,7 +25,7 @@ class Validator:
         Method initializing the validation
         """
         if le is None:
-            classes = len(CLASSES)
+            classes = [0 for _ in len(CLASSES)]
         else:
             classes = le.classes_
 
