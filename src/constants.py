@@ -4,7 +4,10 @@ Author: Jakub Lisowski, 2024
 File collects various constants used in the project as well as enums used for configuration.
 """
 
+from pathlib import Path
 from enum import Enum, IntEnum
+
+from src.test.test_file import TestFile
 
 
 # ------------------------------
@@ -46,6 +49,7 @@ Small constant to avoid division by zero
 # ------------------------------
 
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
+DENOISE_FREQ_LOW_CUT: float = 80.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 """
@@ -54,7 +58,7 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # DETECT SPEECH constants
 # ------------------------------
 
-DETECT_SILENCE_WINDOW_MAX_MS : int = 50
+DETECT_SILENCE_WINDOW_MAX_MS: int = 50
 DETECT_SILENCE_THRESHOLD_DB: int = -40
 SILENCE_CUT_WINDOW_MS: int = 25
 
@@ -118,7 +122,7 @@ SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
 SPECTROGRAM_N_FFT: int = 4096
 SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 512
+SPECTROGRAM_N_MELS: int = 256
 
 # ------------------------------
 # WAV ITERATOR constants
@@ -201,6 +205,7 @@ HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR: str = 'work_dir'
 HELPER_SCRIPTS_HISTOGRAM_N_BINS: int = 256
 HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
 
+
 # audio_augmentation.py
 AUDIO_AUGMENTATION_DEFAULT_SEMITONES = 6
 AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR = 0.5
@@ -209,3 +214,42 @@ AUDIO_AUGMENTATION_DEFAULT_GAIN_DB = -10
 AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT = 0.1
 AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY = 0.25
 AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY = 0.6
+
+# ------------------------------
+# TEST constants
+# ------------------------------
+
+TEST_FOLDER_IN = Path.resolve(Path(f'{__file__}/../test/test_data'))
+TEST_FOLDER_OUT = Path.resolve(Path(f'{__file__}/../test/test_tmp'))
+DEFAULT_FILE_NAMES = [
+    'f2_script1_ipad_office1_35000.wav',
+    'f5733968_nohash_4.wav',
+    'f6581345_nohash_0.wav'
+]
+DEFAULT_TEST_FILES = [
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[0]),
+        DEFAULT_FILE_NAMES[0],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[0])
+    ),
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[1]),
+        DEFAULT_FILE_NAMES[1],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[1])
+    ),
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[2]),
+        DEFAULT_FILE_NAMES[2],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[2])
+    )
+]
+DEFAULT_SHOULD_PLOT = True
+DEFAULT_SAVE_SPECTROGRAMS = True
+DEFAULT_SAVE_AUDIO = True
+
+# ------------------------------
+# THREADING constants
+# ------------------------------
+
+NUM_THREADS_DB_PREPARE: int = 2
+NUM_PROCESSES_DB_PREPARE: int = 8
