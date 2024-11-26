@@ -197,7 +197,8 @@ class AudioNormalizer:
             silence_threshold (float): RMS energy threshold in dB to classify as speech.
 
         Returns:
-            AudioData: New AudioData object with silent segments removed, maintaining input dimensions.
+            AudioData: New AudioData object with silent segments removed,
+             maintaining input dimensions.
         """
         window = (SILENCE_CUT_WINDOW_MS * audio_data.sample_rate) // 1000
 
