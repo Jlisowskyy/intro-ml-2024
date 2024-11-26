@@ -206,7 +206,7 @@ class DatabaseGenerator:
             audio_datas.append(add_echo(audio_data, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                                   AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY))
 
-        for audio_data_to_save, index in audio_datas:
+        for index, audio_data_to_save in enumerate(audio_datas):
             spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
 
             if not path.exists(new_root):
