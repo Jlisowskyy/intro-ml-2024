@@ -22,10 +22,14 @@ import numpy as np
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME, NUM_THREADS_DB_PREPARE, \
-    NUM_PROCESSES_DB_PREPARE
+    NUM_PROCESSES_DB_PREPARE, GENERATE_WITH_AUGMENTATION
+from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
+                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
+                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
+                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
-
+from src.scripts.audio_augmentation import change_pitch, add_reverb, add_echo
 
 def generate_annotations(dry: bool = False) -> list[str]:
     """
@@ -194,17 +198,27 @@ class DatabaseGenerator:
                                                audio_data.audio_signal)),
                                            constant_values=(0, 0))
 
-        spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
+        audio_datas=[audio_data]
+        if GENERATE_WITH_AUGMENTATION:
 
-        if spectrogram is None:
-            print(f"Failed to process file: {file}")
-            return
+            audio_datas.append(change_pitch(audio_data, AUDIO_AUGMENTATION_DEFAULT_SEMITONES))
+            audio_datas.append(add_reverb(audio_data, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT))
+            audio_datas.append(add_echo(audio_data, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
+                                  AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY))
 
-        if not path.exists(new_root):
-            with self._file_lock:
-                makedirs(path.join(new_root))
+        for index, audio_data_to_save in enumerate(audio_datas):
+            spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
 
-        np.save(path.join(new_root, f"{file[:-4]}.npy"), spectrogram)
+            if spectrogram is None:
+                print(f"Failed to process file: {file}")
+                return
+
+            if not path.exists(new_root):
+                with self._file_lock:
+                    makedirs(path.join(new_root))
+
+
+            np.save(path.join(new_root, f"{file[:-4]}{index}.npy"), spectrogram)
 
 
 def process_func(folder: str) -> None:
