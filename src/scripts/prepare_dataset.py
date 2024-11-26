@@ -267,6 +267,7 @@ def run_process(folders: list[str]) -> None:
         env = os.environ.copy()
         env["PYTHONPATH"] = path.dirname(src_dir) + os.pathsep + env.get("PYTHONPATH", "")
 
+        # pylint: disable=consider-using-with
         process = subprocess.Popen(
             cmd,
             stderr=subprocess.PIPE,
