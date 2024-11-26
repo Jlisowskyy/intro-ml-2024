@@ -11,8 +11,6 @@ from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
 
-from src.constants import CLASSES
-
 
 class Validator:
     """

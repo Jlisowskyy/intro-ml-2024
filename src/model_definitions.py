@@ -3,7 +3,7 @@ This module contains a list of model definitions that can be used to train a CNN
 It is used by the train.py script to train multiple models and compare their performance.
 """
 import torch
-import torch.nn as nn
+from torch import nn
 
 from src.cnn.cnn import BasicCNN
 from src.cnn.model_definition import ModelDefinition
