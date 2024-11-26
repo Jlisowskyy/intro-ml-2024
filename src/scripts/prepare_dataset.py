@@ -267,6 +267,7 @@ def run_process(folders: list[str]) -> None:
 
         process = subprocess.Popen(
             cmd,
+            stderr=subprocess.PIPE,
             env=env,
             cwd=path.dirname(src_dir)
         )
