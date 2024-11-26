@@ -163,7 +163,7 @@ class WavIteratorBase(ABC):
 
         return self._audio_data
 
-    def transform(self, transform_func: Callable[[AudioData], np.ndarray],
+    def transform(self, transform_func: Callable[[np.ndarray, int], np.ndarray],
                   new_channels: int | None = None) -> None:
         """
         Transform the audio data using the provided function
@@ -172,7 +172,7 @@ class WavIteratorBase(ABC):
         :param new_channels: Number of channels in the transformed data
         """
 
-        self._audio_data = transform_func(AudioData(self._audio_data, self._frame_rate))
+        self._audio_data = transform_func(self._audio_data, self._frame_rate)
         self._num_channels = new_channels if new_channels is not None else self._num_channels
         self._invalidate()
 
@@ -396,9 +396,7 @@ class FlattenWavIterator:
         window_size = int(self._base_iterator.get_frame_rate() * window_length_seconds)
         self._base_iterator.set_window_size(window_size)
 
-        def flatten_channels(audio_data: AudioData) -> np.ndarray:
-            data = audio_data.audio_signal
-
+        def flatten_channels(data: np.ndarray, sr: int) -> np.ndarray:
             stacked_data = data.reshape(-1, self._base_iterator.get_num_channels())
             mono_data = np.mean(stacked_data, axis=1).astype(data.dtype)
             return mono_data.reshape(-1, 1)
@@ -417,7 +415,7 @@ class FlattenWavIterator:
         """
         return self._base_iterator
 
-    def transform(self, transform_func: Callable[[AudioData], np.ndarray]) -> None:
+    def transform(self, transform_func: Callable[[np.ndarray, int], np.ndarray]) -> None:
         """
         Transform the audio data using the provided function.
 
