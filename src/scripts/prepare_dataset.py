@@ -39,36 +39,36 @@ def generate_annotations(dry: bool = False) -> list[str]:
 
     Notes:
         - Generates a CSV file with columns: folder,file_name,classID
-        - Skips '_background_noise_' folder and non-WAV files
-        - Handles Mac hidden files by skipping files starting with '.'
+        - Skips "_background_noise_" folder and non-WAV files
+        - Handles Mac hidden files by skipping files starting with "."
     """
     folders = []
 
-    db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
-    with open(db_path, 'w', encoding='UTF-8') as f:
-        f.write('folder,file_name,classID\n')
+    db_path = DATABASE_ANNOTATIONS_PATH if not dry else "/dev/null"
+    with open(db_path, "w", encoding="UTF-8") as f:
+        f.write("folder,file_name,classID\n")
 
         for root, _, files in walk(DATABASE_PATH):
-            folder = root.rsplit('/')[-1]
+            folder = root.rsplit("/")[-1]
 
-            if folder == '_background_noise_':
+            if folder == "_background_noise_":
                 continue
 
             folders.append(folder)
             new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in files:
-                if (not file.endswith('.wav')
-                        or file.startswith('.')):
+                if (not file.endswith(".wav")
+                        or file.startswith(".")):
                     continue
 
-                class_id = folder if folder in CLASSES else 'unknown'
-                data = f'{new_root},{file},{class_id}'
+                class_id = folder if folder in CLASSES else "unknown"
+                data = f"{new_root},{file},{class_id}"
 
                 if dry:
                     print(data)
                 else:
-                    f.write(data + '\n')
+                    f.write(data + "\n")
 
     return folders
 
@@ -121,7 +121,7 @@ class DatabaseGenerator:
             self._threads.append(t)
 
         for root, _, files in walk(DATABASE_PATH):
-            folder = root.rsplit('/')[-1]
+            folder = root.rsplit("/")[-1]
 
             if folder != target_folder:
                 continue
@@ -129,11 +129,12 @@ class DatabaseGenerator:
             new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in files:
-                if (not file.endswith('.wav')
-                        or file.startswith('.')
-                        or folder == '_background_noise_'):
+                if (not file.endswith(".wav")
+                        or file.startswith(".")
+                        or folder == "_background_noise_"):
                     continue
 
+                #pylint: disable=consider-using-with
                 self._sem_rev.acquire()
                 with self._lock:
                     self._queue.append((file, root, new_root))
@@ -154,6 +155,7 @@ class DatabaseGenerator:
         thread-safe queue access.
         """
         while True:
+            # pylint: disable=consider-using-with
             self._sem.acquire()
             with self._lock:
                 if self._should_stop:
@@ -198,7 +200,7 @@ class DatabaseGenerator:
             with self._file_lock:
                 makedirs(path.join(new_root))
 
-        np.save(path.join(new_root, f'{file[:-4]}.npy'), spectrogram)
+        np.save(path.join(new_root, f"{file[:-4]}.npy"), spectrogram)
 
 
 def process_func(folder: str) -> None:
@@ -257,13 +259,13 @@ def run_process(folders: list[str]) -> None:
         cmd = [
             sys.executable,
             "-m",
-            f"src.scripts.prepare_dataset",
-            '--folders',
-            ','.join(folder_chunk)
+            "src.scripts.prepare_dataset",
+            "--folders",
+            ",".join(folder_chunk)
         ]
 
         env = os.environ.copy()
-        env['PYTHONPATH'] = path.dirname(src_dir) + os.pathsep + env.get('PYTHONPATH', '')
+        env["PYTHONPATH"] = path.dirname(src_dir) + os.pathsep + env.get("PYTHONPATH", "")
 
         process = subprocess.Popen(
             cmd,
@@ -298,17 +300,17 @@ def main(dry: bool = False) -> None:
         - Generates annotations and launches processing jobs
     """
     folders = generate_annotations(dry)
-    print(f'Generated annotations for {len(folders)} folders')
+    print(f"Generated annotations for {len(folders)} folders")
 
     if not dry:
         run_process(folders)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # This is ONLY for subprocesses to run the process_func
-    if len(sys.argv) > 2 and sys.argv[1] == '--folders':
-        folder_list = sys.argv[2].split(',')
-        for f in folder_list:
-            process_func(f)
+    if len(sys.argv) > 2 and sys.argv[1] == "--folders":
+        folder_list = sys.argv[2].split(",")
+        for d in folder_list:
+            process_func(d)
 
-            print(f'Processed folder: {f}')
+            print(f"Processed folder: {d}")
