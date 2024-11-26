@@ -396,7 +396,7 @@ class FlattenWavIterator:
         window_size = int(self._base_iterator.get_frame_rate() * window_length_seconds)
         self._base_iterator.set_window_size(window_size)
 
-        def flatten_channels(data: np.ndarray, sr: int) -> np.ndarray:
+        def flatten_channels(data: np.ndarray, _: int) -> np.ndarray:
             stacked_data = data.reshape(-1, self._base_iterator.get_num_channels())
             mono_data = np.mean(stacked_data, axis=1).astype(data.dtype)
             return mono_data.reshape(-1, 1)
