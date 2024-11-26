@@ -70,11 +70,14 @@ def add_reverb(audio_data: AudioData, reverb_amount: float = 0.3) -> AudioData:
     """
     Adds a simple reverb effect to the audio.
     """
-    impulse_response = np.zeros(int(audio_data.sample_rate * reverb_amount))
-    impulse_response[0] = 1.0
-    impulse_response[-1] = 0.5
+    impulse_length = int(audio_data.sample_rate * reverb_amount)  
+    impulse_response = np.zeros(impulse_length)
+    
+    impulse_response[0] = 1.0  
+    impulse_response[-1] = 0.5  
+    impulse_response[1:] = np.linspace(1.0, 0.5, impulse_length - 1)
     reverberated_signal = convolve(audio_data.audio_signal, impulse_response, mode='full')
-    reverberated_signal = reverberated_signal[: len(audio_data.audio_signal)]
+    reverberated_signal = reverberated_signal[:len(audio_data.audio_signal)]
     return AudioData(reverberated_signal, audio_data.sample_rate)
 
 
@@ -91,16 +94,32 @@ def add_echo(audio_data: AudioData, delay: float = 0.2, decay: float = 0.5) -> A
     return AudioData(echo_signal, audio_data.sample_rate)
 
 
-def augmentations(audio_data: AudioData) -> AudioData:
+
+def augmentations(audio_data: AudioData, options:list , semitones=6, speed_factor=0.5,
+                  noise_level=0.10, gain_db=-10, reverb_amount=0.1, echo_delay=0.25,
+                  echo_decay=0.6) -> AudioData:
     """
     Applies a chain of augmentations to the audio data.
+    
+    options = ['pitch', 'speed', 'noise', 'volume', 'reverb', 'echo']
     """
-    #audio_data = change_pitch(audio_data, semitones=6)  # Raise pitch by 2 semitones
-    audio_data = change_speed(audio_data, speed_factor=0.5)  # Speed up speech
-    #audio_data = add_noise(audio_data, noise_level=0.10)  # Add slight noise
-    # audio_data = change_volume(audio_data, gain_db=-10)  # Decrease volume by 3 dB
-    # audio_data = add_reverb(audio_data, reverb_amount=3.7)  # Add reverb
-    #audio_data = add_echo(audio_data, delay=0.25, decay=0.6)  # Add echo
+    if 'pitch' in options:
+        audio_data = change_pitch(audio_data, semitones)
+    
+    if 'speed' in options:
+        audio_data = change_speed(audio_data, speed_factor)
+    
+    if 'noise' in options:
+        audio_data = add_noise(audio_data, noise_level)
+    
+    if 'volume' in options:
+        audio_data = change_volume(audio_data, gain_db)
+    
+    if 'reverb' in options:
+        audio_data = add_reverb(audio_data, reverb_amount)
+    
+    if 'echo' in options:
+        audio_data = add_echo(audio_data, echo_delay, echo_decay)
     return audio_data
 
 
@@ -109,8 +128,11 @@ def augmentations(audio_data: AudioData) -> AudioData:
 def process(file_path:str, output_path:str) -> None:
     
     audio_data = load_file(file_path)
-    audio_data = augmentations(audio_data)
-    save_file(audio_data, output_path)
+    options = ['pitch', 'speed', 'noise', 'volume', 'reverb', 'echo']
+    for option in options:
+        audio_data_augmented = augmentations(audio_data, [option])
+        new_output_path=output_path.split('.')[0] + option + '.' + output_path.split('.')[1]
+        save_file(audio_data_augmented, new_output_path)
     
     
 
