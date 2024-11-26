@@ -6,6 +6,7 @@ Module featuring training functions plus a training setup
 from datetime import datetime
 from random import randint
 
+from sklearn.preprocessing import LabelEncoder
 import torch
 from torch import nn
 from torch.optim.optimizer import Optimizer
@@ -28,7 +29,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False,
-        labels: list[object] | None = None
+        labels: LabelEncoder | None = None
 ) -> None:
     """
     Method training `model` a single iteration with the data provided
@@ -104,7 +105,6 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
-        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
@@ -113,7 +113,7 @@ def validate(
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
           device: str, epochs: int, val_data: DataLoader | None = None,
-          labels: list[object] | None = None) -> None:
+          labels: LabelEncoder | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -141,7 +141,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         # TODO: add description
     """
     min_valid_loss = float('inf')
-    for i in range(epochs):
+    for i in range(1):
         print(f"Epoch {i + 1}")
         train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1, labels)
 
@@ -158,7 +158,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
 
 def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
-         labels: list[object] | None = None) -> Validator:
+         labels: LabelEncoder | None = None) -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -227,8 +227,8 @@ def main() -> None:
         optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
         train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-              validate_dataloader)
+              validate_dataloader, dataset.get_encoder())
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device, dataset.get_labels())
+        test(cnn, test_dataloader, device, dataset.get_encoder())

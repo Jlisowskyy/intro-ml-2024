@@ -171,7 +171,7 @@ CLASSES = [
     'stop',
     'go',
     'unknown',
-    'silence'
+    # 'silence'
 ]
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
@@ -188,7 +188,7 @@ DATABASE_VALID_WAV_SR: int = 16000
 
 MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
-MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
+MODEL_PRETRAINED_PATH: str = './cnn_e9_backup.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """

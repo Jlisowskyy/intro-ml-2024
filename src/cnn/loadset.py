@@ -135,7 +135,7 @@ class MultiLabelDataset(Dataset):
             self.annotations['folder'][index],
             self.annotations['file_name'][index][:-4] + '.npy'
         )
-        print(spectrogram_path)
+        # print(spectrogram_path)
         spectrogram = np.load(spectrogram_path)
         tens = torch.from_numpy(spectrogram).type(torch.float32)
         # NOTE rot90 can stay, but I can drop it and we'll have all future models account for it
