@@ -37,6 +37,7 @@ from src.scripts import prepare_dataset
 from src.scripts import regenerate_csv
 from src.scripts import spectrogram_script
 from src.scripts import validate_dataset
+from src.scripts import prepare_noises
 from src.test import test_classify, test_fit_to_window
 from src.test import test_cnn
 from src.test import test_cut_wav
@@ -45,6 +46,7 @@ from src.test import test_silence_removal
 from src.test import test_normalize
 from src.test import test_transformation_pipeline
 from src.test import test_wav
+from src.test import test_noise_injector
 
 # Initialize colorama
 init()
@@ -106,7 +108,9 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "silence_removal": test_silence_removal.silence_removal_test,
     "transformation_pipeline": test_transformation_pipeline.transformation_pipeline_test,
     "test_classify": test_classify.example_test_run,
-    "fit_to_window": test_fit_to_window.fit_to_window_test
+    "fit_to_window": test_fit_to_window.fit_to_window_test,
+    "noise_injector": test_noise_injector.noise_injector_test,
+    "prepare_noise": prepare_noises.main()
 }
 
 

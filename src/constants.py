@@ -182,6 +182,9 @@ DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
 DATABASE_ANNOTATIONS_PATH: str = './annotations_kaggle.csv'
 DATABASE_VALID_WAV_SR: int = 16000
 
+DATABASE_NOISES: str = f'{DATABASE_PATH}/train/_background_noise_'
+DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
+
 # ------------------------------
 # MODEL constants
 # ------------------------------
@@ -243,3 +246,10 @@ DEFAULT_SAVE_AUDIO = True
 
 NUM_THREADS_DB_PREPARE: int = 2
 NUM_PROCESSES_DB_PREPARE: int = 8
+
+# ------------------------------
+# NOISE constants
+# ------------------------------
+
+SNR_BOTTOM_BOUND = 10
+SNR_UPPER_BOUND = 15
