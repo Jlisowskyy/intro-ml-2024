@@ -34,6 +34,40 @@ class AudioNormalizer:
         self.normalization_type = normalization_type
 
     @staticmethod
+    def fit_to_window(audio_data: AudioData, window_length_seconds: float) -> AudioData:
+        """
+        Fit the audio data to a specified window length by repeating the signal
+        Raises an error if the window length is smaller than the signal length
+
+        :param audio_data: Audio data to be fitted
+        :param window_length_seconds: Length of the window to fit the signal to
+        """
+        audio_data.audio_signal = AudioNormalizer.fit_to_window_raw(audio_data.audio_signal,
+                                                                    audio_data.sample_rate,
+                                                                    window_length_seconds)
+        return audio_data
+
+    @staticmethod
+    def fit_to_window_raw(x: np.ndarray, sr: int, window_length_seconds: float) -> np.ndarray:
+        """
+        Fit the audio data to a specified window length by repeating the signal
+        Raises an error if the window length is smaller than the signal length
+
+        :param x: Audio data to be fitted
+        :param sr: Sample rate of the audio data
+        :param window_length_seconds: Length of the window to fit the signal to
+        """
+        window_size = int(window_length_seconds * sr)
+        if window_size < len(x):
+            raise ValueError("Window length is smaller than the signal length")
+
+        num_repeats = window_size // len(x) + 1
+        reps = (num_repeats,) + (1,) * (x.ndim - 1)
+        x = np.tile(x, reps)
+        x = x[:window_size]
+        return x
+
+    @staticmethod
     def mean_variance_normalization(audio_data: AudioData) -> AudioData:
         """
         Apply mean and variance normalization to the signal.
@@ -52,11 +86,11 @@ class AudioNormalizer:
 
     @staticmethod
     def pcen_normalization(audio_data: AudioData,
-                       time_constant: float = NORMALIZATION_PCEN_TIME_CONSTANT,
-                       alpha: float = NORMALIZATION_PCEN_ALPHA,
-                       delta: float = NORMALIZATION_PCEN_DELTA,
-                       r: float = NORMALIZATION_PCEN_R,
-                       eps: float = EPSILON) -> AudioData:
+                           time_constant: float = NORMALIZATION_PCEN_TIME_CONSTANT,
+                           alpha: float = NORMALIZATION_PCEN_ALPHA,
+                           delta: float = NORMALIZATION_PCEN_DELTA,
+                           r: float = NORMALIZATION_PCEN_R,
+                           eps: float = EPSILON) -> AudioData:
         # pylint: disable=line-too-long
         """
         Apply Per-Channel Energy Normalization (PCEN) to the signal.
@@ -74,17 +108,17 @@ class AudioNormalizer:
 
         s = np.abs(librosa.stft(audio_data.audio_signal)) ** 2
         m = librosa.pcen(s, sr=audio_data.sample_rate, hop_length=NORMALIZATION_PCEN_HOP_LENGTH,
-                        gain=alpha, bias=delta,
-                        eps=eps, power=r,
-                        time_constant=time_constant)
+                         gain=alpha, bias=delta,
+                         eps=eps, power=r,
+                         time_constant=time_constant)
         normalized_signal = librosa.istft(m)
         audio_data.audio_signal = normalized_signal
         return audio_data
 
     @staticmethod
     def normalize(audio_data: AudioData,
-              normalization_type: NormalizationType,
-              *args) -> AudioData:
+                  normalization_type: NormalizationType,
+                  *args) -> AudioData:
         """
         General normalize function that chooses between currently implemented normalization methods.
 

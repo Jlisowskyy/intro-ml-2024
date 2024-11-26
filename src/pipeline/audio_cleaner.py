@@ -42,7 +42,7 @@ class AudioCleaner:
                 audio_signal = AudioData.to_float(audio_signal)
 
             # Resample to 16 kHz if needed
-            if audio_data.sample_rate != 16000: # FIXME random constant
+            if audio_data.sample_rate != 16000:  # FIXME random constant
                 resampled_signal = torchaudio.transforms.Resample(
                     orig_freq=audio_data.sample_rate, new_freq=16000
                 )(torch.tensor(audio_signal, dtype=torch.float32))
@@ -169,7 +169,6 @@ class AudioCleaner:
 
         return AudioData(output, audio_data.sample_rate)
 
-
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'AudioCleaner':
         """
@@ -198,7 +197,9 @@ class AudioCleaner:
 
         transformed_data = []
         for audio_data in x_data:
-            transformed_data.append(self.denoise(audio_data))
+            audio_data = self.denoise(audio_data)
+            audio_data = self.remove_silence(audio_data)
+            transformed_data.append(audio_data)
 
         return transformed_data
 
