@@ -15,7 +15,7 @@ from src.pipeline.spectrogram_generator import SpectrogramGenerator
 
 
 def process_audio(audio_data: AudioData,
-                  normalization_type: NormalizationType = NORMALIZATION_TYPE) -> np.ndarray:
+                  normalization_type: NormalizationType = NORMALIZATION_TYPE) -> np.ndarray | None:
     """
     Process the audio data by denoising, normalizing, and generating a mel spectrogram.
 
@@ -46,4 +46,4 @@ def process_audio(audio_data: AudioData,
     transformed_data = preprocess_pipeline.transform([audio_data])
 
     # Return the processed mel spectrogram
-    return transformed_data[0]
+    return transformed_data[0] if len(transformed_data) > 0 else None

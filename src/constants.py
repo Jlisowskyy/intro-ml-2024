@@ -49,6 +49,7 @@ Small constant to avoid division by zero
 # ------------------------------
 
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
+DENOISE_FREQ_LOW_CUT: float = 80.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 """
@@ -58,7 +59,7 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # ------------------------------
 
 DETECT_SILENCE_WINDOW_MAX_MS: int = 50
-DETECT_SILENCE_THRESHOLD_DB: int = -40
+DETECT_SILENCE_THRESHOLD_DB: int = -60
 SILENCE_CUT_WINDOW_MS: int = 25
 
 # ------------------------------
@@ -119,9 +120,9 @@ TRAINING_MOMENTUM: float = 0.9
 SPECTROGRAM_WIDTH: int = 300
 SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
-SPECTROGRAM_N_FFT: int = 4096
-SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 512
+SPECTROGRAM_N_FFT: int = 400
+SPECTROGRAM_HOP_LENGTH: int = 160
+SPECTROGRAM_N_MELS: int = 64
 
 # ------------------------------
 # WAV ITERATOR constants
@@ -188,7 +189,7 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 1
+MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
@@ -245,7 +246,7 @@ DEFAULT_SAVE_AUDIO = True
 
 NUM_THREADS_DB_PREPARE: int = 2
 NUM_PROCESSES_DB_PREPARE: int = 8
-
+  
 # ------------------------------
 # NOISE constants
 # ------------------------------
