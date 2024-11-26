@@ -26,7 +26,7 @@ def fit_to_window_test() -> None:
         audio_cleaner = AudioCleaner()
         current_window_length_seconds = audio_data.audio_signal.shape[0] / audio_data.sample_rate
         audio_data = audio_cleaner.denoise(audio_data)
-        audio_data = audio_cleaner.remove_silence(audio_data)
+        audio_data = AudioNormalizer.remove_silence(audio_data)
         return audio_normalizer.fit_to_window(audio_data, current_window_length_seconds)
 
     test_transformation(transformation_func,

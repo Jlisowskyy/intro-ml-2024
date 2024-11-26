@@ -196,6 +196,10 @@ class DatabaseGenerator:
 
         spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
+        if spectrogram is None:
+            print(f"Failed to process file: {file}")
+            return
+
         if not path.exists(new_root):
             with self._file_lock:
                 makedirs(path.join(new_root))

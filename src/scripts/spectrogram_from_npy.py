@@ -87,3 +87,9 @@ def main(argv: list[str]) -> None:
         raise ValueError("The number of samples must be at least 1.")
 
     process(args.file_path, args.directory, args.number)
+
+
+if __name__ == "__main__":
+    import sys
+
+    main(sys.argv[1:])
