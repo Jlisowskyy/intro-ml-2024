@@ -9,8 +9,6 @@ from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
 
-from src.constants import CLASSES
-
 class Validator:
     """
     Class providing a simple validation
@@ -25,7 +23,7 @@ class Validator:
         Method initializing the validation
         """
         if le is None:
-            classes = [0 for _ in len(CLASSES)]
+            classes = [0, 1]
         else:
             classes = le.classes_
 
