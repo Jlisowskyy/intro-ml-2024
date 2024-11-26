@@ -206,4 +206,4 @@ HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
 # THREADING constants
 # ------------------------------
 
-NUM_THREADS_DB_PREPARE = 32
+NUM_THREADS_DB_PREPARE = 16
