@@ -12,7 +12,6 @@ from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
@@ -231,13 +230,15 @@ def main() -> None:
             print(cnn)
 
             loss_function = nn.CrossEntropyLoss()
-            optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
+            optimiser = torch.optim.SGD(cnn.parameters(),
+                                        lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
             train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
                   validate_dataloader)
 
             now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-            torch.save(cnn.state_dict(), f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
+            torch.save(cnn.state_dict(),
+                       f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
             validator = test(cnn, test_dataloader, device, dataset.get_labels())
             if validator.get_macro_f1() > best_macro_f1:
                 best_macro_f1 = validator.get_macro_f1()
@@ -251,4 +252,3 @@ def main() -> None:
         return
     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
     torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
-

@@ -22,7 +22,6 @@ Adding new functionality:
 
 import argparse
 import inspect
-import os
 import traceback
 from collections.abc import Callable
 from pathlib import Path
