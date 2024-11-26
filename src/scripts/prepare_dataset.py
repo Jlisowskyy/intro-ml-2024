@@ -18,7 +18,6 @@ import threading
 from os import walk, path, makedirs
 
 import numpy as np
-from tqdm import tqdm
 
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
@@ -268,8 +267,6 @@ def run_process(folders: list[str]) -> None:
 
         process = subprocess.Popen(
             cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             env=env,
             cwd=path.dirname(src_dir)
         )
@@ -295,6 +292,8 @@ def main(dry: bool = False) -> None:
         - Generates annotations and launches processing jobs
     """
     folders = generate_annotations(dry)
+    print(f'Generated annotations for {len(folders)} folders')
+
     if not dry:
         run_process(folders)
 
@@ -305,3 +304,5 @@ if __name__ == '__main__':
         folder_list = sys.argv[2].split(',')
         for f in folder_list:
             process_func(f)
+
+            print(f'Processed folder: {f}')
