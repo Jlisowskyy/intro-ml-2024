@@ -51,7 +51,7 @@ def gather_folders() -> list[str]:
     """
     folders = []
 
-    for root, _, files in walk(DATABASE_PATH):
+    for root, _, __ in walk(DATABASE_PATH):
         folder = root.rsplit("/")[-1]
 
         if folder == "_background_noise_":
@@ -84,6 +84,8 @@ class DatabaseGenerator:
         Initializes the DatabaseGenerator with thread synchronization primitives
         and empty queues/thread pools.
         """
+
+        # pylint: disable=too-many-instance-attributes
         self._queue = []
         self._threads = []
         self._should_stop = False
