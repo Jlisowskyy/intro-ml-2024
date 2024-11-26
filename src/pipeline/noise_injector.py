@@ -40,6 +40,9 @@ class NoiseInjector:
 
         # Select a random file
         random_file = choice(audio_files)
+
+        random_file = 'pink_noise_000.wav'
+
         return path.join(folder_path, random_file)
 
     # pylint: disable=unused-argument
