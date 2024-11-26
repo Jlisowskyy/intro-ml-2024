@@ -38,6 +38,7 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
     :param preprocess_func: Preprocessing function to apply to the audio signal
     before transformation
     """
+    # pylint-disable-next-line=too-many-locals
     for test_file in test_files:
         it_transformed = load_wav(test_file.file_path, 0, WavIteratorType.PLAIN)
         it_transformed.set_window_size(it_transformed.get_num_frames())
