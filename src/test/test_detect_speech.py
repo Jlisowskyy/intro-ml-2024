@@ -43,13 +43,13 @@ TEST_FILES = [
 def silence_removal_test() -> None:
     """
     Run the manual test for the silence removal module.
-    Displays spectrograms before and after silence removal and saves processed files.
+    Displays spectrogram before and after silence removal and saves processed files.
     """
 
-    def transform_func(x: AudioData) -> np.ndarray:
+    def transform_func(x: np.ndarray, sr: int) -> np.ndarray:
         cleaner = AudioCleaner()
-        denoised = cleaner.denoise_raw(x.audio_signal, x.sample_rate)
-        return AudioCleaner.remove_silence_raw(denoised, x.sample_rate)
+        denoised = cleaner.denoise_raw(x, sr)
+        return AudioCleaner.remove_silence_raw(denoised, sr)
 
     for test_file, test_out in TEST_FILES:
         it_cleaned = load_wav(test_file, 0, WavIteratorType.PLAIN)
