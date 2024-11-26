@@ -8,7 +8,7 @@ import torch.utils
 from torch.utils.data import DataLoader
 
 from src.cnn.cnn import BasicCNN
-from src.cnn.loadset import DAPSDataset
+from src.cnn.loadset import MultiLabelDataset
 from src.cnn.train import test
 from src.constants import TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, MODEL_PRETRAINED_PATH
@@ -27,7 +27,7 @@ def main() -> None:
                                    weights_only=True))
     cnn.to(device)
 
-    dataset = DAPSDataset(
+    dataset = MultiLabelDataset(
         DATABASE_ANNOTATIONS_PATH,
         DATABASE_OUT_PATH,
         device
