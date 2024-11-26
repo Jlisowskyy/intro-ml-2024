@@ -1,7 +1,13 @@
 """
-Author: Tomasz Mycielski
+Author: Tomasz Mycielski, Jakub Lisowski, 2024
 
-Helper script for generating a dataset and a relevant annotations file
+Dataset Generation and Annotation Tool
+
+This script provides functionality for:
+1. Generating a dataset from audio files
+2. Creating corresponding annotation files
+3. Processing audio data in parallel using multiple threads and processes
+4. Converting audio files to spectrograms for machine learning tasks
 """
 
 import math
@@ -24,9 +30,19 @@ from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
 def generate_annotations(dry: bool = False) -> list[str]:
     """
-    Generate annotations for the dataset
-    """
+    Creates annotation files for the audio dataset by scanning through the directory structure.
 
+    Args:
+        dry (bool): If True, prints annotations instead of writing to file. Used for testing.
+
+    Returns:
+        list[str]: List of folder names found in the dataset.
+
+    Notes:
+        - Generates a CSV file with columns: folder,file_name,classID
+        - Skips '_background_noise_' folder and non-WAV files
+        - Handles Mac hidden files by skipping files starting with '.'
+    """
     folders = []
 
     db_path = DATABASE_ANNOTATIONS_PATH if not dry else '/dev/null'
@@ -43,7 +59,6 @@ def generate_annotations(dry: bool = False) -> list[str]:
             new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in files:
-                # Omit annoying hidden mac files
                 if (not file.endswith('.wav')
                         or file.startswith('.')):
                     continue
@@ -58,28 +73,29 @@ def generate_annotations(dry: bool = False) -> list[str]:
 
     return folders
 
+
 class DatabaseGenerator:
     """
-    Helper class for generating a dataset and a relevant annotations file
+    A thread-safe database generator that processes audio files in parallel.
+
+    This class manages multiple worker threads to convert audio files into spectrograms,
+    handling concurrent file processing and disk I/O operations safely.
+
+    Attributes:
+        _queue (list): Thread-safe queue for storing files to be processed
+        _threads (list): List of worker threads
+        _should_stop (bool): Flag to signal thread termination
+        _lock (threading.Lock): Lock for queue access synchronization
+        _sem (threading.Semaphore): Semaphore for queue population control
+        _sem_rev (threading.Semaphore): Reverse semaphore for thread pool management
+        _file_lock (threading.Lock): Lock for file system operations
     """
 
-    # ------------------------------
-    # Class fields
-    # ------------------------------
-
-    _queue: list
-    _threads: list
-    _should_stop: bool
-    _lock: threading.Lock
-    _sem: threading.Semaphore
-    _sem_rev: threading.Semaphore
-    _file_lock: threading.Lock
-
-    # ------------------------------
-    # Class init
-    # ------------------------------
-
     def __init__(self) -> None:
+        """
+        Initializes the DatabaseGenerator with thread synchronization primitives
+        and empty queues/thread pools.
+        """
         self._queue = []
         self._threads = []
         self._should_stop = False
@@ -88,15 +104,18 @@ class DatabaseGenerator:
         self._sem = threading.Semaphore(0)
         self._sem_rev = threading.Semaphore(NUM_THREADS_DB_PREPARE)
 
-    # ------------------------------
-    # Class methods
-    # ------------------------------
-
     def process(self, target_folder: str) -> None:
         """
-        Process the dataset
-        """
+        Processes all audio files in the target folder using multiple threads.
 
+        Args:
+            target_folder (str): Name of the folder containing audio files to process
+
+        Notes:
+            - Creates worker threads based on NUM_THREADS_DB_PREPARE constant
+            - Manages thread lifecycle and synchronization
+            - Processes WAV files into spectrograms
+        """
         for _ in range(NUM_THREADS_DB_PREPARE):
             t = threading.Thread(target=self._worker)
             t.start()
@@ -111,7 +130,6 @@ class DatabaseGenerator:
             new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
 
             for file in files:
-                # Omit annoying hidden mac files
                 if (not file.endswith('.wav')
                         or file.startswith('.')
                         or folder == '_background_noise_'):
@@ -128,15 +146,14 @@ class DatabaseGenerator:
         for t in self._threads:
             t.join()
 
-    # ------------------------------
-    # Protected methods
-    # ------------------------------
-
     def _worker(self) -> None:
         """
-        Worker method
-        """
+        Worker thread function that processes files from the shared queue.
 
+        Continuously pulls files from the queue and processes them until
+        signaled to stop. Uses semaphores for synchronization and
+        thread-safe queue access.
+        """
         while True:
             self._sem.acquire()
             with self._lock:
@@ -150,22 +167,31 @@ class DatabaseGenerator:
 
     def _process_file(self, file: str, root: str, new_root: str) -> None:
         """
-        Process a single file
-        """
+        Processes a single audio file into a spectrogram.
 
+        Args:
+            file (str): Name of the audio file
+            root (str): Source directory path
+            new_root (str): Destination directory path
+
+        Notes:
+            - Converts audio to fixed-length windows
+            - Generates spectrograms using process_audio function
+            - Handles padding for shorter audio files
+            - Saves output as NumPy arrays
+        """
         it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
-                                DATABASE_CUT_ITERATOR)
+                               DATABASE_CUT_ITERATOR)
 
         sr = it.get_first_iter().get_frame_rate()
         it = AudioDataIterator(it)
         audio_data = next(iter(it))
 
-        # Pad not full files
         if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
             audio_data.audio_signal = np.pad(audio_data.audio_signal,
-                                             (0, MODEL_WINDOW_LENGTH * sr - len(
-                                                 audio_data.audio_signal)),
-                                             constant_values=(0, 0))
+                                           (0, MODEL_WINDOW_LENGTH * sr - len(
+                                               audio_data.audio_signal)),
+                                           constant_values=(0, 0))
 
         spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)
 
@@ -178,18 +204,34 @@ class DatabaseGenerator:
 
 def process_func(folder: str) -> None:
     """
-    Function for each running process
-    """
+    Single-process function for processing a folder of audio files.
 
+    Args:
+        folder (str): Name of the folder to process
+
+    Notes:
+        - Creates a DatabaseGenerator instance for the folder
+        - Used as the target function for multiprocessing
+    """
     generator = DatabaseGenerator()
     generator.process(folder)
 
 
 def chunk_folders(folders: list[str], max_processes: int) -> list[list[str]]:
     """
-    Chunk the folders
-    """
+    Divides folders into chunks for parallel processing.
 
+    Args:
+        folders (list[str]): List of folder names to process
+        max_processes (int): Maximum number of parallel processes to use
+
+    Returns:
+        list[list[str]]: List of folder chunks, each to be processed by one process
+
+    Notes:
+        - Ensures even distribution of work across processes
+        - Respects maximum process limit
+    """
     num_processes = min(max_processes, len(folders))
     chunk_size = math.ceil(len(folders) / num_processes)
     return [folders[i:i + chunk_size] for i in range(0, len(folders), chunk_size)]
@@ -197,9 +239,16 @@ def chunk_folders(folders: list[str], max_processes: int) -> list[list[str]]:
 
 def run_process(folders: list[str]) -> None:
     """
-    Run the processes
-    """
+    Launches multiple processes to handle folder processing in parallel.
 
+    Args:
+        folders (list[str]): List of folders to process
+
+    Notes:
+        - Sets up Python environment for subprocesses
+        - Handles process creation and monitoring
+        - Reports errors from failed processes
+    """
     src_dir = path.dirname(path.dirname(path.abspath(__file__)))
 
     folder_chunks = chunk_folders(folders, NUM_PROCESSES_DB_PREPARE)
@@ -236,10 +285,18 @@ def run_process(folders: list[str]) -> None:
 
 def main(dry: bool = False) -> None:
     """
-    Main method
+    Main entry point for the dataset preparation script.
+
+    Args:
+        dry (bool): If True, runs in dry-run mode, printing annotations instead of writing files
+
+    Notes:
+        - Coordinates the entire dataset preparation process
+        - Generates annotations and launches processing jobs
     """
     folders = generate_annotations(dry)
-    run_process(folders)
+    if not dry:
+        run_process(folders)
 
 
 if __name__ == '__main__':
