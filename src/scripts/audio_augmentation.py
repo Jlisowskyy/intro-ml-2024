@@ -12,12 +12,12 @@ from scipy.signal import convolve
 
 from src.pipeline.audio_data import AudioData
 
-from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES, 
+from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
                             AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
-                            AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL, 
+                            AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL,
                             AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
-                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT, 
-                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY, 
+                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
+                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                             AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
 
 
@@ -186,13 +186,15 @@ def process(file_path: str, output_path: str) -> None:
         file_path (str): The path to the input audio file.
         output_path (str): The base path for saving the output audio files.
     """
-    audio_data=AudioData(sf.read(file_path))
+    audio_signal, sample_rate = sf.read(file_path)
+    audio_data=AudioData(audio_signal, sample_rate)
     options = ['pitch', 'speed', 'noise', 'volume', 'reverb', 'echo']
 
     for option in options:
         audio_data_augmented = augmentations(audio_data, [option])
         new_output_path = output_path.split('.')[0] + "_" + option + '.' + output_path.split('.')[1]
-        sf.write(file_path, new_output_path.audio_signal, new_output_path.sample_rate)
+        sf.write(new_output_path, audio_data_augmented.audio_signal,
+                 audio_data_augmented.sample_rate)
 
 
 def main(argv: list[str]) -> None:
