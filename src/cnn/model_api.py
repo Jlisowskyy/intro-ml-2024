@@ -24,7 +24,6 @@ def classify_file(file_path: str, model: BasicCNN) -> str:
 
     :return: The predicted class label or an error message
     """
-
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
     it = AudioDataIterator(it)
 
