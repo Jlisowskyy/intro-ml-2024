@@ -1,5 +1,5 @@
 """
-Audio Pitch Adjustment Module
+Author: Michał Kwiatkowski
 
 Provides the `AudioPitcher` class for augmenting audio data by altering its pitch.
 Designed for use in audio data pipelines with adjustable semitone parameters.
@@ -29,7 +29,7 @@ class AudioPitcher:
 
         Parameters:
             x_data (list[AudioData]): List of input audio data to fit.
-            y_data (list[int], optional): List of target labels corresponding to the input audio 
+            y_data (list[int], optional): List of target labels corresponding to the input audio
                                           data.
 
         Returns:
