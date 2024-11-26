@@ -23,19 +23,7 @@ class AudioCleaner:
     A class used to clean audio data as part of a machine learning pipeline.
     """
 
-    def __init__(self) -> None:
-        """
-        Initializes the AudioCleaner.
-
-        Parameters:
-        denoise_type (DenoiseType): Type of denoising to perform (from DenoiseType enum).
-
-        Returns:
-        None
-        """
-        self.denoiser_model = pretrained.dns64()
-        self.denoiser_model.eval()
-        self.denoiser_model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    denoiser_model = pretrained.dns64()
 
     def denoise(self, audio_data: AudioData) -> AudioData:
         """
@@ -214,3 +202,7 @@ class AudioCleaner:
             transformed_data.append(audio_data)
 
         return transformed_data
+
+
+AudioCleaner.denoiser_model.eval()
+AudioCleaner.denoiser_model.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))

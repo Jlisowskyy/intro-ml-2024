@@ -49,6 +49,7 @@ Small constant to avoid division by zero
 # ------------------------------
 
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
+DENOISE_FREQ_LOW_CUT: float = 80.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 """
@@ -121,7 +122,7 @@ SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
 SPECTROGRAM_N_FFT: int = 4096
 SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 512
+SPECTROGRAM_N_MELS: int = 256
 
 # ------------------------------
 # WAV ITERATOR constants
@@ -235,3 +236,10 @@ DEFAULT_TEST_FILES = [
 DEFAULT_SHOULD_PLOT = True
 DEFAULT_SAVE_SPECTROGRAMS = True
 DEFAULT_SAVE_AUDIO = True
+
+# ------------------------------
+# THREADING constants
+# ------------------------------
+
+NUM_THREADS_DB_PREPARE: int = 2
+NUM_PROCESSES_DB_PREPARE: int = 8
