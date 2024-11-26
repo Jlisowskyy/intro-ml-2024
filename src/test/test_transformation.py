@@ -1,5 +1,6 @@
 """
 Author: Łukasz Kryczka
+
 Contains functionality for manual inspection of signal and through its spectrogram
 before and after a transformation provided by the user
 """
@@ -20,7 +21,9 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
                         test_files: List[TestFile],
                         save_spectrograms=False,
                         save_audio=False,
-                        plot=True) -> None:
+                        plot=True,
+                        preprocess_func: Callable[[AudioData], AudioData] = None
+                        ) -> None:
     """
     Run the manual test for the transformation function on the provided test files.
     Displays the original and transformed audio signals
@@ -32,6 +35,8 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
     :param save_spectrograms: Flag indicating whether to save the spectrograms as images
     :param save_audio: Flag indicating whether to save the transformed audio signal to a WAV file
     :param plot: Flag indicating whether to plot the spectrograms
+    :param preprocess_func: Preprocessing function to apply to the audio signal
+    before transformation
     """
     for test_file in test_files:
         it_transformed = load_wav(test_file.file_path, 0, WavIteratorType.PLAIN)
@@ -45,6 +50,11 @@ def test_transformation(transformation_func: Callable[[AudioData], AudioData],
 
         original_audio_data = AudioData(original_audio, int(it.get_frame_rate()))
         processed_audio_data = AudioData(processed_audio, int(it.get_frame_rate()))
+
+        if preprocess_func:
+            original_audio_data = preprocess_func(original_audio_data)
+            processed_audio_data = preprocess_func(processed_audio_data)
+
         processed_audio_data = transformation_func(processed_audio_data)
 
         original_spectrogram = SpectrogramGenerator.gen_spectrogram(original_audio_data, mel=True)

@@ -41,7 +41,7 @@ from src.test import test_classify, test_fit_to_window
 from src.test import test_cnn
 from src.test import test_cut_wav
 from src.test import test_denoise
-from src.test import test_detect_speech
+from src.test import test_silence_removal
 from src.test import test_normalize
 from src.test import test_transformation_pipeline
 from src.test import test_wav
@@ -98,12 +98,13 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "wav": test_wav.manual_test,
     "pytest": run_pytest,
     "denoise": test_denoise.denoise_test_manual,
-    "normalize": test_normalize.manual_test,
+    "normalize_mv": test_normalize.mean_variance_normalization_manual_test,
+    "normalize_pcen": test_normalize.pcen_normalization_manual_test,
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test_cnn,
     "dataset": test_cnn.manual_test_dataset,
-    "silence_removal": test_detect_speech.silence_removal_test,
-    "transformation_pipeline": test_transformation_pipeline.example_test_run,
+    "silence_removal": test_silence_removal.silence_removal_test,
+    "transformation_pipeline": test_transformation_pipeline.transformation_pipeline_test,
     "test_classify": test_classify.example_test_run,
     "fit_to_window": test_fit_to_window.fit_to_window_test
 }
