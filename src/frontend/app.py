@@ -49,4 +49,4 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
 
         return ModelResponse(response=str(result))
     except Exception as e:  # pylint: disable=broad-exception-caught
-        return ModelResponse(response=f"Error processing file: {str(traceback.format_exc())}")
+        return ModelResponse(response=f"Error: {e}, traceback: {str(traceback.format_exc())}")

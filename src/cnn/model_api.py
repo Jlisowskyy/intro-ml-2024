@@ -7,7 +7,8 @@ Module for classifying audio data using a CNN model.
 from sklearn.preprocessing import LabelEncoder
 
 from src.cnn.cnn import BasicCNN
-from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType, CLASSIFICATION_CONFIDENCE_THRESHOLD, CLASSES
+from src.constants import (MODEL_WINDOW_LENGTH, WavIteratorType,
+                           CLASSIFICATION_CONFIDENCE_THRESHOLD, CLASSES)
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
 le = LabelEncoder()
