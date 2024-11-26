@@ -12,38 +12,14 @@ from scipy.signal import convolve
 
 from src.pipeline.audio_data import AudioData
 
+from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES, 
+                            AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
+                            AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL, 
+                            AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
+                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT, 
+                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY, 
+                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
 
-DEFAULT_SEMITONES = 6
-DEFAULT_SPEED_FACTOR = 0.5
-DEFAULT_NOISE_LEVEL = 0.03
-DEFAULT_GAIN_DB = -10
-DEFAULT_REVERB_AMOUNT = 0.1
-DEFAULT_ECHO_DELAY = 0.25
-DEFAULT_ECHO_DECAY = 0.6
-
-def load_file(file_path: str) -> AudioData:
-    """
-    Loads an audio file from the specified path into an AudioData object.
-
-    Args:
-        file_path (str): The path to the audio file.
-
-    Returns:
-        AudioData: The audio data loaded from the file.
-    """
-    audio_data, sample_rate = sf.read(file_path)
-    return AudioData(audio_data, sample_rate)
-
-
-def save_file(audio_data: AudioData, file_path: str) -> None:
-    """
-    Saves the given audio data to the specified file path.
-
-    Args:
-        audio_data (AudioData): The audio data to save.
-        file_path (str): The path where the audio file should be saved.
-    """
-    sf.write(file_path, audio_data.audio_signal, audio_data.sample_rate)
 
 
 def change_pitch(audio_data: AudioData, semitones: float) -> AudioData:
@@ -156,13 +132,13 @@ def add_echo(audio_data: AudioData, delay: float = 0.2, decay: float = 0.5) -> A
 
 
 def augmentations(audio_data: AudioData, options: list,
-                  semitones=DEFAULT_SEMITONES,
-                  speed_factor=DEFAULT_SPEED_FACTOR,
-                  noise_level=DEFAULT_NOISE_LEVEL,
-                  gain_db=DEFAULT_GAIN_DB,
-                  reverb_amount=DEFAULT_REVERB_AMOUNT,
-                  echo_delay=DEFAULT_ECHO_DELAY,
-                  echo_decay=DEFAULT_ECHO_DECAY) -> AudioData:
+                  semitones=AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
+                  speed_factor=AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
+                  noise_level=AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL,
+                  gain_db=AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
+                  reverb_amount=AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
+                  echo_delay=AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
+                  echo_decay=AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY) -> AudioData:
     """
     Applies a series of augmentations to the given audio data based on the specified options.
 
@@ -210,13 +186,13 @@ def process(file_path: str, output_path: str) -> None:
         file_path (str): The path to the input audio file.
         output_path (str): The base path for saving the output audio files.
     """
-    audio_data = load_file(file_path)
+    audio_data=AudioData(sf.read(file_path))
     options = ['pitch', 'speed', 'noise', 'volume', 'reverb', 'echo']
 
     for option in options:
         audio_data_augmented = augmentations(audio_data, [option])
         new_output_path = output_path.split('.')[0] + "_" + option + '.' + output_path.split('.')[1]
-        save_file(audio_data_augmented, new_output_path)
+        sf.write(file_path, new_output_path.audio_signal, new_output_path.sample_rate)
 
 
 def main(argv: list[str]) -> None:
