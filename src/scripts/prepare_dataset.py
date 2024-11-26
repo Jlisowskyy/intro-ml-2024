@@ -58,7 +58,7 @@ class DatabaseGenerator:
 
     def process(self, dry: bool) -> None:
         """
-        Script entry point
+        Process the dataset
         """
 
         self._dry = dry
@@ -100,6 +100,10 @@ class DatabaseGenerator:
     # ------------------------------
 
     def _worker(self) -> None:
+        """
+        Worker method
+        """
+
         while True:
             self._sem.acquire()
             with self._lock:
@@ -112,6 +116,10 @@ class DatabaseGenerator:
             self._sem_rev.release()
 
     def _process_file(self, file: str, folder: str, root: str, new_root: str) -> None:
+        """
+        Process a single file
+        """
+
         it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
                                 DATABASE_CUT_ITERATOR)
 
@@ -146,5 +154,8 @@ class DatabaseGenerator:
 
 
 def main(dry: bool = False) -> None:
+    """
+    Main method
+    """
     generator = DatabaseGenerator()
     generator.process(dry)
