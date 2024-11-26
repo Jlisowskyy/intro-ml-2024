@@ -85,7 +85,7 @@ class DatabaseGenerator:
         and empty queues/thread pools.
         """
 
-        # pylint: disable=too-many-instance-attributes
+        #pylint: disable=too-many-instance-attributes
         self._queue = []
         self._threads = []
         self._should_stop = False
