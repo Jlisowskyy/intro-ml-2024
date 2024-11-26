@@ -62,6 +62,7 @@ def gather_folders() -> list[str]:
     return folders
 
 
+#pylint: disable=too-many-instance-attributes
 class DatabaseGenerator:
     """
     A thread-safe database generator that processes audio files in parallel.
@@ -84,8 +85,6 @@ class DatabaseGenerator:
         Initializes the DatabaseGenerator with thread synchronization primitives
         and empty queues/thread pools.
         """
-
-        #pylint: disable=too-many-instance-attributes
         self._queue = []
         self._threads = []
         self._should_stop = False
