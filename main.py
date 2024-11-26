@@ -109,7 +109,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "transformation_pipeline": test_transformation_pipeline.transformation_pipeline_test,
     "test_classify": test_classify.example_test_run,
     "fit_to_window": test_fit_to_window.fit_to_window_test,
-    "noise_injector": test_noise_injector.noise_injector_test
+    "noise_injector": test_noise_injector.noise_injector_test,
+    "prepare_noise": prepare_noises.main()
 }
 
 
@@ -234,12 +235,6 @@ def handle_command(command: str, args: list[str] = None) -> bool:
         elif command in ('validate', '-v', '--validate'):
             print_success("Starting validation...")
             validate_dataset.main()
-        elif command in ('prepare_noise'):
-            print_success("Starting noise preparation...")
-            prepare_noises.main()
-        elif command in ('noise_injector'):
-            print_success("Injecting noise...")
-            prepare_noises.main()
         elif command in ('run', '-r', '--run'):
             print_success("Starting frontend...")
             fastapi_main()

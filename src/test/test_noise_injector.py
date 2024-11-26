@@ -1,5 +1,9 @@
 """
 Author: Michał Kwiatkowski
+
+This script tests the NoiseInjector class by applying noise to audio data and verifying
+the transformation. It uses predefined test files and evaluates the noise injection
+process using the test_transformation function.
 """
 
 from src.constants import (DEFAULT_FILE_NAMES,
@@ -20,8 +24,12 @@ TEST_FILES = {TestFile(
 
 def noise_injector_test() -> None:
     """
+    Test the NoiseInjector class by applying noise injection to audio data.
     """
     def transformation_func(audio_data: AudioData) -> AudioData:
+        """
+        Applies noise injection to the given audio data and returns the noisy audio.
+        """
         noise_injector = NoiseInjector()
         audio_with_noise = noise_injector.transform([audio_data])
         return audio_with_noise[0]

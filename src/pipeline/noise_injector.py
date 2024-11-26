@@ -1,68 +1,97 @@
 """
-Author: Michał Kwiatkowski
+Author: Michał Kwiatkowski, 2024
+
+This file defines a NoiseInjector class that injects random noise from a specified folder of 
+audio files into a list of input audio data. The noise is scaled based on a randomly chosen 
+signal-to-noise ratio (SNR) between a specified lower and upper bound.
+
+The NoiseInjector class includes methods to load random audio files, apply noise injection to 
+audio signals, and handle potential mismatches in sample rates and audio lengths. The class is 
+designed to process lists of AudioData objects and return a list of noise-injected AudioData 
+objects.
 """
 
 from os import listdir, path
 from random import choice
 import numpy as np
 import soundfile as sf
-from src.constants import DATABASE_OUT_NOISES
+from src.constants import DATABASE_OUT_NOISES, SNR_BOTTOM_BOUND, SNR_UPPER_BOUND
 from src.pipeline.audio_data import AudioData
 
 class NoiseInjector:
     """
-    ni ma
+    The NoiseInjector class injects random noise from a folder of noise files into a list of 
+    input audio data, modifying the audio signals by adding scaled noise with a randomly 
+    selected signal-to-noise ratio (SNR).
+
+    Attributes:
+        noise_folder_path (str): Path to the folder containing noise audio files. Default is 
+                                  `DATABASE_OUT_NOISES`.
     """
 
-    def __init__(self, noise_folder_path = DATABASE_OUT_NOISES) -> None:
+    def __init__(self, noise_folder_path=DATABASE_OUT_NOISES) -> None:
+        """
+        Initializes the NoiseInjector with the path to the folder containing noise files.
+
+        Parameters:
+            noise_folder_path (str): Path to the folder with noise audio files. Defaults to 
+                                      `DATABASE_OUT_NOISES`.
+        """
         self.noise_folder_path = noise_folder_path
-        return
 
     @staticmethod
     def get_random_audio_file(folder_path: str) -> str:
         """
         Get a random audio file from a specified folder.
 
-        Args:
+        Parameters:
             folder_path (str): The path to the folder containing audio files.
 
         Returns:
             str: The path to a randomly selected audio file.
-        """
-        # List all files in the folder
-        files = listdir(folder_path)
 
-        # Filter the list to include only audio files
+        Raises:
+            ValueError: If no audio files are found in the specified folder.
+        """
+        files = listdir(folder_path)
         audio_files = [f for f in files if f.endswith('.wav')]
 
         if not audio_files:
             raise ValueError("No audio files found in the specified folder.")
 
-        # Select a random file
         random_file = choice(audio_files)
-
-        random_file = 'pink_noise_000.wav'
-
         return path.join(folder_path, random_file)
 
     # pylint: disable=unused-argument
     def fit(self, x_data: list[AudioData], y_data: list[int] = None) -> 'NoiseInjector':
         """
-        ni ma
+        Placeholder method for fitting the noise injector, which is not implemented.
+        This function does not perform any actions in the current version.
+
+        Parameters:
+            x_data (list[AudioData]): List of input audio data to fit.
+            y_data (list[int], optional): List of target labels corresponding to the input audio 
+                                          data.
+
+        Returns:
+            NoiseInjector: The instance of the NoiseInjector class (unchanged).
         """
         return
 
     def transform(self, x_data: list[AudioData]) -> list[AudioData]:
         """
-        Inject random noise from a noise file to the input audio data.
-        
-        Args:
+        Injects random noise into the input audio data.
+
+        Parameters:
             x_data (list[AudioData]): List of input audio data to be noise-injected.
-        
+
         Returns:
-            list[AudioData]: List of noise-injected audio data.
+            list[AudioData]: List of audio data with added noise.
+
+        Raises:
+            ValueError: If the sample rate of the noise does not match the sample rate of the 
+                        input audio.
         """
-        # Noise-injected audio list
         noisy_audio_data = []
 
         for audio_data in x_data:
@@ -70,12 +99,11 @@ class NoiseInjector:
             noise_file_path = NoiseInjector.get_random_audio_file(self.noise_folder_path)
             noise_audio, noise_sample_rate = sf.read(noise_file_path)
 
-            # Convert noise to float32 using AudioData's to_float method
             noise_audio = AudioData.to_float(noise_audio)
-            
+
             if noise_sample_rate != audio_data.sample_rate:
-                # Resample noise if sample rates don't match
-                raise ValueError(f"Sample rate mismatch: noise {noise_sample_rate} vs audio {audio_data.sample_rate}")
+                raise ValueError(f"Sample rate mismatch: noise {noise_sample_rate} vs audio "
+                                 f"{audio_data.sample_rate}")
 
             if len(noise_audio) < len(audio_data.audio_signal):
                 # Repeat noise to match audio length
@@ -86,7 +114,7 @@ class NoiseInjector:
             noise_segment = noise_audio[:len(audio_data.audio_signal)]
 
             # Add noise with a random SNR
-            snr = np.random.uniform(10, 30)
+            snr = np.random.uniform(SNR_BOTTOM_BOUND, SNR_UPPER_BOUND)
             noise_power = np.mean(noise_segment**2)
             signal_power = np.mean(audio_data.audio_signal**2)
             noise_scale = np.sqrt(signal_power / (noise_power * (10 ** (snr/10))))

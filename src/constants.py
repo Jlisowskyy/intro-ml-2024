@@ -238,3 +238,10 @@ DEFAULT_TEST_FILES = [
 DEFAULT_SHOULD_PLOT = False
 DEFAULT_SAVE_SPECTROGRAMS = True
 DEFAULT_SAVE_AUDIO = True
+
+# ------------------------------
+# NOISE constants
+# ------------------------------
+
+SNR_BOTTOM_BOUND = 10
+SNR_UPPER_BOUND = 15
