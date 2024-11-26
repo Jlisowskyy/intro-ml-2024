@@ -108,7 +108,6 @@ class DatabaseGenerator:
         """
 
         with open(f"/tmp/annotations_{os.getpid()}.csv", "w", encoding="UTF-8") as f:
-            f.write("folder,file_name,classID\n")
             self._file = f
 
             for _ in range(NUM_THREADS_DB_PREPARE):
