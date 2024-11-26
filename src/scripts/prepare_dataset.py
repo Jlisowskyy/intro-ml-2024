@@ -273,12 +273,17 @@ def run_process(folders: list[str]) -> None:
         )
         processes.append(process)
 
-    for process in processes:
-        process.wait()
+    try:
+        for process in processes:
+            process.wait()
 
-        if process.returncode != 0:
-            stderr = process.stderr.read().decode()
-            print(f"Process failed with error: {stderr}", file=sys.stderr)
+            if process.returncode != 0:
+                stderr = process.stderr.read().decode()
+                print(f"Process failed with error: {stderr}", file=sys.stderr)
+    except KeyboardInterrupt:
+        for process in processes:
+            process.kill()
+        raise
 
 
 def main(dry: bool = False) -> None:
