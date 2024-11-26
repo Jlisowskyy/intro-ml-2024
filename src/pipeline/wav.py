@@ -163,7 +163,7 @@ class WavIteratorBase(ABC):
 
         return self._audio_data
 
-    def transform(self, transform_func: Callable[[AudioData], np.ndarray],
+    def transform(self, transform_func: Callable[[np.ndarray, int], np.ndarray],
                   new_channels: int | None = None) -> None:
         """
         Transform the audio data using the provided function
@@ -172,7 +172,7 @@ class WavIteratorBase(ABC):
         :param new_channels: Number of channels in the transformed data
         """
 
-        self._audio_data = transform_func(AudioData(self._audio_data, self._frame_rate))
+        self._audio_data = transform_func(self._audio_data, self._frame_rate)
         self._num_channels = new_channels if new_channels is not None else self._num_channels
         self._invalidate()
 
