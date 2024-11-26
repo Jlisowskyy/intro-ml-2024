@@ -14,8 +14,6 @@ import torchaudio
 import torchaudio.transforms
 from PIL import Image
 from matplotlib import pyplot as plt
-
-matplotlib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_HIGH_CUT,
@@ -23,6 +21,8 @@ from src.constants import (SPECTROGRAM_WIDTH, SPECTROGRAM_HEIGHT, DENOISE_FREQ_H
                            SPECTROGRAM_HOP_LENGTH,
                            SPECTROGRAM_N_MELS, DENOISE_FREQ_LOW_CUT)
 from src.pipeline.audio_data import AudioData
+
+matplotlib.use('Agg')
 
 
 class SpectrogramGenerator:
@@ -39,6 +39,7 @@ class SpectrogramGenerator:
         """
         return
 
+    #pylint: disable=too-many-locals
     @staticmethod
     def gen_spectrogram(audio: AudioData, mel: bool = False,
                         show_axis: bool = False, width: int = SPECTROGRAM_WIDTH,
