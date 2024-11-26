@@ -172,7 +172,7 @@ CLASSES = [
     'go',
     'unknown',
     # 'silence'
-]
+] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_NAME: str = 'kaggle'
@@ -182,9 +182,13 @@ DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
 DATABASE_ANNOTATIONS_PATH: str = './annotations_kaggle.csv'
 DATABASE_VALID_WAV_SR: int = 16000
 
+DATABASE_NOISES: str = f'{DATABASE_PATH}/train/_background_noise_'
+DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
+
 # ------------------------------
 # MODEL constants
 # ------------------------------
+MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
@@ -204,6 +208,18 @@ HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX: str = '_spectrograms'
 HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR: str = 'work_dir'
 HELPER_SCRIPTS_HISTOGRAM_N_BINS: int = 256
 HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
+
+
+# audio_augmentation.py
+GENERATE_WITH_AUGMENTATION: bool = False
+
+AUDIO_AUGMENTATION_DEFAULT_SEMITONES = 6
+AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR = 0.5
+AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL = 0.03
+AUDIO_AUGMENTATION_DEFAULT_GAIN_DB = -10
+AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT = 0.1
+AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY = 0.25
+AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY = 0.6
 
 # ------------------------------
 # TEST constants
@@ -243,3 +259,10 @@ DEFAULT_SAVE_AUDIO = True
 
 NUM_THREADS_DB_PREPARE: int = 2
 NUM_PROCESSES_DB_PREPARE: int = 8
+
+# ------------------------------
+# NOISE constants
+# ------------------------------
+
+SNR_BOTTOM_BOUND = 10
+SNR_UPPER_BOUND = 15
