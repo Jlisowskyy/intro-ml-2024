@@ -37,6 +37,7 @@ from src.scripts import prepare_dataset
 from src.scripts import regenerate_csv
 from src.scripts import spectrogram_script
 from src.scripts import validate_dataset
+from src.scripts import prepare_noises
 from src.test import test_classify
 from src.test import test_cnn
 from src.test import test_cut_wav
@@ -229,6 +230,9 @@ def handle_command(command: str, args: list[str] = None) -> bool:
         elif command in ('validate', '-v', '--validate'):
             print_success("Starting validation...")
             validate_dataset.main()
+        elif command in ('noise'):
+            print_success("Starting noise preparation...")
+            prepare_noises.main()
         elif command in ('run', '-r', '--run'):
             print_success("Starting frontend...")
             fastapi_main()
