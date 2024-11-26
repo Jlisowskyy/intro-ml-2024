@@ -47,6 +47,7 @@ from src.test import test_normalize
 from src.test import test_transformation_pipeline
 from src.test import test_wav
 from src.test import test_noise_injector
+from src.test import test_augmentation
 
 # Initialize colorama
 init()
@@ -110,7 +111,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "test_classify": test_classify.example_test_run,
     "fit_to_window": test_fit_to_window.fit_to_window_test,
     "noise_injector": test_noise_injector.noise_injector_test,
-    "prepare_noise": prepare_noises.main()
+    "prepare_noise": prepare_noises.main,
+    "test_augmentation": test_augmentation.main
 }
 
 
