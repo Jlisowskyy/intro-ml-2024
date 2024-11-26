@@ -19,7 +19,7 @@ from os import walk, path, makedirs
 
 import numpy as np
 
-from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
+from src.constants import MODEL_WINDOW_LENGTH_SECONDS, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME, NUM_THREADS_DB_PREPARE, \
     NUM_PROCESSES_DB_PREPARE
@@ -181,16 +181,16 @@ class DatabaseGenerator:
             - Handles padding for shorter audio files
             - Saves output as NumPy arrays
         """
-        it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
-                               DATABASE_CUT_ITERATOR)
+        it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH_SECONDS,
+                                DATABASE_CUT_ITERATOR)
 
         sr = it.get_first_iter().get_frame_rate()
         it = AudioDataIterator(it)
         audio_data = next(iter(it))
 
-        if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
+        if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH_SECONDS * sr:
             audio_data.audio_signal = np.pad(audio_data.audio_signal,
-                                           (0, MODEL_WINDOW_LENGTH * sr - len(
+                                           (0, MODEL_WINDOW_LENGTH_SECONDS * sr - len(
                                                audio_data.audio_signal)),
                                            constant_values=(0, 0))
 

@@ -10,7 +10,7 @@ from os import walk, path, makedirs
 import numpy as np
 from tqdm import tqdm
 
-from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
+from src.constants import MODEL_WINDOW_LENGTH_SECONDS, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, SPEAKER_CLASSES, \
     DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME
 from src.pipeline.base_preprocessing_pipeline import process_audio
@@ -37,7 +37,7 @@ def main() -> None:
                 # RIP /^(m[368])|(f[178][^0])/
                 speaker = re.search(r'[fm]\d\d?', file)[0]
                 data_class_id = SPEAKER_CLASSES[speaker]
-                it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH,
+                it = FlattenWavIterator(path.join(root, file), MODEL_WINDOW_LENGTH_SECONDS,
                                         DATABASE_CUT_ITERATOR)
                 sr = it.get_first_iter().get_frame_rate()
                 it = AudioDataIterator(it)
@@ -45,7 +45,7 @@ def main() -> None:
                 sub_file_counter: int = 0
                 for audio_data in it:
                     # Omit not full chunks to avoid filling the dataset with silence
-                    if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH * sr:
+                    if len(audio_data.audio_signal) < MODEL_WINDOW_LENGTH_SECONDS * sr:
                         continue
 
                     spectrogram = process_audio(audio_data, NORMALIZATION_TYPE)

@@ -6,7 +6,7 @@ Module for classifying audio data using a CNN model.
 """
 
 from src.cnn.cnn import BasicCNN
-from src.constants import MODEL_WINDOW_LENGTH, WavIteratorType, CLASSIFICATION_CONFIDENCE_THRESHOLD
+from src.constants import MODEL_WINDOW_LENGTH_SECONDS, WavIteratorType, CLASSIFICATION_CONFIDENCE_THRESHOLD
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 
 
@@ -20,7 +20,7 @@ def classify_file(file_path: str, model: BasicCNN) -> bool:
     :return: True if audio belongs 1 claas, False otherwise
     """
 
-    it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
+    it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH_SECONDS, WavIteratorType.OVERLAPPING)
     it = AudioDataIterator(it)
 
     results = [0, 0]

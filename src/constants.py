@@ -186,7 +186,7 @@ DATABASE_VALID_WAV_SR: int = 16000
 # MODEL constants
 # ------------------------------
 
-MODEL_WINDOW_LENGTH: int = 1
+MODEL_WINDOW_LENGTH_SECONDS: float = 1
 MODEL_BASE_PATH: str = './models/model.pth'
 MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
 
