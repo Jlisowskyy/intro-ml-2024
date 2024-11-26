@@ -201,3 +201,9 @@ HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX: str = '_spectrograms'
 HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR: str = 'work_dir'
 HELPER_SCRIPTS_HISTOGRAM_N_BINS: int = 256
 HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
+
+# ------------------------------
+# THREADING constants
+# ------------------------------
+
+NUM_THREADS_DB_PREPARE = 32
