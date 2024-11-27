@@ -57,20 +57,20 @@ class DeeperCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
         self.relu2 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
         self.relu3 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 256)
+        self.fc1 = nn.Linear(self.flattened_size, 64)
         self.relu4 = nn.ReLU()
-        self.fc2 = nn.Linear(256, len(CLASSES))
+        self.fc2 = nn.Linear(64, len(CLASSES))
 
     def forward(self, x):
         x = self.relu1(self.conv1(x))
@@ -101,18 +101,18 @@ class WideCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 256)
+        self.fc1 = nn.Linear(self.flattened_size, 32)
         self.relu3 = nn.ReLU()
-        self.fc2 = nn.Linear(256, len(CLASSES))
+        self.fc2 = nn.Linear(32, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.conv1(x)))
@@ -137,21 +137,21 @@ class DropoutCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=5)
+        self.conv1 = nn.Conv2d(3, 8, kernel_size=5)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
         self.dropout1 = nn.Dropout(0.25)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=5)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=5)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
         self.dropout2 = nn.Dropout(0.25)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 256)
+        self.fc1 = nn.Linear(self.flattened_size, 32)
         self.relu3 = nn.ReLU()
         self.dropout3 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(256, len(CLASSES))
+        self.fc2 = nn.Linear(32, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.conv1(x)))
@@ -181,20 +181,20 @@ class BatchNormCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
-        self.batchnorm1 = nn.BatchNorm2d(32)
+        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
+        self.batchnorm1 = nn.BatchNorm2d(8)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.batchnorm2 = nn.BatchNorm2d(64)
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
+        self.batchnorm2 = nn.BatchNorm2d(16)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 128)
+        self.fc1 = nn.Linear(self.flattened_size, 32)
         self.relu3 = nn.ReLU()
-        self.fc2 = nn.Linear(128, len(CLASSES))
+        self.fc2 = nn.Linear(32, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.batchnorm1(self.conv1(x))))
@@ -241,9 +241,9 @@ class BasicCNN(BaseCNN):
 
 # List of model definitions
 model_definitions = [
+    ModelDefinition('DeeperCNN', DeeperCNN),
     ModelDefinition('BasicCNN', BasicCNN),
     ModelDefinition('SimpleCNN', SimpleCNN),
-    ModelDefinition('DeeperCNN', DeeperCNN),
     ModelDefinition('WideCNN', WideCNN),
     ModelDefinition('DropoutCNN', DropoutCNN),
     ModelDefinition('BatchNormCNN', BatchNormCNN),
