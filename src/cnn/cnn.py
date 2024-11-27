@@ -63,7 +63,7 @@ class BaseCNN(nn.Module, ABC):
         """
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        cnn = cls(class_count=len(CLASSES))
+        cnn = cls()
         cnn.load_state_dict(torch.load(model_file_path, map_location=torch.device(device),
                                        weights_only=True))
         cnn.to(device)

@@ -13,6 +13,8 @@ from src.constants import (TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
                            TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH,
                            DATABASE_OUT_PATH, MODEL_BASE_PATH)
 from src.model_definitions import BasicCNN
+from src.model_definitions import model_definitions
+from src.cnn.model_definition import ModelDefinition
 
 
 def main() -> None:
@@ -20,10 +22,21 @@ def main() -> None:
     Script entry point
     """
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    cnn = None
+    for model_definition in model_definitions:
+        try:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            temp_cnn = model_definition.model()
+            temp_cnn.load_model(MODEL_BASE_PATH)
+            cnn = temp_cnn
+            break
+        except Exception as e:
+            print(f'Failed to load model {model_definition.model_name}: {e}')
+            continue
 
-    cnn = BasicCNN()  # TODO: REPLACE IT WITH YOUR MODEL
-    cnn.load_model(MODEL_BASE_PATH)
+    if cnn is None:
+        print('No model was loaded')
+        return
 
     dataset = MultiLabelDataset(
         DATABASE_ANNOTATIONS_PATH,
