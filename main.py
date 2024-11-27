@@ -47,7 +47,6 @@ from src.test import test_normalize
 from src.test import test_silence_removal
 from src.test import test_transformation_pipeline
 from src.test import test_wav
-from src.test import test_noise_injector
 from src.test import test_augmentation
 
 # Initialize colorama
