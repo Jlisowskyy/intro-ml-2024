@@ -6,14 +6,13 @@ Module featuring training functions plus a training setup
 from datetime import datetime
 from random import randint
 
-from sklearn.preprocessing import LabelEncoder
 import torch
+from sklearn.preprocessing import LabelEncoder
 from torch import nn
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
@@ -241,7 +240,7 @@ def main() -> None:
             now = datetime.now().strftime('%Y-%m-%dT%H:%M')
             torch.save(cnn.state_dict(),
                        f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
-            validator = test(cnn, test_dataloader, device, dataset.get_labels())
+            validator = test(cnn, test_dataloader, device, dataset.le)
             if validator.get_macro_f1() > best_macro_f1:
                 best_macro_f1 = validator.get_macro_f1()
                 best_model = cnn
@@ -254,4 +253,4 @@ def main() -> None:
         return
     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
     torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
-    test(best_model, test_dataloader, device, dataset.get_labels())
+    test(best_model, test_dataloader, device, dataset.le)

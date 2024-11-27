@@ -26,7 +26,7 @@ model_definitions = []
 
 
 # Default CNN model
-default_cnn = BasicCNN(len(CLASSES))
+default_cnn = BasicCNN()
 model_definitions.append(ModelDefinition('DefaultCNN', default_cnn))
 
 
