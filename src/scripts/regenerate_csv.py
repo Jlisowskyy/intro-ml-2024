@@ -15,6 +15,7 @@ def main() -> None:
     Script entry point
     """
 
+    print('Regenerating annotations.csv')
     with open(DATABASE_ANNOTATIONS_PATH, 'w', encoding='UTF-8') as f:
         f.write('folder,file_name,classID\n')
         for root, _, files in walk(DATABASE_OUT_PATH):
