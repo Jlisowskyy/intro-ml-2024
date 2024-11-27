@@ -6,12 +6,14 @@ Module featuring training functions plus a training setup
 from datetime import datetime
 from random import randint
 
+from sklearn.preprocessing import LabelEncoder
 import torch
 from torch import nn
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
+from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
@@ -28,7 +30,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False,
-        labels: list[object] | None = None
+        labels: LabelEncoder | None = None
 ) -> None:
     """
     Method training `model` a single iteration with the data provided
@@ -112,7 +114,7 @@ def validate(
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
           device: str, epochs: int, val_data: DataLoader | None = None,
-          labels: list[object] | None = None) -> None:
+          labels: LabelEncoder | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -158,7 +160,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
 
 def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
-         labels: list[object] | None = None) -> Validator:
+         labels: LabelEncoder | None = None) -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -234,7 +236,7 @@ def main() -> None:
                                         lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
             train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-                  validate_dataloader)
+                  validate_dataloader, dataset.get_encoder())
 
             now = datetime.now().strftime('%Y-%m-%dT%H:%M')
             torch.save(cnn.state_dict(),
@@ -252,3 +254,4 @@ def main() -> None:
         return
     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
     torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
+    test(best_model, test_dataloader, device, dataset.get_labels())

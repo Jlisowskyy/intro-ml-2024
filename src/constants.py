@@ -171,6 +171,7 @@ CLASSES = [
     'stop',
     'go',
     'unknown',
+    # 'silence'
 ] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
