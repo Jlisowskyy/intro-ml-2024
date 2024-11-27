@@ -4,8 +4,8 @@ Author: Jakub Lisowski, 2024
 File collects various constants used in the project as well as enums used for configuration.
 """
 
-from pathlib import Path
 from enum import Enum, IntEnum
+from pathlib import Path
 
 from src.test.test_file import TestFile
 
@@ -94,13 +94,14 @@ NORMALIZATION_PCEN_HOP_LENGTH: int = 512
 # TRAINING constants
 # ------------------------------
 
-TRAINING_TRAIN_BATCH_SIZE: int = 128
-TRAINING_VALIDATION_BATCH_SIZE: int = 128
-TRAINING_TEST_BATCH_SIZE: int = 128
+TRAINING_TRAIN_BATCH_SIZE: int = 32
+TRAINING_VALIDATION_BATCH_SIZE: int = 32
+TRAINING_TEST_BATCH_SIZE: int = 32
 TRAINING_EPOCHS: int = 10
 # 0.1 seems to be too high (exploding loss)
 # this porridge is pretty decent (maybe should be smaller? TODO: check)
-TRAINING_LEARNING_RATES: list[float] = [0.0001]
+# TRAINING_LEARNING_RATES: list[float] = [0.0001]
+TRAINING_LEARNING_RATES: list[float] = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
 TRAINING_TRAIN_SET_SIZE: float = 0.64
 TRAINING_VALIDATION_SET_SIZE: float = 0.16
 TRAINING_TEST_SET_SIZE: float = 0.2

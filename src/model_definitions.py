@@ -11,6 +11,7 @@ from src.cnn.cnn import BaseCNN
 from src.cnn.model_definition import ModelDefinition
 from src.constants import CLASSES, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH
 
+
 # pylint: disable=missing-class-docstring,missing-function-docstring
 
 
@@ -57,20 +58,20 @@ class DeeperCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.relu2 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv3 = nn.Conv2d(16, 32, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         self.relu3 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 64)
+        self.fc1 = nn.Linear(self.flattened_size, 256)
         self.relu4 = nn.ReLU()
-        self.fc2 = nn.Linear(64, len(CLASSES))
+        self.fc2 = nn.Linear(256, len(CLASSES))
 
     def forward(self, x):
         x = self.relu1(self.conv1(x))
@@ -101,18 +102,18 @@ class WideCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 32)
+        self.fc1 = nn.Linear(self.flattened_size, 256)
         self.relu3 = nn.ReLU()
-        self.fc2 = nn.Linear(32, len(CLASSES))
+        self.fc2 = nn.Linear(256, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.conv1(x)))
@@ -137,21 +138,21 @@ class DropoutCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 8, kernel_size=5)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=5)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
         self.dropout1 = nn.Dropout(0.25)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=5)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
         self.dropout2 = nn.Dropout(0.25)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 32)
+        self.fc1 = nn.Linear(self.flattened_size, 256)
         self.relu3 = nn.ReLU()
         self.dropout3 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(32, len(CLASSES))
+        self.fc2 = nn.Linear(256, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.conv1(x)))
@@ -181,20 +182,20 @@ class BatchNormCNN(BaseCNN):
 
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 8, kernel_size=3, padding=1)
-        self.batchnorm1 = nn.BatchNorm2d(8)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.batchnorm1 = nn.BatchNorm2d(32)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(2)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=3, padding=1)
-        self.batchnorm2 = nn.BatchNorm2d(16)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.batchnorm2 = nn.BatchNorm2d(64)
         self.relu2 = nn.ReLU()
         self.pool2 = nn.MaxPool2d(2)
 
         self.flattened_size = self._get_flattened_size()
 
-        self.fc1 = nn.Linear(self.flattened_size, 32)
+        self.fc1 = nn.Linear(self.flattened_size, 128)
         self.relu3 = nn.ReLU()
-        self.fc2 = nn.Linear(32, len(CLASSES))
+        self.fc2 = nn.Linear(128, len(CLASSES))
 
     def forward(self, x):
         x = self.pool1(self.relu1(self.batchnorm1(self.conv1(x))))
@@ -239,8 +240,61 @@ class BasicCNN(BaseCNN):
         return x
 
 
+class ResidualCNN(BaseCNN):
+    """
+    Simple CNN with residual blocks
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        # Residual blocks
+        self.res_block1 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64)
+        )
+
+        self.res_block2 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128)
+        )
+
+        self.conv_downsample = nn.Conv2d(64, 128, kernel_size=1)
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(128, len(CLASSES))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.pool(tnnf.relu(self.bn1(self.conv1(x))))
+
+        # First residual block
+        identity = x
+        x = self.res_block1(x)
+        x += identity
+        x = tnnf.relu(x)
+
+        # Second residual block with dimension increase
+        identity = self.conv_downsample(x)
+        x = self.res_block2(x)
+        x += identity
+        x = tnnf.relu(x)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.fc(x)
+        return x
+
 # List of model definitions
 model_definitions = [
+    ModelDefinition('ResidualCNN', ResidualCNN),
     ModelDefinition('DeeperCNN', DeeperCNN),
     ModelDefinition('BasicCNN', BasicCNN),
     ModelDefinition('SimpleCNN', SimpleCNN),
