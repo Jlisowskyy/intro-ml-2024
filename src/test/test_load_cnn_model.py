@@ -7,7 +7,7 @@ and print its details.
 
 import argparse
 
-from src.cnn.cnn import BasicCNN
+from src.model_definitions import BasicCNN
 
 
 def main():

@@ -6,7 +6,7 @@ State of the application
 
 from pathlib import Path
 
-from src.cnn.cnn import BasicCNN
+from src.model_definitions import BasicCNN
 from src.constants import MODEL_BASE_PATH
 
 

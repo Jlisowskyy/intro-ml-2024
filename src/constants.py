@@ -191,7 +191,7 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
-MODEL_BASE_PATH: str = './cnn_e9_backup.pth'
+MODEL_BASE_PATH: str = f'./{MODELS_DIR}/cnn_e9_backup-2024-11-26T23:45.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """

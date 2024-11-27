@@ -22,7 +22,7 @@ def main() -> None:
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    cnn = BaseCNN()
+    cnn = BaseCNN()  # TODO: fix this
     cnn.load_state_dict(torch.load(MODEL_BASE_PATH,
                                    map_location=torch.device(device),
                                    weights_only=True))
