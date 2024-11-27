@@ -12,10 +12,10 @@ objects.
 """
 
 from os import listdir, path
-from random import Random
+from random import Random, randint
 import numpy as np
 import soundfile as sf
-from src.constants import DATABASE_OUT_NOISES, DEFAULT_SEED, SNR_BOTTOM_BOUND, SNR_UPPER_BOUND
+from src.constants import DATABASE_OUT_NOISES, SNR_BOTTOM_BOUND, SNR_UPPER_BOUND
 from src.pipeline.audio_data import AudioData
 
 class NoiseInjector:
@@ -29,7 +29,8 @@ class NoiseInjector:
                                   `DATABASE_OUT_NOISES`.
     """
 
-    def __init__(self, noise_folder_path = DATABASE_OUT_NOISES, seed: int = DEFAULT_SEED) -> None:
+    def __init__(self, noise_folder_path = DATABASE_OUT_NOISES,
+                 seed: int = randint(0, 1 << 32)) -> None:
         """
         Initializes the NoiseInjector with the path to the folder containing noise files.
 
@@ -40,6 +41,7 @@ class NoiseInjector:
         self.noise_folder_path = noise_folder_path
         self._seed = seed
         self._rng = Random(seed)
+        print(f'Noise Injector seed: {self._rng}')
 
     def get_random_audio_file(self, folder_path: str) -> str:
         """
