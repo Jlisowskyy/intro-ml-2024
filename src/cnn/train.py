@@ -227,7 +227,7 @@ def main() -> None:
     for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
         for model_definition in model_definitions:
             print(f"Training {model_definition.model_name} with learning rate {learning_rate}")
-            cnn = model_definition.model.to(device)
+            cnn = model_definition.model().to(device)
             print(cnn)
 
             loss_function = nn.CrossEntropyLoss()

@@ -241,10 +241,10 @@ class BasicCNN(BaseCNN):
 
 # List of model definitions
 model_definitions = [
-    ModelDefinition('BasicCNN', BasicCNN()),
-    ModelDefinition('SimpleCNN', SimpleCNN()),
-    ModelDefinition('DeeperCNN', DeeperCNN()),
-    ModelDefinition('WideCNN', WideCNN()),
-    ModelDefinition('DropoutCNN', DropoutCNN()),
-    ModelDefinition('BatchNormCNN', BatchNormCNN()),
+    ModelDefinition('BasicCNN', BasicCNN),
+    ModelDefinition('SimpleCNN', SimpleCNN),
+    ModelDefinition('DeeperCNN', DeeperCNN),
+    ModelDefinition('WideCNN', WideCNN),
+    ModelDefinition('DropoutCNN', DropoutCNN),
+    ModelDefinition('BatchNormCNN', BatchNormCNN),
 ]
