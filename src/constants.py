@@ -4,8 +4,8 @@ Author: Jakub Lisowski, 2024
 File collects various constants used in the project as well as enums used for configuration.
 """
 
-from pathlib import Path
 from enum import Enum, IntEnum
+from pathlib import Path
 
 from src.test.test_file import TestFile
 
@@ -94,13 +94,14 @@ NORMALIZATION_PCEN_HOP_LENGTH: int = 512
 # TRAINING constants
 # ------------------------------
 
-TRAINING_TRAIN_BATCH_SIZE: int = 128
-TRAINING_VALIDATION_BATCH_SIZE: int = 128
-TRAINING_TEST_BATCH_SIZE: int = 128
+TRAINING_TRAIN_BATCH_SIZE: int = 32
+TRAINING_VALIDATION_BATCH_SIZE: int = 32
+TRAINING_TEST_BATCH_SIZE: int = 32
 TRAINING_EPOCHS: int = 10
 # 0.1 seems to be too high (exploding loss)
 # this porridge is pretty decent (maybe should be smaller? TODO: check)
-TRAINING_LEARNING_RATES: list[float] = [0.0001]
+# TRAINING_LEARNING_RATES: list[float] = [0.0001]
+TRAINING_LEARNING_RATES: list[float] = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]
 TRAINING_TRAIN_SET_SIZE: float = 0.64
 TRAINING_VALIDATION_SET_SIZE: float = 0.16
 TRAINING_TEST_SET_SIZE: float = 0.2
@@ -191,7 +192,7 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
-MODEL_BASE_PATH: str = './cnn_e9_backup.pth'
+MODEL_BASE_PATH: str = f'./{MODELS_DIR}/cnn_e9_backup-2024-11-26T23:45.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """

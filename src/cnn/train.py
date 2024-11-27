@@ -6,20 +6,20 @@ Module featuring training functions plus a training setup
 from datetime import datetime
 from random import randint
 
-from sklearn.preprocessing import LabelEncoder
 import torch
+from sklearn.preprocessing import LabelEncoder
 from torch import nn
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from src.cnn.cnn import BasicCNN
 from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR
+from src.model_definitions import model_definitions
 
 
 def train_single_epoch(
@@ -150,11 +150,11 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
         valid_loss = validate(model, val_data, loss_fn, device)
         print(f'Validation loss: {valid_loss / len(val_data)}')
-        if valid_loss < min_valid_loss:
-            min_valid_loss = valid_loss
-            # backup for longer training sessions
-            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-            torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
+        # if valid_loss < min_valid_loss:
+        #     min_valid_loss = valid_loss
+        #     # backup for longer training sessions
+        #     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+        #     torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
     print("Finished training")
 
 
@@ -222,16 +222,40 @@ def main() -> None:
     print(f"Label names: {dataset.get_labels()}")
 
     # training
-    for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-        cnn = BasicCNN().to(device)
-        print(cnn)
+    best_macro_f1 = 0.0
+    best_model = None
+    for _ in range(3):
+        for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+            for model_definition in model_definitions:
+                try:
+                    print(f"Training {model_definition.model_name} with learning rate {learning_rate}")
+                    cnn = model_definition.model().to(device)
+                    print(cnn)
 
-        loss_function = nn.CrossEntropyLoss()
-        optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
+                    loss_function = nn.CrossEntropyLoss()
+                    optimiser = torch.optim.SGD(cnn.parameters(),
+                                                lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-              validate_dataloader, dataset.get_encoder())
+                    train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                          validate_dataloader, dataset.get_encoder())
 
-        now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device, dataset.get_encoder())
+                    now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+                    torch.save(cnn.state_dict(),
+                               f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
+                    validator = test(cnn, test_dataloader, device, dataset.le)
+                    if validator.get_macro_f1() > best_macro_f1:
+                        best_macro_f1 = validator.get_macro_f1()
+                        best_model = cnn
+                except Exception as e:
+                    print(e)
+
+
+    print(f"Best model: {best_model}")
+    print(f"Best macro F1: {best_macro_f1}")
+
+    if best_model is None:
+        print("No model was selected as the best (This is a bug)")
+        return
+    now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
+    test(best_model, test_dataloader, device, dataset.le)
