@@ -23,8 +23,8 @@ Adding new functionality:
 import argparse
 import inspect
 import traceback
-from pathlib import Path
 from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 import uvicorn
@@ -34,16 +34,17 @@ from src.cnn import train
 from src.scripts import data_analysis
 from src.scripts import generate_rgb_histogram
 from src.scripts import prepare_dataset
+from src.scripts import prepare_noises
 from src.scripts import regenerate_csv
 from src.scripts import spectrogram_script
 from src.scripts import validate_dataset
-from src.scripts import prepare_noises
 from src.test import test_classify, test_fit_to_window
 from src.test import test_cnn
 from src.test import test_cut_wav
 from src.test import test_denoise
-from src.test import test_silence_removal
+from src.test import test_noise_injector
 from src.test import test_normalize
+from src.test import test_silence_removal
 from src.test import test_transformation_pipeline
 from src.test import test_wav
 from src.test import test_noise_injector

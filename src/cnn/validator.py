@@ -3,14 +3,11 @@ Author: Jakub Lisowski, Tomasz Mycielski, 2024
 
 Simple class providing a simple validation method
 """
-from collections.abc import Iterable
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
-
 
 class Validator:
     """
@@ -21,26 +18,28 @@ class Validator:
 
     _results: pd.DataFrame
 
-    def __init__(self, classes: Iterable[any] = None) -> None:
+    def __init__(self, le: LabelEncoder = None) -> None:
         """
         Method initializing the validation
         """
-        if not classes:
+        if le is None:
             classes = [0, 1]
+        else:
+            classes = le.classes_
 
+        self.le = le
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
-    def validate(self, predictions: Tensor, target: Tensor,
-                 le: LabelEncoder | None = None) -> None:
+    def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
         Method saving the results of the validation
         """
-        if le is None:
+        if self.le is None:
             for response, answer in zip(predictions, target):
                 self._results.loc[answer.item(), response.argmax(0).item()] += 1
         else:
             for response, answer in zip(predictions, target):
-                loc = tuple(le.inverse_transform((answer.item(), response.argmax(0).item())))
+                loc = tuple(self.le.inverse_transform((answer.item(), response.argmax(0).item())))
                 self._results.loc[loc] += 1
 
     def get_f1_score(self) -> float | None:

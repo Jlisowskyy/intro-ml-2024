@@ -6,6 +6,7 @@ Module featuring training functions plus a training setup
 from datetime import datetime
 from random import randint
 
+from sklearn.preprocessing import LabelEncoder
 import torch
 from torch import nn
 from torch.optim.optimizer import Optimizer
@@ -18,7 +19,7 @@ from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR
 
 
 def train_single_epoch(
@@ -28,7 +29,7 @@ def train_single_epoch(
         optim: Optimizer,
         device: str,
         calculate_accuracy: bool = False,
-        labels: list[object] | None = None
+        labels: LabelEncoder | None = None
 ) -> None:
     """
     Method training `model` a single iteration with the data provided
@@ -104,7 +105,6 @@ def validate(
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
-        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
@@ -113,7 +113,7 @@ def validate(
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
           device: str, epochs: int, val_data: DataLoader | None = None,
-          labels: list[object] | None = None) -> None:
+          labels: LabelEncoder | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -153,12 +153,13 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
         if valid_loss < min_valid_loss:
             min_valid_loss = valid_loss
             # backup for longer training sessions
-            torch.save(model.state_dict(), f'cnn_e{i + 1}_backup.pth')
+            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
     print("Finished training")
 
 
 def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
-         labels: list[object] | None = None) -> Validator:
+         labels: LabelEncoder | None = None) -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -218,17 +219,19 @@ def main() -> None:
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
     test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
+    print(f"Label names: {dataset.get_labels()}")
+
     # training
     for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-        cnn = BasicCNN(len(dataset.get_labels())).to(device)
+        cnn = BasicCNN().to(device)
         print(cnn)
 
         loss_function = nn.CrossEntropyLoss()
         optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
         train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-              validate_dataloader)
+              validate_dataloader, dataset.get_encoder())
 
         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
         torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device, dataset.get_labels())
+        test(cnn, test_dataloader, device, dataset.get_encoder())

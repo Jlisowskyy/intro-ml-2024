@@ -171,8 +171,8 @@ CLASSES = [
     'stop',
     'go',
     'unknown',
-    'silence'
-]
+    # 'silence'
+] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_NAME: str = 'kaggle'
@@ -188,10 +188,10 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 # ------------------------------
 # MODEL constants
 # ------------------------------
+MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
-MODEL_BASE_PATH: str = './models/model.pth'
-MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
+MODEL_BASE_PATH: str = './cnn_e9_backup.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """
@@ -210,7 +210,7 @@ HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
 
 
 # audio_augmentation.py
-GENERATE_WITH_AUGMENTATION: bool = True
+GENERATE_WITH_AUGMENTATION: bool = False
 
 AUDIO_AUGMENTATION_DEFAULT_SEMITONES = 6
 AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR = 0.5
