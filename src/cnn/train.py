@@ -150,6 +150,7 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
         valid_loss = validate(model, val_data, loss_fn, device)
         print(f'Validation loss: {valid_loss / len(val_data)}')
+        # pylint: disable=consider-using-min-builtin
         if valid_loss < min_valid_loss:
             # TODO: Make this config dependent
             min_valid_loss = valid_loss
