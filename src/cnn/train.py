@@ -18,7 +18,7 @@ from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR, TRAINING_RETRY_ATTEMPTS
 from src.model_definitions import model_definitions
 
 
@@ -150,11 +150,12 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
 
         valid_loss = validate(model, val_data, loss_fn, device)
         print(f'Validation loss: {valid_loss / len(val_data)}')
-        # if valid_loss < min_valid_loss:
-        #     min_valid_loss = valid_loss
-        #     # backup for longer training sessions
-        #     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        #     torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
+        if valid_loss < min_valid_loss:
+            # TODO: Make this config dependent
+            min_valid_loss = valid_loss
+            # backup for longer training sessions
+            # now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            # torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
     print("Finished training")
 
 
@@ -224,11 +225,12 @@ def main() -> None:
     # training
     best_macro_f1 = 0.0
     best_model = None
-    for _ in range(3):
+    for _ in range(TRAINING_RETRY_ATTEMPTS):
         for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
             for model_definition in model_definitions:
                 try:
-                    print(f"Training {model_definition.model_name} with learning rate {learning_rate}")
+                    print(f"Training {model_definition.model_name} "
+                          f"with learning rate {learning_rate}")
                     cnn = model_definition.model().to(device)
                     print(cnn)
 
@@ -246,9 +248,9 @@ def main() -> None:
                     if validator.get_macro_f1() > best_macro_f1:
                         best_macro_f1 = validator.get_macro_f1()
                         best_model = cnn
+                # pylint: disable=broad-except
                 except Exception as e:
-                    print(e)
-
+                    print(f"Error while training {model_definition.model_name}: {e}")
 
     print(f"Best model: {best_model}")
     print(f"Best macro F1: {best_macro_f1}")

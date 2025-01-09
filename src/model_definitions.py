@@ -296,9 +296,9 @@ class ResidualCNN(BaseCNN):
 model_definitions = [
     ModelDefinition('ResidualCNN', ResidualCNN),
     ModelDefinition('DeeperCNN', DeeperCNN),
-    ModelDefinition('BasicCNN', BasicCNN),
-    ModelDefinition('SimpleCNN', SimpleCNN),
     ModelDefinition('WideCNN', WideCNN),
     ModelDefinition('DropoutCNN', DropoutCNN),
     ModelDefinition('BatchNormCNN', BatchNormCNN),
+    ModelDefinition('BasicCNN', BasicCNN),
+    ModelDefinition('SimpleCNN', SimpleCNN),
 ]
