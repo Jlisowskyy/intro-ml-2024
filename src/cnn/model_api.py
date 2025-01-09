@@ -6,7 +6,7 @@ Module for classifying audio data using a CNN model.
 """
 from sklearn.preprocessing import LabelEncoder
 
-from src.cnn.cnn import BasicCNN
+from src.model_definitions import BasicCNN
 from src.constants import (MODEL_WINDOW_LENGTH, WavIteratorType,
                            CLASSIFICATION_CONFIDENCE_THRESHOLD, CLASSES)
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
@@ -24,7 +24,6 @@ def classify_file(file_path: str, model: BasicCNN) -> str:
 
     :return: The predicted class label or an error message
     """
-
     it = FlattenWavIterator(file_path, MODEL_WINDOW_LENGTH, WavIteratorType.OVERLAPPING)
     it = AudioDataIterator(it)
 

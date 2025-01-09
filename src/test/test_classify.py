@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from src.cnn.cnn import BasicCNN
+from src.model_definitions import BasicCNN
 from src.pipeline.audio_data import AudioData
 
 # TODO: Kill this file
