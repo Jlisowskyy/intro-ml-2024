@@ -170,9 +170,13 @@ CLASSES = [
     'off',
     'stop',
     'go',
-    'unknown',
+    'unknown1',
+    'unknown2',
+    'unknown3',
+    'unknown4'
     # 'silence'
 ] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
+NUM_CLASSES_UNKNOWN = 4
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_NAME: str = 'kaggle'
