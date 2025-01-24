@@ -159,6 +159,7 @@ SPEAKER_CLASSES = {
     'f10': 0
 }
 
+NUM_CLASSES_UNKNOWN = 4
 CLASSES = [
     'yes',
     'no',
@@ -170,9 +171,9 @@ CLASSES = [
     'off',
     'stop',
     'go',
-    'unknown',
     # 'silence'
-] # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
+] + [f"unknown{i + 1}" for i in range(0, NUM_CLASSES_UNKNOWN)]
+# TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
 DATABASE_NAME: str = 'kaggle'
