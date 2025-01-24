@@ -22,4 +22,3 @@ def setup_notebook_env():
     print("Using device:", device)
 
     return device
-
