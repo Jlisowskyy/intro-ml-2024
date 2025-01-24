@@ -1,6 +1,7 @@
 from IPython.display import Audio, display
 from src.pipeline.audio_data import AudioData
 
+
 """
     Function to display an audio in jupyter notebook.
 """
