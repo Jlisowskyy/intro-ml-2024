@@ -82,11 +82,12 @@ class DatabaseGenerator:
         self._file_lock = threading.Lock()
         self._sem = threading.Semaphore(0)
         self._sem_rev = threading.Semaphore(NUM_THREADS_DB_PREPARE)
-        self._modifiers = [lambda x : change_pitch(x, AUDIO_AUGMENTATION_DEFAULT_SEMITONES),
-                           lambda x : add_reverb(x, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT),
-                           lambda x : add_echo(x, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
+        self._modifiers = {'pitch': lambda x : change_pitch(x, AUDIO_AUGMENTATION_DEFAULT_SEMITONES),
+                           'reverb': lambda x : add_reverb(x, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT),
+                           'echo': lambda x : add_echo(x, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                                                AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY),
-                           lambda x : change_speed(x, AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR)]
+                           'speed': lambda x : change_speed(x, AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR)}
+        self._modifier_labels = list(self._modifiers.keys())
 
     def process(self, target_folder: str) -> None:
         """
@@ -180,13 +181,13 @@ class DatabaseGenerator:
                                                audio_data.audio_signal)),
                                            constant_values=(0, 0))
 
-        audio_datas=[audio_data]
+        audio_datas={'unmodified': audio_data}
         if GENERATE_WITH_AUGMENTATION:
-            modified = random.choice(self._modifiers)(audio_data)
-            audio_datas.append(modified)
+            modtype = random.choice(self._modifier_labels)
+            audio_datas[modtype] = self._modifiers[modtype](audio_data)
             
 
-        for index, audio_data_to_save in enumerate(audio_datas):
+        for index, audio_data_to_save in audio_datas.items():
             spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
 
             if spectrogram is None:
