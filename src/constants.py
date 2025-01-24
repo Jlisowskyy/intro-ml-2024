@@ -191,7 +191,11 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
 MODELS_DIR: str = './models'
 
 MODEL_WINDOW_LENGTH: float = 1
+<<<<<<< Updated upstream
 MODEL_BASE_PATH: str = f'./{MODELS_DIR}/cnn_e9_backup-2024-11-26T23:45.pth'
+=======
+MODEL_BASE_PATH: str = '/home/michal/Downloads/DropoutCNN_4733756101932929789_2024-11-27T04_52.pth'
+>>>>>>> Stashed changes
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
 """
