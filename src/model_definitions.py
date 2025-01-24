@@ -292,6 +292,7 @@ class ResidualCNN(BaseCNN):
         x = self.fc(x)
         return x
 
+
 # List of model definitions
 model_definitions = [
     ModelDefinition('ResidualCNN', ResidualCNN),
@@ -302,3 +303,22 @@ model_definitions = [
     ModelDefinition('BasicCNN', BasicCNN),
     ModelDefinition('SimpleCNN', SimpleCNN),
 ]
+
+
+def load_model_from_known_definitions(model_path: str) -> None | BaseCNN:
+    cnn = None
+    for model_definition in model_definitions:
+        try:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            temp_cnn = model_definition.model()
+            temp_cnn.load_model(model_path)
+            cnn = temp_cnn.to(device)
+            break
+            # pylint: disable=broad-except, unused-variable
+        except Exception as e:
+            continue
+
+    if cnn is None:
+        print('No model was loaded')
+        return None
+    return cnn
