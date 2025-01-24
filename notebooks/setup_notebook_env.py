@@ -11,7 +11,10 @@ def setup_notebook_env():
     Setup the notebook environment
     Returns: device
     """
-    os.chdir("../")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, '..'))
+    os.chdir(project_root)
+
     print("Current working directory:", os.getcwd())
     print("PyTorch version:", torch.__version__)
 
@@ -19,3 +22,4 @@ def setup_notebook_env():
     print("Using device:", device)
 
     return device
+
