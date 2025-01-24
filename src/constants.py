@@ -172,7 +172,7 @@ CLASSES = [
     'stop',
     'go',
     # 'silence'
-] + [f"unknown{i + 1}" for i in range(0, NUM_CLASSES_UNKNOWN)] 
+] + [f"unknown{i + 1}" for i in range(0, NUM_CLASSES_UNKNOWN)]
 # TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
