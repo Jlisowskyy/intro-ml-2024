@@ -184,7 +184,8 @@ DATABASE_ANNOTATIONS_PATH: str = './annotations_kaggle.csv'
 DATABASE_VALID_WAV_SR: int = 16000
 
 DATABASE_NOISES: str = f'{DATABASE_PATH}/train/_background_noise_'
-DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/noise_folder'
+# please be careful when adding audio files to the dataset, this has underscores for a reason
+DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/_noise_folder_'
 
 # ------------------------------
 # MODEL constants
