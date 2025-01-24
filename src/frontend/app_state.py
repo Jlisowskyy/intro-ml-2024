@@ -6,7 +6,7 @@ State of the application
 
 from pathlib import Path
 
-from src.model_definitions import BasicCNN, LoadModelFromKnownDefinitions
+from src.model_definitions import BasicCNN, load_model_from_known_definitions
 from src.constants import MODEL_BASE_PATH
 
 
@@ -28,6 +28,6 @@ class AppState:
         with open(AppState.PAGE_PATH, 'r', encoding='utf-8') as f:
             self.page = f.read()
 
-        self.classifier = LoadModelFromKnownDefinitions(MODEL_BASE_PATH);
+        self.classifier = load_model_from_known_definitions(MODEL_BASE_PATH)
         if self.classifier is None:
             raise FileNotFoundError('Model not found')

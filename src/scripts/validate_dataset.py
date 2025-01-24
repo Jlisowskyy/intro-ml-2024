@@ -12,13 +12,7 @@ from src.cnn.train import test
 from src.constants import (TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
                            TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH,
                            DATABASE_OUT_PATH, MODEL_BASE_PATH)
-<<<<<<< Updated upstream
-from src.model_definitions import BasicCNN
-=======
-from src.model_definitions import BasicCNN, LoadModelFromKnownDefinitions
-from src.model_definitions import model_definitions
-from src.cnn.model_definition import ModelDefinition
->>>>>>> Stashed changes
+from src.model_definitions import load_model_from_known_definitions
 
 
 def main() -> None:
@@ -26,7 +20,7 @@ def main() -> None:
     Script entry point
     """
 
-    cnn = LoadModelFromKnownDefinitions(MODEL_BASE_PATH);
+    cnn = load_model_from_known_definitions(MODEL_BASE_PATH)
     if cnn is None:
         print('Model not found')
         return

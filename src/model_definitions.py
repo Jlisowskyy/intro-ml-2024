@@ -305,7 +305,7 @@ model_definitions = [
 ]
 
 
-def LoadModelFromKnownDefinitions(model_path: str) -> None | BaseCNN:
+def load_model_from_known_definitions(model_path: str) -> None | BaseCNN:
     cnn = None
     for model_definition in model_definitions:
         try:
@@ -314,6 +314,7 @@ def LoadModelFromKnownDefinitions(model_path: str) -> None | BaseCNN:
             temp_cnn.load_model(model_path)
             cnn = temp_cnn.to(device)
             break
+            # pylint: disable=broad-except, unused-variable
         except Exception as e:
             continue
 
