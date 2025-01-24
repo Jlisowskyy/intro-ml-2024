@@ -13,8 +13,6 @@ from src.pipeline.preprocessing_singleton import PreprocessingSingleton
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
 from src.pipeline.wav import load_wav
 from src.test.test_file import TestFile
-import wave
-import numpy as np
 
 # Define a test file for processing
 TEST_FILE = TestFile(
@@ -22,15 +20,6 @@ TEST_FILE = TestFile(
     DEFAULT_FILE_NAMES[2],
     str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[2])
 )
-
-def write_wave(audio_data: np.ndarray, file_name: str, sample_width: int, frame_rate: int):
-    with wave.open(file_name, mode='wb') as wav_file:
-        wav_file.setnchannels(1)
-        wav_file.setsampwidth(sample_width)
-        wav_file.setframerate(frame_rate)
-        wav_file.setcomptype('NONE', 'not compressed')
-        wav_file.setnframes(len(audio_data))
-        wav_file.writeframes(np.array(audio_data).tobytes())
 
 def main() -> None:
     """
@@ -69,17 +58,6 @@ def main() -> None:
     accelerated_audio = preprocessing_pipeline.accelerate_audio([original_audio_data])
     pitched_audio = preprocessing_pipeline.pitch_audio([original_audio_data])
     injected_echo = preprocessing_pipeline.inject_echo([original_audio_data])
-
-    write_wave(TEST_FILE.get_transformed_file_path_out("cleaned"), cleaned_audio,
-               it.get_sample_width(), it.get_frame_rate())
-    write_wave(TEST_FILE.get_transformed_file_path_out("injected_noise"), injected_noise,
-               it.get_sample_width(), it.get_frame_rate())
-    write_wave(TEST_FILE.get_transformed_file_path_out("accelerated_audio"), accelerated_audio,
-               it.get_sample_width(), it.get_frame_rate())
-    write_wave(TEST_FILE.get_transformed_file_path_out("pitched_audio"), pitched_audio,
-               it.get_sample_width(), it.get_frame_rate())
-    write_wave(TEST_FILE.get_transformed_file_path_out("injected_echo"), injected_echo,
-               it.get_sample_width(), it.get_frame_rate())
 
     # Generate and save spectrograms for the processed audio
     SpectrogramGenerator.save_spectrogram(
