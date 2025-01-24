@@ -15,6 +15,7 @@ import os
 import subprocess
 import sys
 import threading
+import random
 from os import walk, path, makedirs
 
 import numpy as np
@@ -22,7 +23,8 @@ import numpy as np
 from src.constants import (AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
-                           AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
+                           AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY,
+                           AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR)
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
     DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, NORMALIZATION_TYPE, DATABASE_NAME, \
     NUM_THREADS_DB_PREPARE, \
@@ -30,7 +32,7 @@ from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
 from src.scripts import regenerate_csv
-from src.scripts.audio_augmentation import change_pitch, add_reverb, add_echo
+from src.scripts.audio_augmentation import change_pitch, add_reverb, add_echo, change_speed
 
 
 def gather_folders() -> list[str]:
@@ -80,6 +82,11 @@ class DatabaseGenerator:
         self._file_lock = threading.Lock()
         self._sem = threading.Semaphore(0)
         self._sem_rev = threading.Semaphore(NUM_THREADS_DB_PREPARE)
+        self._modifiers = [lambda x : change_pitch(x, AUDIO_AUGMENTATION_DEFAULT_SEMITONES),
+                           lambda x : add_reverb(x, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT),
+                           lambda x : add_echo(x, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
+                                               AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY),
+                           lambda x : change_speed(x, AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR)]
 
     def process(self, target_folder: str) -> None:
         """
@@ -175,11 +182,9 @@ class DatabaseGenerator:
 
         audio_datas=[audio_data]
         if GENERATE_WITH_AUGMENTATION:
-
-            audio_datas.append(change_pitch(audio_data, AUDIO_AUGMENTATION_DEFAULT_SEMITONES))
-            audio_datas.append(add_reverb(audio_data, AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT))
-            audio_datas.append(add_echo(audio_data, AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
-                                  AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY))
+            modified = random.choice(self._modifiers)(audio_data)
+            audio_datas.append(modified)
+            
 
         for index, audio_data_to_save in enumerate(audio_datas):
             spectrogram = process_audio(audio_data_to_save, NORMALIZATION_TYPE)
