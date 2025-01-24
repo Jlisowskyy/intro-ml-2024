@@ -5,7 +5,7 @@ Provides the `AudioPitcher` class for augmenting audio data by altering its pitc
 Designed for use in audio data pipelines with adjustable semitone parameters.
 """
 
-from src.constants import AUDIO_AUGMENTATION_DEFAULT_SEMITONES
+from src.constants import AUDIO_AUGMENT_DEFAULT_SEMITONES
 from src.pipeline.audio_data import AudioData
 from src.scripts.audio_augmentation import change_pitch
 
@@ -18,7 +18,7 @@ class AudioPitcher:
                            Positive values increase the pitch, negative values decrease it.
     """
 
-    def __init__(self, semitones: float = AUDIO_AUGMENTATION_DEFAULT_SEMITONES) -> None:
+    def __init__(self, semitones: float = AUDIO_AUGMENT_DEFAULT_SEMITONES) -> None:
         self.semitones = semitones
 
     # pylint: disable=unused-argument

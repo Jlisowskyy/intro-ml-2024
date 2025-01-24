@@ -12,13 +12,13 @@ from scipy.signal import convolve
 
 from src.pipeline.audio_data import AudioData
 
-from src.constants import ( AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
-                            AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
-                            AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL,
-                            AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
-                            AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
-                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
-                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
+from src.constants import ( AUDIO_AUGMENT_DEFAULT_SEMITONES,
+                            AUDIO_AUGMENT_DEFAULT_SPEED_FACTOR,
+                            AUDIO_AUGMENT_DEFAULT_NOISE_LEVEL,
+                            AUDIO_AUGMENT_DEFAULT_GAIN_DB,
+                            AUDIO_AUGMENT_DEFAULT_REVERB_AMOUNT,
+                            AUDIO_AUGMENT_DEFAULT_ECHO_DELAY,
+                            AUDIO_AUGMENT_DEFAULT_ECHO_DECAY)
 
 
 
@@ -132,13 +132,13 @@ def add_echo(audio_data: AudioData, delay: float = 0.2, decay: float = 0.5) -> A
 
 
 def augmentations(audio_data: AudioData, options: list,
-                  semitones=AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
-                  speed_factor=AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR,
-                  noise_level=AUDIO_AUGMENTATION_DEFAULT_NOISE_LEVEL,
-                  gain_db=AUDIO_AUGMENTATION_DEFAULT_GAIN_DB,
-                  reverb_amount=AUDIO_AUGMENTATION_DEFAULT_REVERB_AMOUNT,
-                  echo_delay=AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
-                  echo_decay=AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY) -> AudioData:
+                  semitones=AUDIO_AUGMENT_DEFAULT_SEMITONES,
+                  speed_factor=AUDIO_AUGMENT_DEFAULT_SPEED_FACTOR,
+                  noise_level=AUDIO_AUGMENT_DEFAULT_NOISE_LEVEL,
+                  gain_db=AUDIO_AUGMENT_DEFAULT_GAIN_DB,
+                  reverb_amount=AUDIO_AUGMENT_DEFAULT_REVERB_AMOUNT,
+                  echo_delay=AUDIO_AUGMENT_DEFAULT_ECHO_DELAY,
+                  echo_decay=AUDIO_AUGMENT_DEFAULT_ECHO_DECAY) -> AudioData:
     """
     Applies a series of augmentations to the given audio data based on the specified options.
 

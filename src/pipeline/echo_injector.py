@@ -5,8 +5,8 @@ Provides the `EchoInjector` class for augmenting audio data by adding echo.
 Designed for use in audio data pipelines with adjustable speed_factor parameter.
 """
 
-from src.constants import AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY, \
-    AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY
+from src.constants import AUDIO_AUGMENT_DEFAULT_ECHO_DELAY, \
+    AUDIO_AUGMENT_DEFAULT_ECHO_DECAY
 
 from src.pipeline.audio_data import AudioData
 from src.scripts.audio_augmentation import add_echo
@@ -25,8 +25,8 @@ class EchoInjector:
                        Values closer to 1.0 result in a slower fade, while lower values 
                        create a faster decay.
     """
-    def __init__(self, delay: float = AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
-                 decay: float = AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY) -> None:
+    def __init__(self, delay: float = AUDIO_AUGMENT_DEFAULT_ECHO_DELAY,
+                 decay: float = AUDIO_AUGMENT_DEFAULT_ECHO_DECAY) -> None:
         """
         Initializes an AudioAccelerator instance with the specified speed adjustment factor.
 
