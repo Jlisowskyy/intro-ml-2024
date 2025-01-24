@@ -24,26 +24,14 @@ from src.constants import (AUDIO_AUGMENTATION_DEFAULT_SEMITONES,
                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DELAY,
                            AUDIO_AUGMENTATION_DEFAULT_ECHO_DECAY)
 from src.constants import MODEL_WINDOW_LENGTH, DATABASE_PATH, \
-    DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, CLASSES, \
-    DATABASE_ANNOTATIONS_PATH, NORMALIZATION_TYPE, DATABASE_NAME, NUM_THREADS_DB_PREPARE, \
+    DATABASE_OUT_NAME, DATABASE_CUT_ITERATOR, NORMALIZATION_TYPE, DATABASE_NAME, \
+    NUM_THREADS_DB_PREPARE, \
     NUM_PROCESSES_DB_PREPARE, GENERATE_WITH_AUGMENTATION
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.wav import FlattenWavIterator, AudioDataIterator
+from src.scripts import regenerate_csv
 from src.scripts.audio_augmentation import change_pitch, add_reverb, add_echo
 
-
-def gather_annotations(pids: list[int]) -> None:
-    """
-    Gathers output of each subprocess and combines it into a single annotation file.
-    """
-
-    with open(DATABASE_ANNOTATIONS_PATH, "w", encoding="UTF-8") as f:
-        f.write("folder,file_name,classID\n")
-
-        for pid in pids:
-            with open(f"/tmp/annotations_{pid}.csv", "r", encoding="UTF-8") as g:
-                for line in g:
-                    f.write(line)
 
 def gather_folders() -> list[str]:
     """
@@ -92,7 +80,6 @@ class DatabaseGenerator:
         self._file_lock = threading.Lock()
         self._sem = threading.Semaphore(0)
         self._sem_rev = threading.Semaphore(NUM_THREADS_DB_PREPARE)
-        self._file = None
 
     def process(self, target_folder: str) -> None:
         """
@@ -107,39 +94,36 @@ class DatabaseGenerator:
             - Processes WAV files into spectrograms
         """
 
-        with open(f"/tmp/annotations_{os.getpid()}.csv", "w", encoding="UTF-8") as f:
-            self._file = f
+        for _ in range(NUM_THREADS_DB_PREPARE):
+            t = threading.Thread(target=self._worker)
+            t.start()
+            self._threads.append(t)
 
-            for _ in range(NUM_THREADS_DB_PREPARE):
-                t = threading.Thread(target=self._worker)
-                t.start()
-                self._threads.append(t)
+        for root, _, files in walk(DATABASE_PATH):
+            folder = root.rsplit("/")[-1]
 
-            for root, _, files in walk(DATABASE_PATH):
-                folder = root.rsplit("/")[-1]
+            if folder != target_folder:
+                continue
 
-                if folder != target_folder:
+            new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
+
+            for file in files:
+                if (not file.endswith(".wav")
+                        or file.startswith(".")
+                        or folder == "_background_noise_"):
                     continue
 
-                new_root = root.replace(DATABASE_NAME, DATABASE_OUT_NAME)
+                # pylint: disable=consider-using-with
+                self._sem_rev.acquire()
+                with self._lock:
+                    self._queue.append((file, root, new_root))
+                self._sem.release()
 
-                for file in files:
-                    if (not file.endswith(".wav")
-                            or file.startswith(".")
-                            or folder == "_background_noise_"):
-                        continue
+        self._should_stop = True
+        self._sem.release(NUM_THREADS_DB_PREPARE)
 
-                    # pylint: disable=consider-using-with
-                    self._sem_rev.acquire()
-                    with self._lock:
-                        self._queue.append((file, root, new_root, folder))
-                    self._sem.release()
-
-            self._should_stop = True
-            self._sem.release(NUM_THREADS_DB_PREPARE)
-
-            for t in self._threads:
-                t.join()
+        for t in self._threads:
+            t.join()
 
     def _worker(self) -> None:
         """
@@ -157,11 +141,11 @@ class DatabaseGenerator:
                     break
                 if len(self._queue) == 0:
                     continue
-                file, root, new_root, folder = self._queue.pop()
-            self._process_file(file, root, new_root, folder)
+                file, root, new_root = self._queue.pop()
+            self._process_file(file, root, new_root)
             self._sem_rev.release()
 
-    def _process_file(self, file: str, root: str, new_root: str, folder: str) -> None:
+    def _process_file(self, file: str, root: str, new_root: str) -> None:
         """
         Processes a single audio file into a spectrogram.
 
@@ -208,13 +192,7 @@ class DatabaseGenerator:
                 with self._file_lock:
                     makedirs(path.join(new_root))
 
-            class_id = folder if folder in CLASSES else "unknown"
             file_name = f"{file[:-4]}{index}.npy"
-            data = f"{new_root},{file_name},{class_id}"
-
-            with self._file_lock:
-                self._file.write(data + "\n")
-
             np.save(path.join(new_root, file_name), spectrogram)
 
 
@@ -305,8 +283,6 @@ def run_process(folders: list[str]) -> None:
             process.kill()
         raise
 
-    gather_annotations(pids)
-
 
 def main(dry: bool = False) -> None:
     """
@@ -324,6 +300,8 @@ def main(dry: bool = False) -> None:
 
     if not dry:
         run_process(folders)
+
+    regenerate_csv.main()
 
 
 if __name__ == "__main__":
