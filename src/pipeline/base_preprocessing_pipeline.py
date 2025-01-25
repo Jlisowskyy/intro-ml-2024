@@ -12,10 +12,15 @@ from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_data import AudioData
 from src.pipeline.audio_normalizer import AudioNormalizer
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
+from src.pipeline.audio_pitcher import AudioPitcher
+from src.pipeline.echo_injector import EchoInjector
+from src.pipeline.noise_injector import NoiseInjector
+from src.pipeline.audio_accelerator import AudioAccelerator
 
 
 def process_audio(audio_data: AudioData,
-                  normalization_type: NormalizationType = NORMALIZATION_TYPE) -> np.ndarray | None:
+                  normalization_type: NormalizationType = NORMALIZATION_TYPE,
+                  modifier: str = '') -> np.ndarray | None:
     """
     Process the audio data by denoising, normalizing, and generating a mel spectrogram.
 
@@ -41,6 +46,18 @@ def process_audio(audio_data: AudioData,
         ('AudioNormalizer', AudioNormalizer(normalization_type=normalization_type)),
         ('SpectrogramGenerator', SpectrogramGenerator())
     ])
+
+    modifier = modifier.lower()
+
+    match modifier:
+        case 'noise':
+            preprocess_pipeline.steps.insert(0,('NoiseInjector', NoiseInjector()))
+        case 'accelerate':
+            preprocess_pipeline.steps.insert(0,('AudioAccelerator', AudioAccelerator()))
+        case 'pitch':
+            preprocess_pipeline.steps.insert(0,('AudioPitcher', AudioPitcher()))
+        case 'echo':
+            preprocess_pipeline.steps.insert(0,('EchoInjector', EchoInjector()))
 
     # Transform the audio data using the pipeline
     transformed_data = preprocess_pipeline.transform([audio_data])

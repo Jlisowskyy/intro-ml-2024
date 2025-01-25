@@ -14,14 +14,12 @@ from src.pipeline.spectrogram_generator import SpectrogramGenerator
 from src.pipeline.wav import load_wav
 from src.test.test_file import TestFile
 
-
 # Define a test file for processing
 TEST_FILE = TestFile(
     str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[2]),
     DEFAULT_FILE_NAMES[2],
     str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[2])
 )
-
 
 def main() -> None:
     """
@@ -55,11 +53,11 @@ def main() -> None:
     original_audio_data = AudioData(original_audio, int(it.get_frame_rate()))
 
     # Apply preprocessing transformations
+    cleaned_audio = preprocessing_pipeline.clean_audio([original_audio_data])
     injected_noise = preprocessing_pipeline.inject_noise([original_audio_data])
     accelerated_audio = preprocessing_pipeline.accelerate_audio([original_audio_data])
     pitched_audio = preprocessing_pipeline.pitch_audio([original_audio_data])
     injected_echo = preprocessing_pipeline.inject_echo([original_audio_data])
-    cleaned_audio = preprocessing_pipeline.clean_audio([original_audio_data])
 
     # Generate and save spectrograms for the processed audio
     SpectrogramGenerator.save_spectrogram(

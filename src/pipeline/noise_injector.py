@@ -41,7 +41,7 @@ class NoiseInjector:
         self.noise_folder_path = noise_folder_path
         self._seed = seed
         self._rng = Random(seed)
-        print(f'Noise Injector seed: {self._rng}')
+        print(f'Noise Injector seed: {self._seed}')
 
     def get_random_audio_file(self, folder_path: str) -> str:
         """
