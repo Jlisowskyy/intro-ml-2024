@@ -141,6 +141,3 @@ def main(args: list[str]) -> None:
     os.makedirs(WORKING_DIR, exist_ok=True)
     process_path_and_generate_rgb_histogram(path, number)
     shutil.rmtree(WORKING_DIR)
-
-    spectrogram_path = args[0]
-    generate_rgb_histogram(spectrogram_path)
