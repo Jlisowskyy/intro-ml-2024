@@ -114,7 +114,7 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "noise_injector": test_noise_injector.noise_injector_test,
     "prepare_noise": prepare_noises.main,
     "test_augmentation": test_augmentation.main,
-    "test_adversal_attack": test_adversal_attack.example_test_run
+    "test_adversal_attack": test_adversal_attack.main
 }
 
 
