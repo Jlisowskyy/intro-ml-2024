@@ -18,8 +18,9 @@ from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR, TRAINING_RETRY_ATTEMPTS
-from src.model_definitions import model_definitions
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR, TRAINING_RETRY_ATTEMPTS, \
+    BEST_LEARNING_RATE
+from src.model_definitions import model_definitions, BEST_MODEL
 
 
 def train_single_epoch(
@@ -191,7 +192,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
     return validator
 
 
-def main() -> None:
+def main(train_single: bool = False) -> None:
     """
     Main function for training the CNN model
     """
@@ -222,36 +223,62 @@ def main() -> None:
     test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
     print(f"Label names: {dataset.get_labels()}")
-
-    # training
     best_macro_f1 = 0.0
     best_model = None
-    for _ in range(TRAINING_RETRY_ATTEMPTS):
-        for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-            for model_definition in model_definitions:
-                try:
-                    print(f"Training {model_definition.model_name} "
-                          f"with learning rate {learning_rate}")
-                    cnn = model_definition.model().to(device)
-                    print(cnn)
 
-                    loss_function = nn.CrossEntropyLoss()
-                    optimiser = torch.optim.SGD(cnn.parameters(),
-                                                lr=learning_rate, momentum=TRAINING_MOMENTUM)
+    # training
+    if not train_single:
+        for _ in range(TRAINING_RETRY_ATTEMPTS):
+            for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+                for model_definition in model_definitions:
+                    try:
+                        print(f"Training {model_definition.model_name} "
+                              f"with learning rate {learning_rate}")
+                        cnn = model_definition.model().to(device)
+                        print(cnn)
 
-                    train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-                          validate_dataloader, dataset.get_encoder())
+                        loss_function = nn.CrossEntropyLoss()
+                        optimiser = torch.optim.SGD(cnn.parameters(),
+                                                    lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-                    now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-                    torch.save(cnn.state_dict(),
-                               f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
-                    validator = test(cnn, test_dataloader, device, dataset.le)
-                    if validator.get_macro_f1() > best_macro_f1:
-                        best_macro_f1 = validator.get_macro_f1()
-                        best_model = cnn
-                # pylint: disable=broad-except
-                except Exception as e:
-                    print(f"Error while training {model_definition.model_name}: {e}")
+                        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                              validate_dataloader, dataset.get_encoder())
+
+                        now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+                        torch.save(cnn.state_dict(),
+                                   f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
+                        validator = test(cnn, test_dataloader, device, dataset.le)
+                        if validator.get_macro_f1() > best_macro_f1:
+                            best_macro_f1 = validator.get_macro_f1()
+                            best_model = cnn
+                    # pylint: disable=broad-except
+                    except Exception as e:
+                        print(f"Error while training {model_definition.model_name}: {e}")
+    else:
+        model_name =  type(BEST_MODEL).__name__
+        try:
+            print(f"Training {model_name} with learning rate {BEST_LEARNING_RATE}")
+            cnn = BEST_MODEL().to(device)
+            print(cnn)
+
+            loss_function = nn.CrossEntropyLoss()
+            optimiser = torch.optim.SGD(cnn.parameters(),
+                                        lr=BEST_LEARNING_RATE, momentum=TRAINING_MOMENTUM)
+
+            train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                  validate_dataloader, dataset.get_encoder())
+
+            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            torch.save(cnn.state_dict(),
+                       f'{MODELS_DIR}/{model_name}_{seed}_{now}.pth')
+
+            validator = test(cnn, test_dataloader, device, dataset.le)
+            best_macro_f1 = validator.get_macro_f1()
+            best_model = cnn
+
+        # pylint: disable=broad-except
+        except Exception as e:
+            print(f"Error while training {model_name}: {e}")
 
     print(f"Best model: {best_model}")
     print(f"Best macro F1: {best_macro_f1}")
@@ -259,6 +286,7 @@ def main() -> None:
     if best_model is None:
         print("No model was selected as the best (This is a bug)")
         return
+
     now = datetime.now().strftime('%Y-%m-%dT%H:%M')
     torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
     test(best_model, test_dataloader, device, dataset.le)
