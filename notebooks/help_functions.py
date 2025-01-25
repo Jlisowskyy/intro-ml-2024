@@ -5,8 +5,6 @@
 from IPython.display import Audio, display
 from src.pipeline.audio_data import AudioData
 
-
-
 def display_audio(audio_data: AudioData) -> None:
     """
     Displays an audio signal as an audio player widget.
