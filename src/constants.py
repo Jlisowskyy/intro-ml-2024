@@ -96,26 +96,26 @@ NORMALIZATION_PCEN_HOP_LENGTH: int = 512
 
 # TODO: Move this to config file that will be .gitignored
 TRAINING_RETRY_ATTEMPTS: int = 1
-TRAINING_LEARNING_RATES: list[float] = [1e-4, 1e-5, 1e-6]
+TRAINING_LEARNING_RATES: list[float] = [1e-3]
 TRAINING_TRAIN_SET_SIZE: float = 0.64
 TRAINING_VALIDATION_SET_SIZE: float = 0.16
 TRAINING_TEST_SET_SIZE: float = 0.2
 
-TRAINING_TRAIN_BATCH_SIZE: int = 64
-TRAINING_VALIDATION_BATCH_SIZE: int = 64
-TRAINING_TEST_BATCH_SIZE: int = 64
+TRAINING_TRAIN_BATCH_SIZE: int = 32
+TRAINING_VALIDATION_BATCH_SIZE: int = 32
+TRAINING_TEST_BATCH_SIZE: int = 32
 
-TRAINING_EPOCHS: int = 50
+TRAINING_EPOCHS: int = 10
+
+BEST_LEARNING_RATE=1e-5
+
+TRAINING_MOMENTUM: float = 0
 
 # torch split does *not* like epsilon, requires the sum to be exactly 1.0
 assert (TRAINING_TRAIN_SET_SIZE +
         TRAINING_VALIDATION_SET_SIZE +
         TRAINING_TEST_SET_SIZE == 1.0), \
     "All set sizes should sum to 1"
-
-TRAINING_MOMENTUM: float = 0.9
-
-BEST_LEARNING_RATE=1e-3
 
 # ------------------------------
 # SPECTROGRAM constants
@@ -163,7 +163,7 @@ SPEAKER_CLASSES = {
     'f10': 0
 }
 
-NUM_CLASSES_UNKNOWN = 4
+NUM_CLASSES_UNKNOWN = 16
 CLASSES = [
     'yes',
     'no',

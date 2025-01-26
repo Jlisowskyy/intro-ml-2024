@@ -39,13 +39,13 @@ def train_single_epoch(
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
         Loss criterion
-        
+
     optim: :class:`torch.optim.optimizer.Optimizer`
         Optimization criterion
 
@@ -89,7 +89,7 @@ def validate(
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
@@ -99,7 +99,7 @@ def validate(
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
 
-    
+
     """
     valid_loss = 0.0
     model.eval()
@@ -122,13 +122,13 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     train_data: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
         Loss criterion
-        
+
     optim: :class:`torch.optim.optimizer.Optimizer`
         Optimization criterion
 
@@ -171,7 +171,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
@@ -255,10 +255,10 @@ def main(train_single: bool = False) -> None:
                     except Exception as e:
                         print(f"Error while training {model_definition.model_name}: {e}")
     else:
-        model_name =  type(BEST_MODEL).__name__
+        model_name =  BEST_MODEL.model_name
         try:
             print(f"Training {model_name} with learning rate {BEST_LEARNING_RATE}")
-            cnn = BEST_MODEL().to(device)
+            cnn = BEST_MODEL.model().to(device)
             print(cnn)
 
             loss_function = nn.CrossEntropyLoss()
