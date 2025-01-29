@@ -11,6 +11,7 @@ import torch
 from art.attacks.evasion import ProjectedGradientDescent
 from art.estimators.classification import PyTorchClassifier
 import soundfile as sf
+import copy
 
 from src.constants import CLASSES, MODEL_BASE_PATH
 from src.model_definitions import KubaCNN1
@@ -115,9 +116,10 @@ def main():
     # Load your original audio data
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)
     original_audio = AudioData(np.array(audio_data_wav), sample_rate)
-    audio2 = original_audio
+    copied_audio = copy.deepcopy(original_audio)
 
-    result = model.classify([audio2])
+    # original spectrogram classification
+    result = model.classify([copied_audio])
     print("Orginal spectrogram prediction: " + CLASSES[result[0]])
 
     # Generate adversarial example
