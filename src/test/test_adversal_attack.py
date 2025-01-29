@@ -8,7 +8,6 @@ from the Adversarial Robustness Toolbox (ART). The module includes methods to:
 from pathlib import Path
 import numpy as np
 import torch
-import copy
 from art.attacks.evasion import ProjectedGradientDescent
 from art.estimators.classification import PyTorchClassifier
 import soundfile as sf
