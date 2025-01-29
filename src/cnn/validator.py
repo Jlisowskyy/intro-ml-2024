@@ -97,6 +97,7 @@ class Validator:
         if not f1:
             f1 = 'N/A'
         res = self._results if 'unknown2' not in list(self._results.columns.values) else self._flattened_()
+
         table = tabulate(res,
                          ['Pred. ' + str(i) for i in res.columns],
                          tablefmt='heavy_grid')
