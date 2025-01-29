@@ -72,7 +72,7 @@ class Validator:
         """
         Method calculating macro F1 score
         """
-        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
+        res = self._results if 'unknown2' not in list(self._results.columns.values) else self._flattened_()
         macro_f1 = 0
         for i in res:
             numerator = 2 * res[i][i]
@@ -85,7 +85,7 @@ class Validator:
         """
         Method calculating overall accuracy
         """
-        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
+        res = self._results if 'unknown2' not in list(self._results.columns.values) else self._flattened_()
         return np.diag(res).sum() / res.values.sum()
 
     def get_results_str(self) -> str:
@@ -96,7 +96,7 @@ class Validator:
         f1 = self.get_f1_score()
         if not f1:
             f1 = 'N/A'
-        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
+        res = self._results if 'unknown2' not in list(self._results.columns.values) else self._flattened_()
         table = tabulate(res,
                          ['Pred. ' + str(i) for i in res.columns],
                          tablefmt='heavy_grid')
