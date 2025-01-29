@@ -14,7 +14,7 @@ from art.estimators.classification import PyTorchClassifier
 import soundfile as sf
 
 from src.constants import CLASSES, MODEL_BASE_PATH
-from src.model_definitions import DeeperCNN
+from src.model_definitions import KubaCNN1
 from src.pipeline.audio_data import AudioData
 from src.pipeline.base_preprocessing_pipeline import process_audio
 from src.pipeline.spectrogram_generator import SpectrogramGenerator
@@ -29,7 +29,7 @@ def create_adversarial_audio_pgd(model, audio_data, epsilon=0.01, step_size=0.00
     Generate an adversarial audio example using PGD that fools the model.
     
     Args:
-        model (DeeperCNN): The trained PyTorch CNN model
+        model: The trained PyTorch CNN model
         audio_data (AudioData): Original audio data
         epsilon (float): Perturbation strength (maximum norm of the perturbation)
         step_size (float): Step size for each iteration of PGD
@@ -142,7 +142,7 @@ def verify_attack(model, original_audio, adversarial_audio):
     Verify the effectiveness of the adversarial attack
     
     Args:
-        model (DeeperCNN): Trained model
+        model: Trained model
         original_audio (AudioData): Original audio
         adversarial_audio (AudioData): Perturbed audio
     
@@ -164,7 +164,10 @@ def main():
     """
 
     # Load your pre-trained model
-    model = DeeperCNN.load_model(MODEL_BASE_PATH)
+    model = KubaCNN1.load_model(MODEL_BASE_PATH)
+    if model is None:
+        print("Failed to load model. Please check model path and file.")
+        return
 
     # Load your original audio data
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)

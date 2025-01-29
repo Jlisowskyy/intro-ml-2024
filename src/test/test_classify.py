@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from src.model_definitions import BasicCNN, DeeperCNN
+from src.model_definitions import load_model_from_known_definitions
 from src.pipeline.audio_data import AudioData
 from src.constants import MODEL_BASE_PATH
 
@@ -27,6 +27,6 @@ def example_test_run():
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)
     audio_data = AudioData(np.array(audio_data_wav), sample_rate)
 
-    classifier = DeeperCNN.load_model(MODEL_BASE_PATH)
+    classifier = load_model_from_known_definitions(MODEL_BASE_PATH)
 
     print(classifier.classify([audio_data]))
