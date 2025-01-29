@@ -5,7 +5,7 @@ Provides the `AudioAccelerator` class for augmenting audio data by altering its 
 Designed for use in audio data pipelines with adjustable speed_factor parameter.
 """
 
-from src.constants import AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR
+from src.constants import AUDIO_AUGMENT_DEFAULT_SPEED_FACTOR
 from src.pipeline.audio_data import AudioData
 from src.scripts.audio_augmentation import change_speed
 
@@ -17,7 +17,7 @@ class AudioAccelerator:
         speed_factor (float): A factor by which the audio speed will be adjusted.
     """
 
-    def __init__(self, speed_factor: float = AUDIO_AUGMENTATION_DEFAULT_SPEED_FACTOR) -> None:
+    def __init__(self, speed_factor: float = AUDIO_AUGMENT_DEFAULT_SPEED_FACTOR) -> None:
         """
         Initializes an AudioAccelerator instance with the specified speed adjustment factor.
 

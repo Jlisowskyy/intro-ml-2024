@@ -17,6 +17,7 @@ class Validator:
     """
 
     _results: pd.DataFrame
+    le: LabelEncoder
 
     def __init__(self, le: LabelEncoder = None) -> None:
         """

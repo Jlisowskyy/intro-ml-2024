@@ -13,6 +13,8 @@ uploaded_files/
 generated_files/
 test.wav
 
+.vscode/
+
 # Created by the program dynamically
 
 # Byte-compiled / optimized / DLL files

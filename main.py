@@ -236,6 +236,9 @@ def handle_command(command: str, args: list[str] = None) -> bool:
         if command in ('train', '-t', '--train'):
             print_success("Starting training...")
             train.main()
+        elif command in ('train_single', '-s', '--train_single'):
+            print_success("Starting training single model...")
+            train.main(True)
         elif command in ('validate', '-v', '--validate'):
             print_success("Starting validation...")
             validate_dataset.main()
@@ -276,6 +279,7 @@ def parse_arguments() -> None:
 
     main_group = parser.add_mutually_exclusive_group()
     main_group.add_argument('-t', '--train', action='store_true', help='Start training')
+    main_group.add_argument('-s', '--train_single', action='store_true', help='Start training single cherry picked model')
     main_group.add_argument('-v', '--validate', action='store_true', help='Start validation')
     main_group.add_argument('-r', '--run', action='store_true', help='Start running')
     main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
@@ -288,6 +292,8 @@ def parse_arguments() -> None:
     cmd = None
     if args.train:
         cmd = 'train'
+    elif args.train_single:
+        cmd = 'train_single'
     elif args.validate:
         cmd = 'validate'
     elif args.run:
