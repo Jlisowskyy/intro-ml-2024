@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
+from constants import NUM_CLASSES_UNKNOWN
 
 class Validator:
     """
@@ -30,6 +31,17 @@ class Validator:
         self.le = le
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
 
+    def _flatten_(self) -> None:
+        # columns
+        unknowns = sum(self._results[f'unknown{i}'] for i in range(1, NUM_CLASSES_UNKNOWN + 1))
+        self._results = self._results.assign(unknown = unknowns)
+        for i in [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)]:
+            del self._results[i]
+        # rows
+        unknowns = sum(self._results.loc[f'unknown{i}'] for i in range(1, NUM_CLASSES_UNKNOWN + 1))
+        self._results.loc['unknown'] = unknowns
+        self._results = self._results.drop(index = [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)])
+
     def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
         Method saving the results of the validation
@@ -41,6 +53,8 @@ class Validator:
             for response, answer in zip(predictions, target):
                 loc = tuple(self.le.inverse_transform((answer.item(), response.argmax(0).item())))
                 self._results.loc[loc] += 1
+            if 'unknown2' in self.le.classes_:
+                self._flatten_()
 
     def get_f1_score(self) -> float | None:
         """
