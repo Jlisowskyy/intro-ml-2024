@@ -170,64 +170,6 @@ class KubaCNN2(BaseCNN):
 
             return x.view(-1).shape[0]
 
-class KubaCNN3(BaseCNN):
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.conv1 = nn.Conv2d(3, 16, 3, padding='same')
-        self.conv2 = nn.Conv2d(16, 32, 3)
-        self.pool1 = nn.MaxPool2d(2, 2)
-        self.dropout1 = nn.Dropout2d(0.2)
-
-        self.conv3 = nn.Conv2d(32, 64, 3)
-        self.conv4 = nn.Conv2d(64, 128, 3)
-        self.pool2 = nn.MaxPool2d(2, 2)
-        self.dropout2 = nn.Dropout2d(0.3)
-
-        self.flattened_size = self._get_flattened_size()
-
-        self.fc1 = nn.Linear(self.flattened_size, 256)
-        self.dropout_fc1 = nn.Dropout(0.7)
-
-        self.fc2 = nn.Linear(256, 128)
-        self.dropout_fc2 = nn.Dropout(0.5)
-
-        self.fc3 = nn.Linear(128, len(CLASSES))
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Data processing method with dropout
-        """
-        x = self.pool1(tnnf.relu(self.conv2(tnnf.relu(self.conv1(x)))))
-        x = self.dropout1(x)
-
-        x = self.pool2(tnnf.relu(self.conv4(tnnf.relu(self.conv3(x)))))
-        x = self.dropout2(x)
-
-        x = torch.flatten(x, 1)
-
-        x = tnnf.relu(self.fc1(x))
-        x = self.dropout_fc1(x)
-
-        x = tnnf.relu(self.fc2(x))
-        x = self.dropout_fc2(x)
-
-        x = self.fc3(x)
-        return x
-
-    def _get_flattened_size(self):
-        with torch.no_grad():
-            dummy_input = torch.zeros(1, 3, SPECTROGRAM_HEIGHT, SPECTROGRAM_WIDTH)
-            x = self.pool1(tnnf.relu(self.conv2(tnnf.relu(self.conv1(dummy_input)))))
-            x = self.dropout1(x)
-
-            x = self.pool2(tnnf.relu(self.conv4(tnnf.relu(self.conv3(x)))))
-            x = self.dropout2(x)
-
-            x = torch.flatten(x, 1)
-
-            return x.view(-1).shape[0]
-
 
 class ResidualCNN(BaseCNN):
     """
@@ -284,14 +226,11 @@ class ResidualCNN(BaseCNN):
 
 # List of model definitions
 model_definitions = [
-    # ModelDefinition("ResidualCNN", ResidualCNN),
-    # ModelDefinition("BasicCNN", BasicCNN),
     ModelDefinition("KubaCNN1", KubaCNN1),
-    # ModelDefinition("KubaCNN2", KubaCNN2),
-    # ModelDefinition("KubaCNN3", KubaCNN3),
+    ModelDefinition("KubaCNN2", KubaCNN2),
 ]
 
-BEST_MODEL = ModelDefinition("KubaCNN3", KubaCNN3)
+BEST_MODEL = ModelDefinition("KubaCNN1", KubaCNN1)
 
 def load_model_from_known_definitions(model_path: str) -> None | BaseCNN:
     cnn = None

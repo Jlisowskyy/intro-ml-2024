@@ -149,24 +149,51 @@
 
         recordButton.addEventListener('click', async () => {
             try {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('Your browser does not support audio recording.');
+                if (!navigator.mediaDevices) {
+                    throw new Error('Media devices API not supported in this browser');
                 }
 
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                if (!navigator.mediaDevices.getUserMedia) {
+                    throw new Error('getUserMedia not supported in this browser');
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                console.log('Audio stream obtained:', stream);
+                console.log('Audio tracks:', stream.getAudioTracks());
+
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const mediaRecorder = new MediaRecorder(stream);
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+                });
                 const audioChunks = [];
 
                 mediaRecorder.ondataavailable = (event) => {
+                    console.log('Data available:', event.data.size);
                     audioChunks.push(event.data);
                 };
 
                 mediaRecorder.onstop = async () => {
+                    console.log('Recording stopped');
+                    console.log('Chunks collected:', audioChunks.length);
+
                     const audioBlob = new Blob(audioChunks);
+                    console.log('Audio blob created:', audioBlob.size, 'bytes');
+
                     const arrayBuffer = await audioBlob.arrayBuffer();
+                    console.log('Array buffer created:', arrayBuffer.byteLength, 'bytes');
+
                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    console.log('Audio decoded:', audioBuffer.duration, 'seconds');
+
                     const wavBlob = convertToWav(audioBuffer);
+                    console.log('WAV blob created:', wavBlob.size, 'bytes');
 
                     await sendAudio(wavBlob);
                     stream.getTracks().forEach(track => track.stop());
@@ -176,17 +203,19 @@
                 recordButton.textContent = 'Recording...';
                 recordButton.classList.add('recording');
 
+                console.log('Starting recording...');
                 mediaRecorder.start();
 
                 setTimeout(() => {
+                    console.log('Stopping recording...');
                     mediaRecorder.stop();
                     recordButton.disabled = false;
-                    recordButton.textContent = 'Record Audio (3 seconds)';
+                    recordButton.textContent = 'Record Audio (1 seconds)';
                     recordButton.classList.remove('recording');
-                }, 3000);
+                }, 1000);
             } catch (error) {
-                console.error('Error:', error);
-                showResult(`Error: ${error.message}`, false);
+                console.error('Detailed error:', error);
+                showResult(`Microphone Error: ${error.message}`, false);
             }
         });
 

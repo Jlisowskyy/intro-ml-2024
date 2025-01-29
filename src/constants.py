@@ -200,7 +200,7 @@ MODELS_DIR: str = './models'
 MODEL_WINDOW_LENGTH: float = 1
 MODEL_BASE_PATH: str = f'./{MODELS_DIR}/best_model_11449690908042250686_2025-01-25T17:41.pth'
 
-CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
+CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.2
 """
 How many chunks need to be classified as 1 to classify the whole file as 1
 """

@@ -12,7 +12,7 @@ from src.cnn.train import test
 from src.constants import (TRAINING_TEST_SET_SIZE, TRAINING_VALIDATION_SET_SIZE,
                            TRAINING_TRAIN_SET_SIZE, DATABASE_ANNOTATIONS_PATH,
                            DATABASE_OUT_PATH, MODEL_BASE_PATH)
-from src.model_definitions import load_model_from_known_definitions
+from src.model_definitions import load_model_from_known_definitions, KubaCNN1, KubaCNN2
 
 
 def main() -> None:
@@ -20,7 +20,7 @@ def main() -> None:
     Script entry point
     """
 
-    cnn = load_model_from_known_definitions(MODEL_BASE_PATH)
+    cnn = KubaCNN1.load_model(MODEL_BASE_PATH)
     if cnn is None:
         print('Model not found')
         return
