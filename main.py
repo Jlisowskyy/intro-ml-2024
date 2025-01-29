@@ -49,6 +49,7 @@ from src.test import test_transformation_pipeline
 from src.test import test_wav
 from src.test import test_augmentation
 from src.test import test_adversal_attack
+from src.scripts import find_correct_classifications
 
 # Initialize colorama
 init()
@@ -114,7 +115,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "noise_injector": test_noise_injector.noise_injector_test,
     "prepare_noise": prepare_noises.main,
     "test_augmentation": test_augmentation.main,
-    "test_adversal_attack": test_adversal_attack.main
+    "test_adversal_attack": test_adversal_attack.main,
+    "find_files": find_correct_classifications.main
 }
 
 
