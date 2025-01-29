@@ -10,15 +10,19 @@ import numpy as np
 from src.model_definitions import KubaCNN1, BaseCNN
 from src.constants import MODEL_BASE_PATH, DATABASE_PATH, CLASSES
 from src.pipeline.audio_data import AudioData
+from sklearn.preprocessing import LabelEncoder
 
 INPUT_DIRECTORY = f'{DATABASE_PATH}/train/audio/down'
-OUTPUT_FILE = str(Path.resolve(Path(f'{__file__}/../scripts_tmp/found_files')))
+OUTPUT_FILE = str(Path.resolve(Path(f'{__file__}/../scripts_tmp/found_files.txt')))
+
+le = LabelEncoder()
+le.fit(CLASSES)
 
 def process_wav_files(
     root_dir: str | Path,
     output_file: str | Path,
     model: BaseCNN,
-    correct_class: int,
+    correct_class: str,
     max_files: int = 100
 ) -> None:
     """
@@ -52,8 +56,9 @@ def process_wav_files(
                 audio_data_wav, sample_rate = sf.read(wav_path)
                 audio_data = AudioData(np.array(audio_data_wav), sample_rate)
                 result = model.classify([audio_data])
+                predicted_label = le.inverse_transform(result)[0]
 
-                if result[0] == correct_class:
+                if predicted_label == correct_class:
                     # Append the path to output file if processing was successful
                     f.write(f"{wav_path}\n")
                     print(f"Successfully processed: {wav_path}")
@@ -71,5 +76,4 @@ def main() -> None:
         print('Model not found')
         return
 
-    class_index = CLASSES.index('down')
-    process_wav_files(INPUT_DIRECTORY, OUTPUT_FILE, cnn, class_index)
+    process_wav_files(INPUT_DIRECTORY, OUTPUT_FILE, cnn, 'down', 100)
