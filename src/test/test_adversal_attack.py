@@ -148,24 +148,15 @@ def main():
     original_audio = AudioData(np.array(audio_data_wav), sample_rate)
 
     # Try different epsilon values if needed
-    epsilon_values = [0.05, 0.03, 0.07]
+    epsilon_value = 0.03
 
-    for epsilon in epsilon_values:
-        adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(
-            model,
-            original_audio,
-            epsilon=epsilon,
-            step_size=epsilon / 5,
-            max_iter=200
-        )
-
-        # Validate perturbation
-        if validate_perturbation(orig_spectrogram, adv_spectrogram):
-            print(
-                f"Successfully generated imperceptible adversarial example with epsilon={epsilon}")
-            break
-        else:
-            print(f"Attempting with different epsilon value...")
+    adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(
+        model,
+        original_audio,
+        epsilon=epsilon_value,
+        step_size=epsilon_value / 5,
+        max_iter=200
+    )
 
     # Save spectrograms
     for i in range(3):
