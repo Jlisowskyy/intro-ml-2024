@@ -67,7 +67,7 @@ def create_adversarial_audio_pgd(model, audio_data, epsilon=0.1, step_size=0.02,
         input_shape=(channels, height, width),
         nb_classes=len(CLASSES)
     )
-    
+
     # Create Projected Gradient Descent (PGD) attack
     attack = ProjectedGradientDescent(
         estimator=classifier,
@@ -135,4 +135,3 @@ def main():
     adv_spectrogram = adv_spectrogram.transpose(1,2,0)
     adv_result = predict_spectrogram([adv_spectrogram], model=model)
     print("Adversal spectrogram prediction: " + CLASSES[adv_result[0]])
-
