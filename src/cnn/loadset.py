@@ -147,7 +147,7 @@ class MultiLabelDataset(Dataset):
         """
         label list getter
         """
-        return self.le.classes_
+        return list(self._results.columns.values)
 
     def get_encoder(self) -> LabelEncoder:
         """
