@@ -40,7 +40,8 @@ class Validator:
         # rows
         unknowns = sum(self._results.loc[f'unknown{i}'] for i in range(1, NUM_CLASSES_UNKNOWN + 1))
         self._results.loc['unknown'] = unknowns
-        self._results = self._results.drop(index = [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)])
+        self._results = self._results.drop(
+            index = [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)])
 
     def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
