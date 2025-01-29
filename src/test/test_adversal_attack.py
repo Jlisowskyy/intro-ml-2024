@@ -148,14 +148,16 @@ def main():
     original_audio = AudioData(np.array(audio_data_wav), sample_rate)
 
     # Try different epsilon values if needed
-    epsilon_value = 0.03
+    epsilon_value = 1
+    step_size = 0.001
+    max_iter = 400
 
     adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(
         model,
         original_audio,
-        epsilon=epsilon_value,
-        step_size=epsilon_value / 5,
-        max_iter=200
+        epsilon= epsilon_value,
+        step_size= step_size,
+        max_iter=max_iter
     )
 
     # Save spectrograms
