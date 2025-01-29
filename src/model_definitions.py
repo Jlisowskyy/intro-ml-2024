@@ -288,7 +288,7 @@ model_definitions = [
     # ModelDefinition("BasicCNN", BasicCNN),
     ModelDefinition("KubaCNN1", KubaCNN1),
     # ModelDefinition("KubaCNN2", KubaCNN2),
-    ModelDefinition("KubaCNN3", KubaCNN3),
+    # ModelDefinition("KubaCNN3", KubaCNN3),
 ]
 
 BEST_MODEL = ModelDefinition("KubaCNN3", KubaCNN3)

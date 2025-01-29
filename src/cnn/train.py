@@ -19,7 +19,7 @@ from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
     DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR, TRAINING_RETRY_ATTEMPTS, \
-    BEST_LEARNING_RATE
+    BEST_LEARNING_RATE, TRAINING_EPOCHS_ARR
 from src.model_definitions import model_definitions, BEST_MODEL
 
 
@@ -210,7 +210,8 @@ def main(train_single: bool = False) -> None:
         device
     )
 
-    seed = randint(0, 1 << 64)
+    # seed = randint(0, 1 << 64)
+    seed=11449690908042250686
     print(f'split seed: {seed}')
     generator = torch.Generator().manual_seed(seed)
     train_dataset, validation_dataset, test_dataset = (
@@ -228,9 +229,9 @@ def main(train_single: bool = False) -> None:
 
     # training
     if not train_single:
-        for _ in range(TRAINING_RETRY_ATTEMPTS):
-            for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-                for model_definition in model_definitions:
+        for model_definition in model_definitions:
+            for epochs in TRAINING_EPOCHS_ARR:
+                for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
                     try:
                         print(f"Training {model_definition.model_name} "
                               f"with learning rate {learning_rate}")
@@ -241,7 +242,7 @@ def main(train_single: bool = False) -> None:
                         optimiser = torch.optim.SGD(cnn.parameters(),
                                                     lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-                        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                        train(cnn, train_dataloader, loss_function, optimiser, device, epochs,
                               validate_dataloader, dataset.get_encoder())
 
                         now = datetime.now().strftime('%Y-%m-%dT%H:%M')
