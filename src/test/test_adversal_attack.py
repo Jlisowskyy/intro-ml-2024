@@ -30,15 +30,18 @@ TEST_FILE_PATH = str(Path.resolve(Path(f'{__file__}/../test_data/f5733968_nohash
 ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX = str(Path.resolve(Path(f'{__file__}/../test_data/original_spectrogram')))
 ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX = str(Path.resolve(Path(f'{__file__}/../test_data/adversarial_spectrogram')))
 
-def create_adversarial_audio_pgd(model, audio_data, epsilon=0.2, step_size=0.3, max_iter=100):
+
+def create_adversarial_audio_pgd(model, audio_data, epsilon=0.05, step_size=0.01, max_iter=200):
     """
-    Generate an adversarial audio example using PGD that fools the model.
+    Generate an adversarial audio example using PGD that aims to be imperceptible.
+
     Args:
         model: The trained PyTorch CNN model
         audio_data (AudioData): Original audio data
-        epsilon (float): Perturbation strength (maximum norm of the perturbation)
-        step_size (float): Step size for each iteration of PGD
-        max_iter (int): Number of iterations for PGD
+        epsilon (float): Perturbation strength (reduced to 0.05 for imperceptibility)
+        step_size (float): Step size (reduced to 0.01 for finer optimization)
+        max_iter (int): Increased iterations for better convergence
+
     Returns:
         tuple: (adversarial_spectrogram, original_spectrogram) as float32 arrays
     """
@@ -57,41 +60,48 @@ def create_adversarial_audio_pgd(model, audio_data, epsilon=0.2, step_size=0.3, 
     og_spectrogram = og_spectrogram.astype(np.float32) / 255.0
     spectrogram = np.expand_dims(og_spectrogram, axis=0)
 
-    # Convert model parameters to float32 if needed
+    # Convert model parameters to float32
     model = model.float()
 
-    # Get actual dimensions
     _, channels, height, width = spectrogram.shape
 
-    # Wrap PyTorch model with ART classifier
+    # Enhanced classifier configuration
     classifier = PyTorchClassifier(
         model=model,
         clip_values=(0, 1),
         loss=torch.nn.CrossEntropyLoss(),
         input_shape=(channels, height, width),
-        nb_classes=len(CLASSES)
+        nb_classes=len(CLASSES),
+        preprocessing=(0, 1)  # Ensure proper scaling
     )
 
-    # Create Projected Gradient Descent (PGD) attack
+    # Create PGD attack with optimized parameters
     attack = ProjectedGradientDescent(
         estimator=classifier,
         eps=epsilon,
         eps_step=step_size,
         max_iter=max_iter,
         targeted=False,
-        batch_size=1
+        batch_size=1,
+        norm=np.inf,  # Use L-infinity norm for better imperceptibility
     )
 
-    # Generate adversarial example
-    x_test_adv = attack.generate(x=spectrogram)
+    # Generate adversarial example with early stopping
+    x_test_adv = attack.generate(
+        x=spectrogram,
+        early_stopping=True,
+        early_stopping_threshold=0.99  # Stop if confidence exceeds 99%
+    )
 
-    # Convert adversarial tensor back to numpy and denormalize
+    # Apply additional constraint to ensure imperceptibility
+    delta = x_test_adv - spectrogram
+    delta = np.clip(delta, -epsilon, epsilon)
+    x_test_adv = spectrogram + delta
+
+    # Convert back and denormalize
     adv_spectrogram = x_test_adv.squeeze(0) * 255.0
-
-    # Denormalize original spectrogram
     original_spectrogram = og_spectrogram * 255.0
 
-    # Ensure outputs are in float32
     return adv_spectrogram.astype(np.float32), original_spectrogram.astype(np.float32)
 
 def predict_spectrogram(spectrogram_array, model):
@@ -106,39 +116,73 @@ def predict_spectrogram(spectrogram_array, model):
     predicted_label = le.inverse_transform(adv_result)[0]
     return predicted_label
 
+def validate_perturbation(original_spec, adversarial_spec, threshold=0.1):
+    """
+    Validate that the perturbation is within acceptable bounds.
+
+    Args:
+        original_spec: Original spectrogram
+        adversarial_spec: Adversarial spectrogram
+        threshold: Maximum allowed relative difference
+
+    Returns:
+        bool: True if perturbation is acceptable
+    """
+    diff = np.abs(original_spec - adversarial_spec)
+    relative_diff = np.mean(diff) / np.mean(original_spec)
+    return relative_diff <= threshold
+
+
 def main():
     """
-    Load a pre-trained model and audio data, and generate an adversarial audio example.
+    Enhanced main function with validation and multiple attack attempts
     """
-
-    # Load your pre-trained model
+    # Load model
     model = KubaCNN1.load_model(MODEL_BASE_PATH)
     if model is None:
         print("Failed to load model. Please check model path and file.")
         return
 
-    # Load your original audio data
+    # Load audio data
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)
     original_audio = AudioData(np.array(audio_data_wav), sample_rate)
-    copied_audio = copy.deepcopy(original_audio)
 
-    # Generate adversarial example
-    adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(model, original_audio)
+    # Try different epsilon values if needed
+    epsilon_values = [0.05, 0.03, 0.07]
 
-    SpectrogramGenerator.save_spectrogram(adv_spectrogram[0], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_0.png")
-    SpectrogramGenerator.save_spectrogram(adv_spectrogram[1], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_1.png")
-    SpectrogramGenerator.save_spectrogram(adv_spectrogram[2], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_2.png")
+    for epsilon in epsilon_values:
+        adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(
+            model,
+            original_audio,
+            epsilon=epsilon,
+            step_size=epsilon / 5,
+            max_iter=200
+        )
 
-    SpectrogramGenerator.save_spectrogram(orig_spectrogram[0], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_0.png")
-    SpectrogramGenerator.save_spectrogram(orig_spectrogram[1], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_1.png")
-    SpectrogramGenerator.save_spectrogram(orig_spectrogram[2], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_2.png")
+        # Validate perturbation
+        if validate_perturbation(orig_spectrogram, adv_spectrogram):
+            print(
+                f"Successfully generated imperceptible adversarial example with epsilon={epsilon}")
+            break
+        else:
+            print(f"Attempting with different epsilon value...")
 
-    # original spectrogram
-    orig_spectrogram = orig_spectrogram.transpose(1,2,0)
+    # Save spectrograms
+    for i in range(3):
+        SpectrogramGenerator.save_spectrogram(
+            adv_spectrogram[i],
+            ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + f"_{i}.png"
+        )
+        SpectrogramGenerator.save_spectrogram(
+            orig_spectrogram[i],
+            ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + f"_{i}.png"
+        )
+
+    # Evaluate results
+    orig_spectrogram = orig_spectrogram.transpose(1, 2, 0)
     orig_result = predict_spectrogram([orig_spectrogram], model=model)
-    print("Original spectrogram prediction: " + orig_result)
+    print("Original spectrogram prediction:", orig_result)
 
-    # transpoisng to original form
-    adv_spectrogram = adv_spectrogram.transpose(1,2,0)
+    adv_spectrogram = adv_spectrogram.transpose(1, 2, 0)
     adv_result = predict_spectrogram([adv_spectrogram], model=model)
-    print("Adversal spectrogram prediction: " + adv_result)
+    print("Adversarial spectrogram prediction:", adv_result)
