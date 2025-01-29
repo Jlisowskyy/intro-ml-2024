@@ -7,10 +7,10 @@ from pathlib import Path
 from itertools import islice
 import soundfile as sf
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 from src.model_definitions import KubaCNN1, BaseCNN
 from src.constants import MODEL_BASE_PATH, DATABASE_PATH, CLASSES
 from src.pipeline.audio_data import AudioData
-from sklearn.preprocessing import LabelEncoder
 
 INPUT_DIRECTORY = f'{DATABASE_PATH}/train/audio/down'
 OUTPUT_FILE = str(Path.resolve(Path(f'{__file__}/../scripts_tmp/found_files.txt')))
