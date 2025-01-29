@@ -29,18 +29,15 @@ ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX = str(Path.resolve(Path(f'{__file__}/../te
 def create_adversarial_audio_pgd(model, audio_data, epsilon=0.1, step_size=0.02, max_iter=20):
     """
     Generate an adversarial audio example using PGD that fools the model.
-    
     Args:
         model: The trained PyTorch CNN model
         audio_data (AudioData): Original audio data
         epsilon (float): Perturbation strength (maximum norm of the perturbation)
         step_size (float): Step size for each iteration of PGD
         max_iter (int): Number of iterations for PGD
-    
     Returns:
-        AudioData: Adversarial audio example
+        tuple: (adversarial_spectrogram, original_spectrogram) as float32 arrays
     """
-
     # Set model to eval mode
     model.eval()
 
@@ -70,7 +67,7 @@ def create_adversarial_audio_pgd(model, audio_data, epsilon=0.1, step_size=0.02,
         input_shape=(channels, height, width),
         nb_classes=len(CLASSES)
     )
-
+    
     # Create Projected Gradient Descent (PGD) attack
     attack = ProjectedGradientDescent(
         estimator=classifier,
@@ -87,10 +84,17 @@ def create_adversarial_audio_pgd(model, audio_data, epsilon=0.1, step_size=0.02,
     # Convert adversarial tensor back to numpy and denormalize
     adv_spectrogram = x_test_adv.squeeze(0) * 255.0
 
-    # Ensure output is in float32
-    return adv_spectrogram.astype(np.float32)
+    # Denormalize original spectrogram
+    original_spectrogram = og_spectrogram * 255.0
+
+    # Ensure outputs are in float32
+    return adv_spectrogram.astype(np.float32), original_spectrogram.astype(np.float32)
 
 def predict_spectrogram(spectrogram_array, model):
+    """
+    Predicts the classification result for a given spectrogram using the specified model.
+    """
+
     tensor_transformer = TensorTransform()
     spectrogram_tesnor = tensor_transformer.transform(spectrogram_array)
     classifier = Classifier(model)
@@ -111,18 +115,23 @@ def main():
     # Load your original audio data
     audio_data_wav, sample_rate = sf.read(TEST_FILE_PATH)
     original_audio = AudioData(np.array(audio_data_wav), sample_rate)
+    audio2 = original_audio
 
-    result = model.classify([original_audio])
-    print(CLASSES[result[0]])
+    result = model.classify([audio2])
+    print("Orginal spectrogram prediction: " + CLASSES[result[0]])
 
     # Generate adversarial example
-    adv_spectrogram = create_adversarial_audio_pgd(model, original_audio)
+    adv_spectrogram, orig_spectrogram = create_adversarial_audio_pgd(model, original_audio)
 
     SpectrogramGenerator.save_spectrogram(adv_spectrogram[0], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_0.png")
     SpectrogramGenerator.save_spectrogram(adv_spectrogram[1], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_1.png")
     SpectrogramGenerator.save_spectrogram(adv_spectrogram[2], ADVERSARIAL_SPECTROGRAM_OUTPUT_PREFIX + "_2.png")
 
+    SpectrogramGenerator.save_spectrogram(orig_spectrogram[0], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_0.png")
+    SpectrogramGenerator.save_spectrogram(orig_spectrogram[1], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_1.png")
+    SpectrogramGenerator.save_spectrogram(orig_spectrogram[2], ORIGINAL_SPECTROGRAM_OUTPUT_PREFIX + "_2.png")
+
     # transpoisng to original form
     adv_spectrogram = adv_spectrogram.transpose(1,2,0)
     adv_result = predict_spectrogram([adv_spectrogram], model=model)
-    print(CLASSES[adv_result[0]])
+    print("Adversal spectrogram prediction: " + CLASSES[adv_result[0]])
