@@ -8,7 +8,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
-from constants import NUM_CLASSES_UNKNOWN
+from src.constants import NUM_CLASSES_UNKNOWN
 
 class Validator:
     """
