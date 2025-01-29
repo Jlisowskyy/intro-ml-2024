@@ -195,10 +195,10 @@ DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/_noise_folder_'
 # ------------------------------
 # MODEL constants
 # ------------------------------
-MODELS_DIR: str = './models'
+MODELS_DIR: str = 'models'
 
 MODEL_WINDOW_LENGTH: float = 1
-MODEL_BASE_PATH: str = f'./{MODELS_DIR}/best_model_11449690908042250686_2025-01-25T17:41.pth'
+MODEL_BASE_PATH: str = f'./{MODELS_DIR}/best_model_11449690908042250686_2025-01-25T17_41.pth'
 
 CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.2
 """
