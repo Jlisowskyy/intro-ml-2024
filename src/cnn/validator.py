@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from tabulate import tabulate
 from torch import Tensor
+from src.constants import NUM_CLASSES_UNKNOWN
 
 class Validator:
     """
@@ -30,6 +31,20 @@ class Validator:
 
         self.le = le
         self._results = pd.DataFrame(0, columns=classes, index=classes, dtype='int64')
+
+    def _flattened_(self) -> pd.DataFrame:
+        res = self._results
+        # columns
+        unknowns = sum(res[f'unknown{i}'] for i in range(1, NUM_CLASSES_UNKNOWN + 1))
+        res = res.assign(unknown = unknowns)
+        for i in [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)]:
+            del res[i]
+        # rows
+        unknowns = sum(res.loc[f'unknown{i}'] for i in range(1, NUM_CLASSES_UNKNOWN + 1))
+        res.loc['unknown'] = unknowns
+        res = res.drop(
+            index = [f'unknown{i}' for i in range(1, NUM_CLASSES_UNKNOWN + 1)])
+        return res
 
     def validate(self, predictions: Tensor, target: Tensor) -> None:
         """
@@ -57,19 +72,21 @@ class Validator:
         """
         Method calculating macro F1 score
         """
+        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
         macro_f1 = 0
-        for i in self._results:
-            numerator = 2 * self._results[i][i]
+        for i in res:
+            numerator = 2 * res[i][i]
             # fn + fp + 2tp of a class is the sum of its row + sum of its column
-            denominator = self._results.sum(axis=0)[i] + self._results.sum(axis=1)[i]
+            denominator = res.sum(axis=0)[i] + res.sum(axis=1)[i]
             macro_f1 += numerator / denominator
-        return macro_f1 / len(self._results)
+        return macro_f1 / len(res)
 
     def get_accuracy(self) -> float:
         """
         Method calculating overall accuracy
         """
-        return np.diag(self._results).sum() / self._results.values.sum()
+        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
+        return np.diag(res).sum() / res.values.sum()
 
     def get_results_str(self) -> str:
         """
@@ -79,9 +96,9 @@ class Validator:
         f1 = self.get_f1_score()
         if not f1:
             f1 = 'N/A'
-
-        table = tabulate(self._results,
-                         ['Pred. ' + str(i) for i in self._results.columns],
+        res = self._results if 'unknown2' not in self.le.classes_ else self._flattened_()
+        table = tabulate(res,
+                         ['Pred. ' + str(i) for i in res.columns],
                          tablefmt='heavy_grid')
         return f'''{table}
 
