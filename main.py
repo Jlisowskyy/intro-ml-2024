@@ -38,6 +38,7 @@ from src.scripts import prepare_noises
 from src.scripts import regenerate_csv
 from src.scripts import spectrogram_script
 from src.scripts import validate_dataset
+from src.scripts import find_correct_classifications
 from src.test import test_classify, test_fit_to_window
 from src.test import test_cnn
 from src.test import test_cut_wav
@@ -114,7 +115,8 @@ TEST_CASES: dict[str, Callable[[], None]] = {
     "noise_injector": test_noise_injector.noise_injector_test,
     "prepare_noise": prepare_noises.main,
     "test_augmentation": test_augmentation.main,
-    "test_adversal_attack": test_adversal_attack.main
+    "test_adversal_attack": test_adversal_attack.main,
+    "find_files": find_correct_classifications.main
 }
 
 

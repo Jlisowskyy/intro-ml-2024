@@ -12,6 +12,7 @@ datasets/*
 uploaded_files/
 generated_files/
 test.wav
+*.png
 
 .vscode/
 

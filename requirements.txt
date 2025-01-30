@@ -38,3 +38,4 @@ wave
 websockets
 aiofiles
 PyQt6
+adversarial-robustness-toolbox
