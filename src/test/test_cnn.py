@@ -6,7 +6,7 @@ Tests for CNN model
 
 from torchsummary import summary
 
-from src.cnn.cnn import BasicCNN
+from src.model_definitions import BasicCNN
 from src.cnn.loadset import DAPSDataset
 from src.constants import DATABASE_ANNOTATIONS_PATH, DATABASE_OUT_PATH, SPECTROGRAM_WIDTH, \
     SPECTROGRAM_HEIGHT

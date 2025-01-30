@@ -22,8 +22,9 @@ Adding new functionality:
 
 import argparse
 import inspect
+import traceback
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 import pytest
 import uvicorn
@@ -33,17 +34,22 @@ from src.cnn import train
 from src.scripts import data_analysis
 from src.scripts import generate_rgb_histogram
 from src.scripts import prepare_dataset
+from src.scripts import prepare_noises
 from src.scripts import regenerate_csv
 from src.scripts import spectrogram_script
 from src.scripts import validate_dataset
+from src.scripts import find_correct_classifications
+from src.test import test_classify, test_fit_to_window
 from src.test import test_cnn
 from src.test import test_cut_wav
 from src.test import test_denoise
-from src.test import test_detect_speech
+from src.test import test_noise_injector
 from src.test import test_normalize
+from src.test import test_silence_removal
 from src.test import test_transformation_pipeline
 from src.test import test_wav
-from src.test import test_classify
+from src.test import test_augmentation
+from src.test import test_adversal_attack
 
 # Initialize colorama
 init()
@@ -96,14 +102,21 @@ SCRIPTS: dict[str, Callable[..., None]] = {
 TEST_CASES: dict[str, Callable[[], None]] = {
     "wav": test_wav.manual_test,
     "pytest": run_pytest,
-    "denoise": test_denoise.manual_test,
-    "normalize": test_normalize.manual_test,
+    "denoise": test_denoise.denoise_test_manual,
+    "normalize_mv": test_normalize.mean_variance_normalization_manual_test,
+    "normalize_pcen": test_normalize.pcen_normalization_manual_test,
     "cut_wav": test_cut_wav.manual_test,
     "cnn": test_cnn.manual_test_cnn,
     "dataset": test_cnn.manual_test_dataset,
-    "speech_detection": test_detect_speech.example_test_run,
-    "transformation_pipeline": test_transformation_pipeline.example_test_run,
-    "test_classify": test_classify.example_test_run
+    "silence_removal": test_silence_removal.silence_removal_test,
+    "transformation_pipeline": test_transformation_pipeline.transformation_pipeline_test,
+    "test_classify": test_classify.example_test_run,
+    "fit_to_window": test_fit_to_window.fit_to_window_test,
+    "noise_injector": test_noise_injector.noise_injector_test,
+    "prepare_noise": prepare_noises.main,
+    "test_augmentation": test_augmentation.main,
+    "test_adversal_attack": test_adversal_attack.main,
+    "find_files": find_correct_classifications.main
 }
 
 
@@ -225,6 +238,9 @@ def handle_command(command: str, args: list[str] = None) -> bool:
         if command in ('train', '-t', '--train'):
             print_success("Starting training...")
             train.main()
+        elif command in ('train_single', '-s', '--train_single'):
+            print_success("Starting training single model...")
+            train.main(True)
         elif command in ('validate', '-v', '--validate'):
             print_success("Starting validation...")
             validate_dataset.main()
@@ -233,7 +249,7 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             fastapi_main()
         elif command in ('prepare', '-p', '--prepare'):
             print_success("Starting db preparation...")
-            prepare_dataset.main()
+            prepare_dataset.main('dry' in args)
         elif command == 'script' and args:
             print_success(f"Running script '{args[0]}'...")
             run_script(args[0], args[1:])
@@ -249,8 +265,8 @@ def handle_command(command: str, args: list[str] = None) -> bool:
             return False
         return True
     # pylint: disable=broad-except
-    except Exception as e:
-        print_error(f"Error executing command: {str(e)}")
+    except Exception:
+        print_error(f"Error executing command: {traceback.format_exc()}")
         return False
 
 
@@ -265,6 +281,7 @@ def parse_arguments() -> None:
 
     main_group = parser.add_mutually_exclusive_group()
     main_group.add_argument('-t', '--train', action='store_true', help='Start training')
+    main_group.add_argument('-s', '--train_single', action='store_true', help='Start training single cherry picked model')
     main_group.add_argument('-v', '--validate', action='store_true', help='Start validation')
     main_group.add_argument('-r', '--run', action='store_true', help='Start running')
     main_group.add_argument('-p', '--prepare', action='store_true', help='Prepare database')
@@ -274,20 +291,24 @@ def parse_arguments() -> None:
     parser.add_argument('args', nargs='*', help='Additional arguments for scripts or tests')
 
     args = parser.parse_args()
-
+    cmd = None
     if args.train:
-        handle_command('train')
+        cmd = 'train'
+    elif args.train_single:
+        cmd = 'train_single'
     elif args.validate:
-        handle_command('validate')
+        cmd = 'validate'
     elif args.run:
-        handle_command('run')
+        cmd = 'run'
     elif args.prepare:
-        handle_command('prepare')
+        cmd = 'prepare'
     elif args.command:
         if not handle_command(args.command, args.args):
             display_help()
     else:
         interactive_mode()
+    if cmd is not None:
+        handle_command(cmd, args.args) # TODO: Add subflags
 
 
 def interactive_mode() -> None:

@@ -7,18 +7,20 @@ from datetime import datetime
 from random import randint
 
 import torch
+from sklearn.preprocessing import LabelEncoder
 from torch import nn
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm  # for the progress bar
 
-from src.cnn.cnn import BasicCNN
-from src.cnn.loadset import DAPSDataset
+from src.cnn.loadset import MultiLabelDataset
 from src.cnn.validator import Validator
 from src.constants import TRAINING_TRAIN_BATCH_SIZE, TRAINING_TEST_BATCH_SIZE, \
     TRAINING_EPOCHS, TRAINING_LEARNING_RATES, TRAINING_VALIDATION_SET_SIZE, \
     TRAINING_TRAIN_SET_SIZE, TRAINING_TEST_SET_SIZE, TRAINING_MOMENTUM, DATABASE_ANNOTATIONS_PATH, \
-    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE
+    DATABASE_OUT_PATH, TRAINING_VALIDATION_BATCH_SIZE, MODELS_DIR, TRAINING_RETRY_ATTEMPTS, \
+    BEST_LEARNING_RATE, TRAINING_EPOCHS_ARR
+from src.model_definitions import model_definitions, BEST_MODEL
 
 
 def train_single_epoch(
@@ -27,7 +29,8 @@ def train_single_epoch(
         loss_fn: nn.Module,
         optim: Optimizer,
         device: str,
-        calculate_accuracy: bool = False
+        calculate_accuracy: bool = False,
+        labels: LabelEncoder | None = None
 ) -> None:
     """
     Method training `model` a single iteration with the data provided
@@ -36,13 +39,13 @@ def train_single_epoch(
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
         Loss criterion
-        
+
     optim: :class:`torch.optim.optimizer.Optimizer`
         Optimization criterion
 
@@ -53,7 +56,7 @@ def train_single_epoch(
         # TODO: add description
     """
 
-    validator = Validator()
+    validator = Validator(labels)
     train_loss = 0.0
     for input_data, target in tqdm(data_loader, colour='blue'):
         input_data, target = input_data.to(device), target.to(device)
@@ -61,7 +64,7 @@ def train_single_epoch(
         predictions = model(input_data)
         loss = loss_fn(predictions, target)
         if calculate_accuracy:
-            validator.validate(predictions, target)
+            validator.validate(predictions, target) # TODO: decouple this
         # back propagate error and update weights
         optim.zero_grad()
         loss.backward()
@@ -86,7 +89,7 @@ def validate(
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
@@ -96,14 +99,13 @@ def validate(
     device: :class:`str`
         Can be either 'cuda' or 'cpu', set device for pytorch
 
-    
+
     """
     valid_loss = 0.0
     model.eval()
     for input_data, target in tqdm(data_loader, colour='yellow'):
         input_data, target = input_data.to(device), target.to(device)
         predictions = model(input_data)
-        print('predictions')
         loss = loss_fn(predictions, target)
         valid_loss += loss.item()
     model.train()
@@ -111,7 +113,8 @@ def validate(
 
 
 def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: Optimizer,
-          device: str, epochs: int, val_data: DataLoader | None = None) -> None:
+          device: str, epochs: int, val_data: DataLoader | None = None,
+          labels: LabelEncoder | None = None) -> None:
     """
     Method training `model` a set amount of epochs, outputting loss every iteration
 
@@ -119,13 +122,13 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     train_data: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
     loss_fn: :class:`torch.nn.Module`
         Loss criterion
-        
+
     optim: :class:`torch.optim.optimizer.Optimizer`
         Optimization criterion
 
@@ -141,21 +144,25 @@ def train(model: nn.Module, train_data: DataLoader, loss_fn: nn.Module, optim: O
     min_valid_loss = float('inf')
     for i in range(epochs):
         print(f"Epoch {i + 1}")
-        train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1)
+        train_single_epoch(model, train_data, loss_fn, optim, device, i == epochs - 1, labels)
 
         if val_data is None:
             continue
 
         valid_loss = validate(model, val_data, loss_fn, device)
         print(f'Validation loss: {valid_loss / len(val_data)}')
+        # pylint: disable=consider-using-min-builtin
         if valid_loss < min_valid_loss:
+            # TODO: Make this config dependent
             min_valid_loss = valid_loss
             # backup for longer training sessions
-            torch.save(model.state_dict(), f'cnn_e{i + 1}_backup.pth')
+            # now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            # torch.save(model.state_dict(), f'{MODELS_DIR}/cnn_e{i + 1}_backup-{now}.pth')
     print("Finished training")
 
 
-def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Validator:
+def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu',
+         labels: LabelEncoder | None = None) -> Validator:
     """
     Validates binary classification `model`
     Prints results including TP/FP/FN/TN, accuracy and F1 score to stdout
@@ -164,7 +171,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Vali
     ----------
     model: :class:`torch.nn.Module`
         Model to train
-    
+
     data_loader: :class:`torch.utils.data.DataLoader`
         Dataloader to feed the model
 
@@ -172,7 +179,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Vali
         Can be either 'cuda' or 'cpu', set device for pytorch
     """
 
-    validator = Validator()
+    validator = Validator(labels)
     model.eval()
     with torch.no_grad():
         for input_data, target in tqdm(data_loader, colour='green'):
@@ -185,7 +192,7 @@ def test(model: nn.Module, data_loader: DataLoader, device: str = 'cpu') -> Vali
     return validator
 
 
-def main() -> None:
+def main(train_single: bool = False) -> None:
     """
     Main function for training the CNN model
     """
@@ -197,13 +204,14 @@ def main() -> None:
     print(f'Using {device}')
 
     # preparing datasets
-    dataset = DAPSDataset(
+    dataset = MultiLabelDataset(
         DATABASE_ANNOTATIONS_PATH,
         DATABASE_OUT_PATH,
         device
     )
 
-    seed = randint(0, 1 << 64)
+    # seed = randint(0, 1 << 64)
+    seed=11449690908042250686
     print(f'split seed: {seed}')
     generator = torch.Generator().manual_seed(seed)
     train_dataset, validation_dataset, test_dataset = (
@@ -215,17 +223,71 @@ def main() -> None:
     validate_dataloader = DataLoader(validation_dataset, batch_size=TRAINING_VALIDATION_BATCH_SIZE)
     test_dataloader = DataLoader(test_dataset, batch_size=TRAINING_TEST_BATCH_SIZE)
 
+    print(f"Label names: {dataset.get_labels()}")
+    best_macro_f1 = 0.0
+    best_model = None
+
     # training
-    for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
-        cnn = BasicCNN().to(device)
-        print(cnn)
+    if not train_single:
+        for model_definition in model_definitions:
+            for epochs in TRAINING_EPOCHS_ARR:
+                for _, learning_rate in enumerate(TRAINING_LEARNING_RATES):
+                    try:
+                        print(f"Training {model_definition.model_name} "
+                              f"with learning rate {learning_rate}")
+                        cnn = model_definition.model().to(device)
+                        print(cnn)
 
-        loss_function = nn.CrossEntropyLoss()
-        optimiser = torch.optim.SGD(cnn.parameters(), lr=learning_rate, momentum=TRAINING_MOMENTUM)
+                        loss_function = nn.CrossEntropyLoss()
+                        optimiser = torch.optim.SGD(cnn.parameters(),
+                                                    lr=learning_rate, momentum=TRAINING_MOMENTUM)
 
-        train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
-              validate_dataloader)
+                        train(cnn, train_dataloader, loss_function, optimiser, device, epochs,
+                              validate_dataloader, dataset.get_encoder())
 
-        now = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        torch.save(cnn.state_dict(), f'cnn_{seed}_{now}.pth')
-        test(cnn, test_dataloader, device)
+                        now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+                        torch.save(cnn.state_dict(),
+                                   f'{MODELS_DIR}/{model_definition.model_name}_{seed}_{now}.pth')
+                        validator = test(cnn, test_dataloader, device, dataset.le)
+                        if validator.get_macro_f1() > best_macro_f1:
+                            best_macro_f1 = validator.get_macro_f1()
+                            best_model = cnn
+                    # pylint: disable=broad-except
+                    except Exception as e:
+                        print(f"Error while training {model_definition.model_name}: {e}")
+    else:
+        model_name =  BEST_MODEL.model_name
+        try:
+            print(f"Training {model_name} with learning rate {BEST_LEARNING_RATE}")
+            cnn = BEST_MODEL.model().to(device)
+            print(cnn)
+
+            loss_function = nn.CrossEntropyLoss()
+            optimiser = torch.optim.SGD(cnn.parameters(),
+                                        lr=BEST_LEARNING_RATE, momentum=TRAINING_MOMENTUM)
+
+            train(cnn, train_dataloader, loss_function, optimiser, device, TRAINING_EPOCHS,
+                  validate_dataloader, dataset.get_encoder())
+
+            now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            torch.save(cnn.state_dict(),
+                       f'{MODELS_DIR}/{model_name}_{seed}_{now}.pth')
+
+            validator = test(cnn, test_dataloader, device, dataset.le)
+            best_macro_f1 = validator.get_macro_f1()
+            best_model = cnn
+
+        # pylint: disable=broad-except
+        except Exception as e:
+            print(f"Error while training {model_name}: {e}")
+
+    print(f"Best model: {best_model}")
+    print(f"Best macro F1: {best_macro_f1}")
+
+    if best_model is None:
+        print("No model was selected as the best (This is a bug)")
+        return
+
+    now = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    torch.save(best_model.state_dict(), f'{MODELS_DIR}/best_model_{seed}_{now}.pth')
+    test(best_model, test_dataloader, device, dataset.le)

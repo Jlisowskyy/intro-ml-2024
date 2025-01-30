@@ -6,7 +6,8 @@ State of the application
 
 from pathlib import Path
 
-from src.cnn.cnn import BasicCNN
+from src.cnn.cnn import BaseCNN
+from src.model_definitions import KubaCNN1
 from src.constants import MODEL_BASE_PATH
 
 
@@ -18,7 +19,7 @@ class AppState:
     PAGE_PATH: Path = Path.resolve(Path(f'{__file__}/../index.html'))
 
     page: str
-    classifier: BasicCNN
+    classifier: BaseCNN
 
     def __init__(self) -> None:
         """
@@ -28,4 +29,6 @@ class AppState:
         with open(AppState.PAGE_PATH, 'r', encoding='utf-8') as f:
             self.page = f.read()
 
-        self.classifier = BasicCNN.load_model(MODEL_BASE_PATH)
+        self.classifier = KubaCNN1.load_model(MODEL_BASE_PATH)
+        if self.classifier is None:
+            raise FileNotFoundError('Model not found')

@@ -4,7 +4,10 @@ Author: Jakub Lisowski, 2024
 File collects various constants used in the project as well as enums used for configuration.
 """
 
+from pathlib import Path
 from enum import Enum, IntEnum
+
+from src.test.test_file import TestFile
 
 
 # ------------------------------
@@ -45,17 +48,8 @@ Small constant to avoid division by zero
 # DENOISE constants
 # ------------------------------
 
-DENOISE_NYQUIST_COEFFICIENT: float = 0.5
-"""
-Nyquist coefficient is 0.5, as it is a half of the sampling rate
-"""
-
-DENOISE_FREQ_LOW_CUT: float = 50.0
-"""
-Lowcut is chosen to be 50 Hz : Male voice frequency range
-"""
-
 DENOISE_FREQ_HIGH_CUT: float = 8200.0
+DENOISE_FREQ_LOW_CUT: float = 80.0
 """
 Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 """
@@ -64,8 +58,9 @@ Highcut is chosen to be 8200 Hz : common male and female voices frequency range
 # DETECT SPEECH constants
 # ------------------------------
 
-DETECT_SILENCE_TOLERANCE: float = 0.5
-DETECT_SILENCE_THRESHOLD: float = 0.015
+DETECT_SILENCE_WINDOW_MAX_MS: int = 50
+DETECT_SILENCE_THRESHOLD_DB: int = -60
+SILENCE_CUT_WINDOW_MS: int = 25
 
 # ------------------------------
 # NORMALIZE constants
@@ -99,24 +94,29 @@ NORMALIZATION_PCEN_HOP_LENGTH: int = 512
 # TRAINING constants
 # ------------------------------
 
-TRAINING_TRAIN_BATCH_SIZE: int = 128
-TRAINING_VALIDATION_BATCH_SIZE: int = 128
-TRAINING_TEST_BATCH_SIZE: int = 128
-TRAINING_EPOCHS: int = 10
-# 0.1 seems to be too high (exploding loss)
-# this porridge is pretty decent (maybe should be smaller? TODO: check)
-TRAINING_LEARNING_RATES: list[float] = [0.0001]
+# TODO: Move this to config file that will be .gitignored
+TRAINING_RETRY_ATTEMPTS: int = 5
+TRAINING_LEARNING_RATES: list[float] = [1e-3]
 TRAINING_TRAIN_SET_SIZE: float = 0.64
 TRAINING_VALIDATION_SET_SIZE: float = 0.16
 TRAINING_TEST_SET_SIZE: float = 0.2
+
+TRAINING_TRAIN_BATCH_SIZE: int = 64
+TRAINING_VALIDATION_BATCH_SIZE: int = 64
+TRAINING_TEST_BATCH_SIZE: int = 64
+
+TRAINING_EPOCHS: int = 60
+TRAINING_EPOCHS_ARR: list[int] = [40, 60, 70]
+
+BEST_LEARNING_RATE=1e-3
+
+TRAINING_MOMENTUM: float = 0.9
 
 # torch split does *not* like epsilon, requires the sum to be exactly 1.0
 assert (TRAINING_TRAIN_SET_SIZE +
         TRAINING_VALIDATION_SET_SIZE +
         TRAINING_TEST_SET_SIZE == 1.0), \
     "All set sizes should sum to 1"
-
-TRAINING_MOMENTUM: float = 0.9
 
 # ------------------------------
 # SPECTROGRAM constants
@@ -125,9 +125,9 @@ TRAINING_MOMENTUM: float = 0.9
 SPECTROGRAM_WIDTH: int = 300
 SPECTROGRAM_HEIGHT: int = 400
 SPECTROGRAM_DPI: int = 100
-SPECTROGRAM_N_FFT: int = 4096
-SPECTROGRAM_HOP_LENGTH: int = 512
-SPECTROGRAM_N_MELS: int = 5120
+SPECTROGRAM_N_FFT: int = 400
+SPECTROGRAM_HOP_LENGTH: int = 160
+SPECTROGRAM_N_MELS: int = 64
 
 # ------------------------------
 # WAV ITERATOR constants
@@ -164,38 +164,43 @@ SPEAKER_CLASSES = {
     'f10': 0
 }
 
-# CLASSES = [
-#     'yes',
-#     'no',
-#     'up',
-#     'down',
-#     'left',
-#     'right',
-#     'on',
-#     'off',
-#     'stop',
-#     'go',
-#     'unknown',
-#     'silence'
-# ]
+NUM_CLASSES_UNKNOWN = 4
+CLASSES = [
+    'yes',
+    'no',
+    'up',
+    'down',
+    'left',
+    'right',
+    'on',
+    'off',
+    'stop',
+    'go',
+    # 'silence'
+] + [f"unknown{i + 1}" for i in range(0, NUM_CLASSES_UNKNOWN)]
+# TEMPORARY - THIS IS CALCULATED ANYWAY FROM THE ANNOTATIONS CSV
 
 DATABASE_CUT_ITERATOR: WavIteratorType = WavIteratorType.PLAIN
-DATABASE_PATH: str = './datasets/daps'
-DATABASE_NAME: str = 'daps'
-DATABASE_OUT_NAME: str = 'daps_split_spectro'
+DATABASE_NAME: str = 'kaggle'
+DATABASE_OUT_NAME: str = 'kaggle_spectro'
+DATABASE_PATH: str = f'./datasets/{DATABASE_NAME}'
 DATABASE_OUT_PATH: str = f'./datasets/{DATABASE_OUT_NAME}'
-DATABASE_ANNOTATIONS_PATH: str = './annotations.csv'
-DATABASE_VALID_WAV_SR: int = 44100
+DATABASE_ANNOTATIONS_PATH: str = './annotations_kaggle.csv'
+DATABASE_VALID_WAV_SR: int = 16000
+
+DATABASE_NOISES: str = f'{DATABASE_PATH}/train/_background_noise_'
+# please be careful when adding audio files to the dataset, this has underscores for a reason
+DATABASE_OUT_NOISES: str = f'{DATABASE_PATH}/_noise_folder_'
 
 # ------------------------------
 # MODEL constants
 # ------------------------------
+MODELS_DIR: str = 'models'
 
-MODEL_WINDOW_LENGTH: int = 3
-MODEL_BASE_PATH: str = './models/model.pth'
-MODEL_PRETRAINED_PATH: str = './models/pretrained.pth'
+MODEL_WINDOW_LENGTH: float = 1
+MODEL_BASE_PATH: str = f'./{MODELS_DIR}/best_model_11449690908042250686_2025-01-25T17_41.pth'
 
-CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.7
+CLASSIFICATION_CONFIDENCE_THRESHOLD: float = 0.2
 """
 How many chunks need to be classified as 1 to classify the whole file as 1
 """
@@ -209,3 +214,61 @@ HELPER_SCRIPTS_SPECTROGRAM_FOLDER_SUFFIX: str = '_spectrograms'
 HELPER_SCRIPTS_HISTOGRAM_DEFAULT_DIR: str = 'work_dir'
 HELPER_SCRIPTS_HISTOGRAM_N_BINS: int = 256
 HELPER_SCRIPTS_HISTOGRAM_ALPHA: float = 0.5
+
+
+# audio_augmentation.py
+GENERATE_WITH_AUGMENTATION: bool = True
+
+AUDIO_AUGMENT_DEFAULT_SEMITONES = 6
+AUDIO_AUGMENT_DEFAULT_SPEED_FACTOR = 0.75
+AUDIO_AUGMENT_DEFAULT_NOISE_LEVEL = 0.03
+AUDIO_AUGMENT_DEFAULT_GAIN_DB = -10
+AUDIO_AUGMENT_DEFAULT_REVERB_AMOUNT = 0.1
+AUDIO_AUGMENT_DEFAULT_ECHO_DELAY = 0.25
+AUDIO_AUGMENT_DEFAULT_ECHO_DECAY = 0.6
+
+# ------------------------------
+# TEST constants
+# ------------------------------
+
+TEST_FOLDER_IN = Path.resolve(Path(f'{__file__}/../test/test_data'))
+TEST_FOLDER_OUT = Path.resolve(Path(f'{__file__}/../test/test_tmp'))
+DEFAULT_FILE_NAMES = [
+    'f2_script1_ipad_office1_35000.wav',
+    'f5733968_nohash_4.wav',
+    'f6581345_nohash_0.wav'
+]
+DEFAULT_TEST_FILES = [
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[0]),
+        DEFAULT_FILE_NAMES[0],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[0])
+    ),
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[1]),
+        DEFAULT_FILE_NAMES[1],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[1])
+    ),
+    TestFile(
+        str(TEST_FOLDER_IN / DEFAULT_FILE_NAMES[2]),
+        DEFAULT_FILE_NAMES[2],
+        str(TEST_FOLDER_OUT / DEFAULT_FILE_NAMES[2])
+    )
+]
+DEFAULT_SHOULD_PLOT = False
+DEFAULT_SAVE_SPECTROGRAMS = True
+DEFAULT_SAVE_AUDIO = True
+
+# ------------------------------
+# THREADING constants
+# ------------------------------
+
+NUM_THREADS_DB_PREPARE: int = 2
+NUM_PROCESSES_DB_PREPARE: int = 8
+
+# ------------------------------
+# NOISE constants
+# ------------------------------
+
+SNR_BOTTOM_BOUND = 10
+SNR_UPPER_BOUND = 15

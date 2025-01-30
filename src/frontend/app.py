@@ -3,16 +3,25 @@ Author: Jakub Lisowski, 2024
 
 FastAPI webserver providing a web interface for the model
 """
+import traceback
 from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.cnn.model_api import classify_file
 from src.frontend.app_state import AppState
 from src.frontend.models import ModelResponse
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app_state = AppState()
 
 
@@ -40,4 +49,4 @@ async def run_model(file: UploadFile = File(...)) -> ModelResponse:
 
         return ModelResponse(response=str(result))
     except Exception as e:  # pylint: disable=broad-exception-caught
-        return ModelResponse(response=f"Error processing file: {str(e)}")
+        return ModelResponse(response=f"Error: {e}, traceback: {str(traceback.format_exc())}")

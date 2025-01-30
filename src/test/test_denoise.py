@@ -1,167 +1,44 @@
 """
-Author: Łukasz Kryczka, 2024
+Author: Łukasz Kryczka
 
-Test cases for the denoise module.
-Currently, tests the basic denoising filter.
+Manual test cases for denoise module using a pretrained DNS64 model.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.io.wavfile import write, read
-from scipy.signal import spectrogram
 
+from src.constants import (DEFAULT_TEST_FILES,
+                           DEFAULT_SAVE_AUDIO,
+                           DEFAULT_SAVE_SPECTROGRAMS,
+                           DEFAULT_SHOULD_PLOT)
 from src.pipeline.audio_cleaner import AudioCleaner
 from src.pipeline.audio_data import AudioData
+from src.test.test_transformation import test_transformation
+
+TEST_FILES = DEFAULT_TEST_FILES
 
 
-def generate_sine_wave(frequency: int,
-                       duration: float,
-                       sample_rate: int,
-                       amplitude: float = 1.0) -> np.ndarray:
+def denoise_test_manual():
     """
-    Generate a sine wave of a given frequency.
+    Run the manual test for the denoise module.
+    It loads a WAV file, adds noise to the audio signal, denoises it using the
+    AudioCleaner class, and displays the original and denoised spectrograms.
 
-    :param frequency: Frequency of the sine wave in Hz
-    :param duration: Duration of the signal in seconds
-    :param sample_rate: Sample rate (samples per second)
-    :param amplitude: Amplitude of the sine wave
-    :return: Generated sine wave as a numpy array
+    The 'original + noise' and 'denoised' audio signals are saved to WAV files.
     """
 
-    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
-    return amplitude * np.sin(2 * np.pi * frequency * t)
+    def preprocess_func(audio_data: AudioData) -> AudioData:
+        noise = np.random.normal(0, 0.02, audio_data.audio_signal.shape)
+        audio_data.audio_signal += noise
+        return audio_data
 
+    def transformation_func(audio_data: AudioData) -> AudioData:
+        audio_cleaner = AudioCleaner()
+        return audio_cleaner.denoise(audio_data)
 
-def save_wave(file_name: str, data: np.ndarray, sample_rate: int) -> None:
-    """
-    Save a numpy array as a WAV file.
-
-    :param file_name: File name to save as
-    :param data: Audio data
-    :param sample_rate: Sample rate of the data
-    """
-
-    write(file_name, sample_rate, data)
-
-
-def load_wave(file_name: str) -> tuple[int, np.ndarray]:
-    """
-    Load a WAV file and return its sample rate and data.
-
-    :param file_name: File name to load
-    :return: Sample rate and audio data as numpy array
-    """
-
-    return read(file_name)
-
-
-# Actual test cases
-
-def test_denoise_basic_low_freq_filtering() -> None:
-    """
-    Test that frequencies below 50 Hz are reduced by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    low_freq = 20
-
-    sine_wave = generate_sine_wave(low_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
-        "Low frequencies were not properly reduced"
-
-
-def test_denoise_basic_high_freq_filtering() -> None:
-    """
-    Test that frequencies above 8500 Hz are reduced by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    high_freq = 16500
-
-    sine_wave = generate_sine_wave(high_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    assert np.max(np.abs(filtered_wave.audio_signal)) < 0.10, \
-        "High frequencies were not properly reduced"
-
-
-def manual_test_denoise_basic_passband_freq() -> None:
-    """
-    Test that frequencies within the passband (100 Hz - 8000 Hz)
-    are preserved by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    passband_freq = 2000
-
-    sine_wave = generate_sine_wave(passband_freq, duration, sample_rate)
-    sine_wave = AudioData(sine_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(sine_wave)
-
-    # Before
-    freqs, times, sxx = spectrogram(sine_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram before Denoising Passband Frequencies - Manual Check')
-    plt.show()
-
-    # After
-    freqs, times, sxx = spectrogram(filtered_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after Denoising Passband Frequencies - Manual Check')
-    plt.show()
-
-    # NOTE: Investigate
-    # ??? The results are not as expected and surprising
-
-    assert np.allclose(sine_wave.audio_signal, filtered_wave.audio_signal, atol=0.20), \
-        "Passband frequencies were not preserved"
-
-
-def manual_test_denoise_basic_mixed_freq() -> None:
-    """
-    Test that a mixture of frequencies is correctly filtered by the denoise_basic filter.
-    """
-
-    sample_rate = 44100
-    duration = 1.0
-    low_freq = 50
-    passband_freq1 = 500
-    passband_freq2 = 3000
-    high_freq = 12000
-
-    mixed_wave = (generate_sine_wave(low_freq, duration, sample_rate) +
-                  generate_sine_wave(passband_freq1, duration, sample_rate) +
-                  generate_sine_wave(passband_freq2, duration, sample_rate) +
-                  generate_sine_wave(high_freq, duration, sample_rate))
-
-    mixed_wave = AudioData(mixed_wave, sample_rate)
-    filtered_wave = AudioCleaner.denoise(mixed_wave)
-
-    # Manual check of the spectrogram
-    freqs, times, sxx = spectrogram(filtered_wave.audio_signal, fs=sample_rate, nperseg=256)
-    plt.pcolormesh(times, freqs, 10 * np.log10(sxx), shading='gouraud')
-    plt.ylabel('Frequency [Hz]')
-    plt.xlabel('Time [s]')
-    plt.title('Spectrogram after Denoising Mixed Frequencies - Manual Check')
-    plt.show()
-
-
-# Running all tests
-def manual_test() -> None:
-    """
-    Run all the tests
-    """
-
-    manual_test_denoise_basic_passband_freq()
-    manual_test_denoise_basic_mixed_freq()
+    test_transformation(transformation_func,
+                        "denoise",
+                        TEST_FILES,
+                        save_audio=DEFAULT_SAVE_AUDIO,
+                        save_spectrograms=DEFAULT_SAVE_SPECTROGRAMS,
+                        plot=DEFAULT_SHOULD_PLOT,
+                        preprocess_func=preprocess_func)

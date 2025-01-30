@@ -22,15 +22,31 @@ def get_random_file_path(dir_path: str, file_type: str) -> str:
     Returns:
         str: file path to a random audio file.
     """
-    while True:
-        files = [f for f in os.listdir(dir_path) if f.endswith(file_type)]
-        if files:
-            return str(os.path.join(dir_path, random.choice(files)))
-        subdirectories = [d for d in os.listdir(dir_path)
-                          if os.path.isdir(os.path.join(dir_path, d))]
-        if not subdirectories:
-            raise FileNotFoundError(f"No {file_type} files found in the directory.")
-        dir_path = str(os.path.join(dir_path, random.choice(subdirectories)))
+
+    files = [
+        os.path.join(dir_path, f)
+        for f in os.listdir(dir_path)
+        if f.endswith(file_type)
+    ]
+
+    if files:
+        return random.choice(files)
+
+    subdirs = [
+        os.path.join(dir_path, d)
+        for d in os.listdir(dir_path)
+        if os.path.isdir(os.path.join(dir_path, d))
+    ]
+
+    for subdir in subdirs:
+        try:
+            return get_random_file_path(subdir, file_type)
+        except FileNotFoundError:
+            continue
+
+    raise FileNotFoundError(
+        f"No {file_type} files found in the directory {dir_path} or its subdirectories."
+    )
 
 def process(file_path: str = "", directory: str = "", number_of_samples: int = 1) -> None:
     """
@@ -87,3 +103,9 @@ def main(argv: list[str]) -> None:
         raise ValueError("The number of samples must be at least 1.")
 
     process(args.file_path, args.directory, args.number)
+
+
+if __name__ == "__main__":
+    import sys
+
+    main(sys.argv[1:])
