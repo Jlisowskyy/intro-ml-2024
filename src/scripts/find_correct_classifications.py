@@ -1,8 +1,7 @@
 """
-Author: Tomasz Mycielski
-
-Module for classifying datasets with pretrained models
+Author: Michał Kwiatkowski
 """
+
 from pathlib import Path
 from itertools import islice
 import soundfile as sf

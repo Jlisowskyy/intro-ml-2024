@@ -1,4 +1,6 @@
 """
+Author: Michał Kwiatkowski
+
 This module provides functionality for generating adversarial audio examples
 to test the robustness of a trained PyTorch CNN model against adversarial attacks.
 The adversarial examples are crafted using the Fast Gradient Sign Method (FGSM)
