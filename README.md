@@ -25,7 +25,7 @@ The project task is to develop CNN model for intercom device detecting authorise
 ### Project Structure:
 
 ```
-├── examples
+├── notebooks
 ├── reports
 └── src
     ├── cnn
@@ -35,8 +35,7 @@ The project task is to develop CNN model for intercom device detecting authorise
     └── test
 ```
 
-- `examples`: Contains example code using jupyter notebooks.
-- `reports`: Contains reports and documentation created for project milestones etc.
+- `notebooks`: Contains example code using jupyter notebooks.
 - `src`: Contains the source code for the project.
   - `cnn`: Contains code for the CNN model.
   - `frontend`: Contains the code for the frontend of the project.
@@ -67,13 +66,26 @@ git clone https://github.com/Jlisowskyy/intro-ml-2024
 cd intro-ml-2024
 ```
 
-#### 3. Initialize the virtual environment:
+#### 3. Create directory inside `datasets` folder and place the dataset there:
+
+```shell
+mkdir datasets/<your_dataset_name>
+cp <your_dataset> datasets/<your_dataset_name>
+```
+
+#### 4. Copy the model to the `models` directory:
+
+```shell
+  cp <model_name> models
+```
+
+#### 5. Initialize the virtual environment:
 
 ```shell
 python -m venv .venv
 ```
 
-#### 4. Activate the virtual environment:
+#### 6. Activate the virtual environment:
 
 On Unix or macOS:
 
